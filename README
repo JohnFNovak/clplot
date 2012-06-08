@@ -17,3 +17,7 @@ To use:
 
   for more information call
     python plot.py -help
+
+Contents of this file:
+  plot.py - the program. 
+  various .txt files - testing files
