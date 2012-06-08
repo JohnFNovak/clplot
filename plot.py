@@ -16,8 +16,6 @@ import math
 import os
 import time
 import string
-import itertools
-import collections
 
 
 # Define a main() function
@@ -43,6 +41,8 @@ def main():
   Messy = False # This is a global flag the notes if there is text mixed with the data or other messyness
   global remnants
   remnants = [] # This is used if multiplot pile is called and a plot has to wait for the next file to be opened
+  global remnanterrors
+  remnanterrors = []
   global LefttoPlot
 
   LefttoPlot = False
@@ -133,7 +133,7 @@ def main():
     struct,data=remove_empties(struct,data)
     #print struct
     #for i in range(len(data)):
-      #print data[i]
+    #  print data[i]
 
     # Plot the stuff
     if len(struct)>1:
@@ -148,7 +148,7 @@ def main():
       smart_plot(np.array(x))
 
   if remnants:
-    plot(remnants)
+    plot(remnants,remnanterrors)
 
   if LefttoPlot:
     outputname = string.split(currentfile,".")[0]
@@ -259,6 +259,7 @@ def smart_plot(X):
   Form = None
 
   z=[]
+  errs=[]
 
   width = len(list(X[0,:]))
   height = len(list(X[:,0]))
@@ -295,15 +296,17 @@ def smart_plot(X):
             if Form[j+2+mults] == "y":
               z.append(x)
               z.append(list(X[:,count]))
+              errs.append(0)
             elif Form[j+2+mults] == "e":
-              print "errors are being ignored for now until we can learn to plot them"
+              errs[-1]=list(X[:,count])
             count = count + 1
           mults = mults + 1
         elif Form[j+1+mults] == "y":
           z.append(x)
           z.append(list(X[:,count]))
+          errs.append(0)
         elif Form[j+1+mults] == "e":
-          print "errors are being ignored for now until we can learn to plot them"
+          errs[-1]=list(X[:,count])
         count = count + 1
         if j+mults+2 == len(Form):
           break
@@ -326,15 +329,17 @@ def smart_plot(X):
             if Form[j+2+mults] == "y":
               z.append(x)
               z.append(list(X[count,:]))
+              errs.append(0)
             elif Form[j+2+mults] == "e":
-              print "errors are being ignored for now until we can learn to plot them"
+              errs[-1]=list(X[count,:])
             count = count + 1
           mults = mults + 1
         elif Form[j+1+mults] == "y":
           z.append(x)
           z.append(list(X[count,:]))
+          errs.append(0)
         elif Form[j+1+mults] == "e":
-          print "errors are being ignored for now until we can learn to plot them"
+          errs[-1]=list(X[count,:])
         count = count + 1
         if j+mults+2 == len(Form):
           break
@@ -344,26 +349,32 @@ def smart_plot(X):
     if is_it_ordered(list(X[:,0])):
       # ordered by the first column
       z=[list(X[:,0]),list(X[:,1])]
+      errs = [0] * len(z)
     elif is_it_ordered(list(X[:,1])):
       # ordered by the second column
       z[list(X[:,1]),list(X[:,0])]
+      errs = [0] * len(z)
     else:
       # not ordered
       print "No deducable ordering, I'll just pick which column is x"
       z=[list(X[:,0]),list(X[:,1])]
+      errs = [0] * len(z)
   elif width!=2 and height==2:
     # the good old fashioned two rows
     print "the good old fashioned two rows"
     if is_it_ordered(list(X[0,:])):
       # ordered by the first row
       z=[list(X[0,:]),list(X[1,:])]
+      errs = [0] * len(z)
     elif is_it_ordered(list(X[1,:])):
       # ordered by the second row
       z=[list(X[1,:]),list(X[0,:])]
+      errs = [0] * len(z)
     else:
       # not ordered
       print "No deducable ordering, I'll just pick which row is x"
       z=[list(X[0,:]),list(X[1,:])]
+      errs = [0] * len(z)
   elif width < 5 and height < 5:
     # we are going to have to look around for ordered things
     needx = True
@@ -377,6 +388,7 @@ def smart_plot(X):
         if i != xcol:
           z.append(list(X[:,xcol]))
           z.append(list(X[:,i]))
+          errs.append(0)
     if needx:
       for i in range(height):
         if is_it_ordered(list(X[i,:])):
@@ -388,6 +400,7 @@ def smart_plot(X):
           if i != xcol:
             z.append(list(X[xrow,:]))
             z.append(list(X[i,:]))
+            errs.append(0)
     if needx:
       print "I don't know what to do with this block. It's",width,"by",height,"and neither axis seems to be ordered"
   elif width < 5 and height > 7:
@@ -403,6 +416,7 @@ def smart_plot(X):
         if i != xcol:
           z.append(list(X[:,xcol]))
           z.append(list(X[:,i]))
+          errs.append(0)
   elif width > 7 and height < 5:
     # we will assume that it is in rows
     needx = True
@@ -416,6 +430,7 @@ def smart_plot(X):
         if i != xrow:
           z.append(list(X[xrow,:]))
           z.append(list(X[i,:]))
+          errs.append(0)
   elif width > 5 and height > 5 and not (width > 12 and height > 12) :
     # will will have to look around for oredered things
     needx = True
@@ -429,6 +444,7 @@ def smart_plot(X):
         if i != xcol:
           z.append(list(X[:,xcol]))
           z.append(list(X[:,i]))
+          errs.append(0)
     if needx:
       for i in range(height):
         if is_it_ordered(list(X[i,:])):
@@ -440,6 +456,7 @@ def smart_plot(X):
           if i != xrow:
             z.append(list(X[xrow,:]))
             z.append(list(X[i,:]))
+            errs.append(0)
     if needx:
       print "I don't know what to do with this block. It's",width,"by",height,"and neither axis seems to be ordered"
   else:
@@ -448,8 +465,10 @@ def smart_plot(X):
   if z:
     if MULTIP:
       global remnants
+      global remnanterrors
       global multicountpile
       z = remnants + z
+      errs = remnanterrors + errs
       multicountpile = 0
       #print (len(z)-len(z)%int(MULTIP))/int(MULTIP)/2
       if (len(z)-len(z)%int(MULTIP))/int(MULTIP)/2 > 1:
@@ -460,15 +479,17 @@ def smart_plot(X):
           #print z[:(int(MULTIP)*2)][0][:5]
           #print multicountpile,'\n'
           #print (int(MULTIP)*2),len(z)
-          plot(z[:(int(MULTIP)*2)])
+          plot(z[:(int(MULTIP)*2)],errs[:(int(MULTIP))])
           z = z[(int(MULTIP)*2):]
+          errs = errs[(int(MULTIP)):]
           multicountpile = multicountpile + 1
       remnants = z
+      remnanterrors = errs
       if remnants:
         LefttoPlot = True
     else:
       # just plot it
-      plot(z)
+      plot(z,errs)
     if Numbering:
       numbered = numbered + 1
 
@@ -536,7 +557,7 @@ def readdat(struct,block,data):
   return x
 
 
-def plot(z):
+def plot(z,errs):
   # This function takes a list z of lists and trys to plot them.
   # the first list is always x, and the folowing are always y's
 
@@ -567,15 +588,30 @@ def plot(z):
     plt.title(str(multicounttile))
     LefttoPlot = True
 
-  arg=[]
+  plottingerrors = True
+  for k in errs:
+    if k != 0:
+      plottingerrors = True
+
+  arg = []
 
   for k in range(0,len(z),2):
-    arg.append(z[k]) # x vector
-    arg.append(z[k+1]) # y vector
-    arg.append(points[(k/2)%len(points)]) # we loop over the point styles
+    z[k]=map(float,z[k])
+    z[k+1]=map(float,z[k+1])
+    if plottingerrors:
+      if errs[k/2] == 0:
+        plt.errorbar(z[k],z[k+1],yerr=[0]*len(z[k]),fmt=points[(k/2)%len(points)])
+      if errs[k/2] != 0:
+        errs[k/2]=map(float,errs[k/2])
+        #print (z[k],z[k+1],errs[k/2],points[(k/2)%len(points)])
+        plt.errorbar(z[k],z[k+1],yerr=errs[k/2],fmt=points[(k/2)%len(points)])
+    if not plottingerrors:
+      arg.append(z[k]) # x vector
+      arg.append(z[k+1])
+      arg.append(points[(k/2)%len(points)])
 
-  plt.plot(*arg);
-  plt.hold()
+  if not plottingerrors:
+    plt.plot(*arg)
 
   outputname = string.split(currentfile,".")[0]
 
