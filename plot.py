@@ -147,25 +147,25 @@ def main():
       x=readdat(struct,0,data)
       smart_plot(np.array(x))
 
-    if remnants:
-      plot(remnants)
+  if remnants:
+    plot(remnants)
 
-    if LefttoPlot:
-      outputname = string.split(currentfile,".")[0]
-      if numbered != 0:
-        outputname = outputname+"_"+str(numbered)
-      if MULTIT:
-        outputname = outputname+"_MULTIT"
-      if multicountpile != 0:
-        outputname = outputname+"_"+str(multicountpile+1)
-      if MULTIP:
-        outputname = outputname+"_MULTIP"
-      if TYPE[0]==".":
-        outputname=outputname+TYPE
-      else:
-        outputname=outputname+"."+TYPE
-      plt.savefig(outputname)
-      print"printed to",outputname
+  if LefttoPlot:
+    outputname = string.split(currentfile,".")[0]
+    if numbered != 0:
+      outputname = outputname+"_"+str(numbered)
+    if MULTIT:
+      outputname = outputname+"_tiled"
+    if multicountpile != 0:
+      outputname = outputname+"_"+str(multicountpile+1)
+    if MULTIP:
+      outputname = outputname+"_multip"
+    if TYPE[0]==".":
+      outputname=outputname+TYPE
+    else:
+      outputname=outputname+"."+TYPE
+    plt.savefig(outputname)
+    print"printed to",outputname
 
 
 def detect_blocks(dataarray):
@@ -582,11 +582,11 @@ def plot(z):
   if numbered != 0:
     outputname = outputname+"_"+str(numbered)
   if MULTIT:
-    outputname = outputname+"_MULTIT"
+    outputname = outputname+"_tiled"
   if multicountpile != 0:
     outputname = outputname+"_"+str(multicountpile)
   if MULTIP:
-    outputname = outputname+"_MULTIP"
+    outputname = outputname+"_multip"
   if TYPE[0]==".":
     outputname=outputname+TYPE
   else:
@@ -606,31 +606,65 @@ def plot_arragnement():
   # THis function looks at MULTIT and decides how to structure the multiplot
   # it returns a 2 tuple which is the root for the first 2 argument of the subplot command
 
+  found = False
+
   if math.sqrt(float(MULTIT))%1 == 0:
     # Or multiplot can be square
-    form=(math.sqrt(float(MULTIT)),math.sqrt(float(MULTIT)))
+    form=(int(math.sqrt(float(MULTIT))),int(math.sqrt(float(MULTIT))))
+    found = True
   elif int(MULTIT) == 3:
     form=(1,3)
-  elif float(MULTIT)%2 == 0:
-    # It's even, so we can make an almost square rectangle
+    found = True
+  if not found:
     looking = True
-    a=1;
-    while looking:
+    a = 1
+    while looking and a*(a+1) <= int(MULTIT):
+      if float(MULTIT) == float(a*(a+1)):
+        looking = False
+        found = True
+      else:
+        a = a+1
+    if found:
+      form = (a,a+1)
+  if not found and math.sqrt(float(MULTIT)+1)%1 == 0:
+    form=(int(math.sqrt(float(MULTIT)+1)),int(math.sqrt(float(MULTIT)+1)))
+    found = True
+  if not found:
+    looking = True
+    a = 1
+    while looking and a*(a+1) <= int(MULTIT)+1:
+      if float(MULTIT)+1 == float(a*(a+1)):
+        looking = False
+        found = True
+      else:
+        a = a+1
+    if found:
+      form = (a,a+1)
+  if not found and math.sqrt(float(MULTIT)+2)%1 == 0:
+    form=(int(math.sqrt(float(MULTIT)+2)),int(math.sqrt(float(MULTIT)+2)))
+    found = True
+  if not found:
+    looking = True
+    a = 1
+    while looking and a*(a+1) <= int(MULTIT)+2:
+      if float(MULTIT)+2 == float(a*(a+1)):
+        looking = False
+        found = True
+      else:
+        a = a+1
+    if found:
+      form = (a,a+1)
+  if not found:
+    looking = True
+    a = 1
+    while looking and a*(a+1) <= int(MULTIT):
       if float(MULTIT) <= float(a*(a+1)):
         looking = False
+        found = True
       else:
-        a=a+1
-    form=(a,a+1)
-  else:
-    #it's odd and not a square, so it will have an empty in the corner
-    looking = True
-    a=1;
-    while looking:
-      if float(int(MULTIT)+1) <= float(a*(a+1)):
-        looking = False
-      else:
-        a=a+1
-    form=(a,a+1)
+        a = a+1
+    if found:
+      form = (a,a+1)
 
   print " I have decided that the multiplots will be",form[0],"by",form[1]
 
