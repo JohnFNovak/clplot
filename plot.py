@@ -1,9 +1,14 @@
+#KN: While OK, this isn't normal python convention. Normally, comments at the beginning of a python script say what kind of python script it is,
+#or commands to the terminal on how to execute, i.e. #bin/bash/python for a python script, #bin/bash/pypi for a PyPi script, etc. Move your
+#copyright/info to a README.
+
 # A universal plotting script
 #
 # John Novak
 # June 4, 2012
 
 
+#KN: This isn't the place to put this. Docstrings go inside functions.
 """A Python program that takes a file or list of files
 and creates plots of the data.
 """
@@ -18,10 +23,16 @@ import time
 import string
 
 
+#Poor Python style. Variable definitions can go into the if __name__ == "__main__" part, the rest should be
+#more specific functions.
+
 # Define a main() function
 def main():
+    #KN: Python tabs are 4 spaces, not 2 (http://www.python.org/dev/peps/pep-0008/)
+    #KN: PEP-8 is the official python style guide. Read it, use it, love it.
   # Read in the command line parameters. NB: sys.argv[0] should be 'plot.py'
   files = []
+  #KN: Its usually simpler to just declare one global dictionary, and then fill in the various config settings as entries in the dict
   global formats
   formats = []
   outputs = []
@@ -49,7 +60,11 @@ def main():
 
   if len(sys.argv)==1:
     givehelp(0)
+
+    
   for i in range(1,len(sys.argv)):
+      #KN: Its way simpler to just iterate over the items. Just do "for flag in sys.argv" and replace sys.argv[i] with flag.
+      #Also, performance tweak: Check if the flag has a dash in it first, otherwise its a filename, i.e. "if '-' in flag: " 
     if "-f" == sys.argv[i][:2]:
       # format flag
       case = 2
@@ -68,6 +83,7 @@ def main():
     elif "-mt" == sys.argv[i][:3]:
       # multiplot tile flag
       case = 5
+    #KN: Just check if the string contains "-h"
     elif "-help" == sys.argv[i][:5] or "-h" == sys.argv[i][:2]:
       givehelp(1)
     elif "-color" == sys.argv[i][:6] or "-c" == sys.argv[i][:2]:
@@ -118,6 +134,12 @@ def main():
     currentfile=filename
     numbered = 0;
     data=[]
+    
+    #Use a context manager for this, python handles opening and closing files way more efficiently that way
+    #with open(filename, 'r') as datafile:
+    #   do stuff
+    #http://effbot.org/zone/python-with-statement.htm
+    
     datafile=open(filename,"r");
 
     # Now read data file
@@ -129,13 +151,16 @@ def main():
     #print struct
     #for i in range(len(data)):
     #  print data[i]
-
+    
+    #KN: This can be done far more efficiently using a filter() function. Either specify a one liner using a lambda function or
+    #write a function that returns True or False
     struct,data=remove_empties(struct,data)
     #print struct
     #for i in range(len(data)):
     #  print data[i]
 
     # Plot the stuff
+    #KN: Not needed. Make sure the struct is a list, and just have the for loop, followed by Numbering = len(struct) > 1
     if len(struct)>1:
       # make multiple plots, each with the name of the input file followed by a _#
       for i in range(len(struct)):
@@ -148,6 +173,7 @@ def main():
       smart_plot(np.array(x))
 
   if remnants:
+      #KN: Where is this imported?
     plot(remnants,remnanterrors)
 
   if LefttoPlot:
@@ -169,6 +195,7 @@ def main():
 
 
 def detect_blocks(dataarray):
+    #KN: Use doctstrings instead of comments
   # This function runs over an array of data pulled from a file and detects
   # the structure so that the proper plotting method can be deduced
   #
@@ -735,6 +762,8 @@ def plot_arragnement():
 
 
 def check_type(x):
+    #KN: While this is a nice job, you just recreated python's type() function
+    #http://stackoverflow.com/questions/2225038/python-determine-the-type-of-an-object
   # This function returns a string. It returns "str" if x is a string, and "num" if x is a number
 
   try:
@@ -754,6 +783,7 @@ def skip(iterator, n):
 
 def givehelp(a):
   # This command prints out some help
+  #KN: Use triple quotes for this, it generates verbatim strings
   print "\nThis is a function which trys to inteligently create plots from text files."
   print "This program is 'inteligent' in that it will try various assumptions about the format of the data in the files"
   print "and the form the output should be given in. So, in many cases it can produce reasonable plots even if no information"
