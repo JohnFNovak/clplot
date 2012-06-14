@@ -323,21 +323,27 @@ def smart_plot(X):
             if Form[j+2+mults] == "y":
               z.append(x)
               z.append(list(X[:,count]))
-              errs.append(0)
-            if Form[j+2+mults] == "x":
-              errs.append(0)
+              errs.append([0]*len(x))
+              errs.append([0]*len(list(X[count,:])))
+            #if Form[j+2+mults] == "x":
+            #  errs.append(0)
             elif Form[j+2+mults] == "e":
-              errs[-1]=list(X[:,count])
+              if Form[j+3+mults] == "y": 
+                errs[-1]=list(X[count,:])
+              if Form[j+3+mults] == "x": 
+                errs[-2]=list(X[count,:])
             count = count + 1
           mults = mults + 1
         elif Form[j+1+mults] == "y":
           z.append(x)
           z.append(list(X[:,count]))
-          errs.append(0)
-        elif Form[j+1+mults] == "x":
-          errs.append(0)
+        #elif Form[j+1+mults] == "x":
+        #  errs.append(0)
         elif Form[j+1+mults] == "e":
-           errs[-1]=list(X[:,count])
+          if Form[j+2+mults] == "y": 
+            errs[-1]=list(X[:,count])
+          if Form[j+2+mults] == "x": 
+             errs[-2]=list(X[:,count])
         count = count + 1
         if j+mults+2 == len(Form):
           break
@@ -360,21 +366,29 @@ def smart_plot(X):
             if Form[j+2+mults] == "y":
               z.append(x)
               z.append(list(X[count,:]))
-              errs.append(0)
-            if Form[j+2+mults] == "x":
-              errs.append(0)
+              errs.append([0]*len(x))
+              errs.append([0]*len(list(X[count,:])))
+            #if Form[j+2+mults] == "x":
+            #  errs.append(0)
             elif Form[j+2+mults] == "e":
-              errs[-1]=list(X[:,count])
+              if Form[j+3+mults] == "y": 
+                errs[-1]=list(X[count,:])
+              if Form[j+3+mults] == "x": 
+                errs[-2]=list(X[count,:])
             count = count + 1
           mults = mults + 1
         elif Form[j+1+mults] == "y":
           z.append(x)
           z.append(list(X[:,count]))
-          errs.append(0)
-        elif Form[j+1+mults] == "x":
-          errs.append(0)
+          errs.append([0]*len(x))
+          errs.append([0]*len(list(X[:,count])))
+        #elif Form[j+1+mults] == "x":
+        #  errs.append(0)
         elif Form[j+1+mults] == "e":
-           errs[-1]=list(X[:,count])
+          if Form[j+2+mults] == "y": 
+            errs[-1]=list(X[:,count])
+          if Form[j+2+mults] == "x": 
+             errs[-2]=list(X[:,count])
         count = count + 1
         if j+mults+2 == len(Form):
           break
@@ -384,38 +398,38 @@ def smart_plot(X):
     if is_it_ordered(list(X[:,0])):
       # ordered by the first column
       z=[list(X[:,0]),list(X[:,1])]
-      errs = [0] * len(z)
-      errs = [[0]*len(z[0])] + errs
+      errs = [[0] * len(z[0])] * 2
+      #errs = [[0]*len(z[0])] + errs
     elif is_it_ordered(list(X[:,1])):
       # ordered by the second column
       z[list(X[:,1]),list(X[:,0])]
-      errs = [0] * len(z)
-      errs = [[0]*len(z[0])] + errs
+      errs = [[0] * len(z[0])] * 2
+      #errs = [[0]*len(z[0])] + errs
     else:
       # not ordered
       print "No deducable ordering, I'll just pick which column is x"
       z=[list(X[:,0]),list(X[:,1])]
-      errs = [0] * len(z)
-      errs = [[0]*len(z[0])] + errs
+      errs = [[0] * len(z[0])] * 2
+      #errs = [[0]*len(z[0])] + errs
   elif width!=2 and height==2:
     # the good old fashioned two rows
     print "the good old fashioned two rows"
     if is_it_ordered(list(X[0,:])):
       # ordered by the first row
       z=[list(X[0,:]),list(X[1,:])]
-      errs = [0] * len(z)
-      errs = [[0]*len(z[0])] + errs
+      errs = [[0] * len(z[0])] * 2
+      #errs = [[0]*len(z[0])] + errs
     elif is_it_ordered(list(X[1,:])):
       # ordered by the second row
       z=[list(X[1,:]),list(X[0,:])]
-      errs = [0] * len(z)
-      errs = [[0]*len(z[0])] + errs
+      errs = [[0] * len(z[0])] * 2
+      #errs = [[0]*len(z[0])] + errs
     else:
       # not ordered
       print "No deducable ordering, I'll just pick which row is x"
       z=[list(X[0,:]),list(X[1,:])]
-      errs = [0] * len(z)
-      errs = [[0]*len(z[0])] + errs
+      errs = [[0] * len(z[0])] * 2
+      #errs = [[0]*len(z[0])] + errs
   elif width < 5 and height < 5:
     # we are going to have to look around for ordered things
     needx = True
@@ -427,10 +441,10 @@ def smart_plot(X):
     if not needx:
       for i in range(width):
         if i != xcol:
+          errs.append([0]*len(list(X[:,xcol])))
           errs.append([0]*len(list(X[:,i])))
           z.append(list(X[:,xcol]))
           z.append(list(X[:,i]))
-          errs.append(0)
     if needx:
       for i in range(height):
         if is_it_ordered(list(X[i,:])):
@@ -440,10 +454,10 @@ def smart_plot(X):
       if not needx:
         for i in range(height):
           if i != xcol:
+            errs.append([0]*len(list(X[xcol,:])))
             errs.append([0]*len(list(X[i,:])))
             z.append(list(X[xrow,:]))
             z.append(list(X[i,:]))
-            errs.append(0)
     if needx:
       print "I don't know what to do with this block. It's",width,"by",height,"and neither axis seems to be ordered"
   elif width < 5 and height > 7:
@@ -457,10 +471,10 @@ def smart_plot(X):
     if not needx:
       for i in range(width):
         if i != xcol:
+          errs.append([0]*len(list(X[:,xcol])))
           errs.append([0]*len(list(X[:,i])))
           z.append(list(X[:,xcol]))
           z.append(list(X[:,i]))
-          errs.append(0)
   elif width > 7 and height < 5:
     # we will assume that it is in rows
     needx = True
@@ -472,10 +486,10 @@ def smart_plot(X):
     if not needx:
       for i in range(height):
         if i != xrow:
+          errs.append([0]*len(list(X[xcol,:])))
           errs.append([0]*len(list(X[i,:])))
           z.append(list(X[xrow,:]))
           z.append(list(X[i,:]))
-          errs.append(0)
   elif width > 5 and height > 5 and not (width > 12 and height > 12) :
     # will will have to look around for oredered things
     needx = True
@@ -487,10 +501,10 @@ def smart_plot(X):
     if not needx:
       for i in range(width):
         if i != xcol:
+          errs.append([0]*len(list(X[:,xcol])))
           errs.append([0]*len(list(X[:,i])))
           z.append(list(X[:,xcol]))
           z.append(list(X[:,i]))
-          errs.append(0)
     if needx:
       for i in range(height):
         if is_it_ordered(list(X[i,:])):
@@ -500,10 +514,10 @@ def smart_plot(X):
       if not needx:
         for i in range(height):
           if i != xrow:
+            errs.append([0]*len(list(X[xcol,:])))
             errs.append([0]*len(list(X[i,:])))
             z.append(list(X[xrow,:]))
             z.append(list(X[i,:]))
-            errs.append(0)
     if needx:
       print "I don't know what to do with this block. It's",width,"by",height,"and neither axis seems to be ordered"
   else:
@@ -639,22 +653,25 @@ def plot(z,errs):
     LefttoPlot = True
 
   plottingerrors = True
-  for k in errs:
-    if k != 0:
-      plottingerrors = True
+  #for k in errs:
+  #  if k != 0:
+  #    plottingerrors = True
 
   arg = []
 
-  print z
-  print errs
+  #print z
+  #print errs
 
   for k in range(0,len(z),2):
     z[k]=map(float,z[k])
     z[k+1]=map(float,z[k+1])
     if plottingerrors:
-      errs[k]=map(float,errs[k])
+      if errs[k] == 0:
+        errs[k]=[0]*len(z[k])
+      else:
+        errs[k]=map(float,errs[k])
       if errs[k+1] == 0:
-        plt.errorbar(z[k],z[k+1],xerr=errs[k],yerr=[0]*len(z[k]),fmt=points[((k+1)/2)%len(points)])
+        plt.errorbar(z[k],z[k+1],xerr=errs[k],yerr=[0]*len(z[k+1]),fmt=points[((k+1)/2)%len(points)])
       if errs[k+1] != 0:
         errs[k+1]=map(float,errs[k+1])
         #print (z[k],z[k+1],errs[k/2],points[(k/2)%len(points)])
