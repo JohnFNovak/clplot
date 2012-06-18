@@ -38,7 +38,7 @@ def main():
   outputs = []
   case = 0 # 0 is reading files, 1 is outputs, 2 is formats
   global TYPE
-  TYPE="png" # the default output is in png format
+  TYPE="eps" # the default output is in eps format
   global MULTIT
   global MULTIP
   global layout
@@ -147,30 +147,31 @@ def main():
       data.append(tuple(line.split()))
 
     # Make decisions about what is in the file
-    struct=detect_blocks(data)
-    #print struct
-    #for i in range(len(data)):
-    #  print data[i]
-    
-    #KN: This can be done far more efficiently using a filter() function. Either specify a one liner using a lambda function or
-    #write a function that returns True or False
-    struct,data=remove_empties(struct,data)
-    #print struct
-    #for i in range(len(data)):
-    #  print data[i]
+    if len(data) > 0:
+      struct=detect_blocks(data)
+      #print struct
+      #for i in range(len(data)):
+      #  print data[i]
+      
+      #KN: This can be done far more efficiently using a filter() function. Either specify a one liner using a lambda function or
+      #write a function that returns True or False
+      struct,data=remove_empties(struct,data)
+      #print struct
+      #for i in range(len(data)):
+      #  print data[i]
 
-    # Plot the stuff
-    #KN: Not needed. Make sure the struct is a list, and just have the for loop, followed by Numbering = len(struct) > 1
-    if len(struct)>1:
-      # make multiple plots, each with the name of the input file followed by a _#
-      for i in range(len(struct)):
-        Numbering = True
-        x=readdat(struct,i,data)
+      # Plot the stuff
+      #KN: Not needed. Make sure the struct is a list, and just have the for loop, followed by Numbering = len(struct) > 1
+      if len(struct)>1:
+        # make multiple plots, each with the name of the input file followed by a _#
+        for i in range(len(struct)):
+          Numbering = True
+          x=readdat(struct,i,data)
+          smart_plot(np.array(x))
+      else:
+        # just make one plot, with the same name as the input file
+        x=readdat(struct,0,data)
         smart_plot(np.array(x))
-    else:
-      # just make one plot, with the same name as the input file
-      x=readdat(struct,0,data)
-      smart_plot(np.array(x))
 
   if remnants:
       #KN: Where is this imported?
