@@ -1,3 +1,4 @@
+#!/usr/bin/python -tt
 #KN: While OK, this isn't normal python convention. Normally, comments at the beginning of a python script say what kind of python script it is,
 #or commands to the terminal on how to execute, i.e. #bin/bash/python for a python script, #bin/bash/pypi for a PyPi script, etc. Move your
 #copyright/info to a README.
@@ -329,22 +330,24 @@ def smart_plot(X):
             #if Form[j+2+mults] == "x":
             #  errs.append(0)
             elif Form[j+2+mults] == "e":
-              if Form[j+3+mults] == "y": 
+              if Form[j+1+mults] == "y": 
                 errs[-1]=list(X[count,:])
-              if Form[j+3+mults] == "x": 
+              if Form[j+1+mults] == "x": 
                 errs[-2]=list(X[count,:])
             count = count + 1
           mults = mults + 1
         elif Form[j+1+mults] == "y":
           z.append(x)
           z.append(list(X[:,count]))
+          errs.append([0]*len(x))
+          errs.append([0]*len(list(X[:,count])))
         #elif Form[j+1+mults] == "x":
         #  errs.append(0)
         elif Form[j+1+mults] == "e":
-          if Form[j+2+mults] == "y": 
+          if Form[j+mults] == "y": 
             errs[-1]=list(X[:,count])
-          if Form[j+2+mults] == "x": 
-             errs[-2]=list(X[:,count])
+          if Form[j+mults] == "x": 
+            errs[-2]=list(X[:,count])
         count = count + 1
         if j+mults+2 == len(Form):
           break
@@ -372,9 +375,9 @@ def smart_plot(X):
             #if Form[j+2+mults] == "x":
             #  errs.append(0)
             elif Form[j+2+mults] == "e":
-              if Form[j+3+mults] == "y": 
+              if Form[j+1+mults] == "y": 
                 errs[-1]=list(X[count,:])
-              if Form[j+3+mults] == "x": 
+              if Form[j+1+mults] == "x": 
                 errs[-2]=list(X[count,:])
             count = count + 1
           mults = mults + 1
@@ -386,10 +389,10 @@ def smart_plot(X):
         #elif Form[j+1+mults] == "x":
         #  errs.append(0)
         elif Form[j+1+mults] == "e":
-          if Form[j+2+mults] == "y": 
+          if Form[j+mults] == "y": 
             errs[-1]=list(X[:,count])
-          if Form[j+2+mults] == "x": 
-             errs[-2]=list(X[:,count])
+          if Form[j+mults] == "x": 
+            errs[-2]=list(X[:,count])
         count = count + 1
         if j+mults+2 == len(Form):
           break
@@ -491,7 +494,7 @@ def smart_plot(X):
           errs.append([0]*len(list(X[i,:])))
           z.append(list(X[xrow,:]))
           z.append(list(X[i,:]))
-  elif width > 5 and height > 5 and not (width > 12 and height > 12) :
+  elif width > 5 and height > 5:
     # will will have to look around for oredered things
     needx = True
     for i in range(width):
