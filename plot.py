@@ -172,8 +172,23 @@ def main():
         datafile=open(filename,"r");
 
         # Now read data file
+        test = datafile.readline()
+        while test[0] == "#" and len(test) > 1: # Not a comment or empty
+            test = datafile.readline()
+        delimiter = ""
+        if len(test.split(" "))>1:
+            delimiter = " "
+        elif len(test.split(","))>1:
+            delimiter = ","
+        elif len(test.split(";"))>1:
+            delimiter = ";"
+        elif len(test.split("."))>1:
+            delimiter = "."
+        else:
+            print "Um, we can't figure out what you are using for data seperation"
+        datafile.seek(0)
         for line in datafile:
-            data.append(tuple(line.split()))
+            data.append(tuple(line.split(delimiter)))
 
         # Make decisions about what is in the file
         if len(data) > 0:
