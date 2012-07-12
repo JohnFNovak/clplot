@@ -60,7 +60,10 @@ def main():
     global y_range
     global x_label
     global y_label
+    global x_log
+    global y_log
 
+    x_log = y_log = False
     x_range = y_range = x_label = y_label = None
 
     LefttoPlot = False
@@ -104,6 +107,10 @@ def main():
             case = 10
         elif "-yl" == sys.argv[i][:3]:
             case = 11
+        elif "-logx" == sys.argv[i][:5]:
+            x_log = True
+        elif "-logy" == sys.argv[i][:5]:
+            y_log = True
         #elif "-" == sys.argv[i][:1]:
         #    case = -1
         #    print "flag",sys.argv[i],"not recognized"
@@ -661,6 +668,8 @@ def plot(z,errs):
     global y_range
     global x_label
     global y_label
+    global x_log
+    global y_log
     points=[]
 
     if Ucolor:
@@ -721,6 +730,10 @@ def plot(z,errs):
         plt.xlabel(x_label)
     if y_label:
         plt.ylabel(y_label)
+    if x_log:
+        plt.xscale('log')
+    if y_log:
+        plt.yscale('log')
 
     outputname = string.split(currentfile,".")[0]
 
@@ -867,6 +880,9 @@ def givehelp(a):
         print "        over. The color options are: b,g,r,c,m,y,k"
         print "-s: Point Style: The '-s' flag can be used to specify the point style. Multiple styles can be specified and they"
         print "        will be iterated over. The point style options are:-,--,-.,:,.,,,o,v,^,<,>,1,2,3,4,s,p,*,h,H,+,x,D,d,|,_\n"
+        print "-xl,-yl: Set X and y labels. SHould be followed by a string, which can be in quotes"
+        print "-logx,-logy: set X and/or Y axes to be log scales"
+        print "-xr,-yr: Set scale of X and Y ranges, should be followed with two numbers sepearated by a colon. Ex: -xr 1:5"
         print "Example:"
         print "        I have a large number of files and I would like them to be plotted with 9 plots tiled per output. I would like them to "
         print "        be eps files, and I have a thing for green circles. In each file the data is in columns 6 wide, but I only want the first"
