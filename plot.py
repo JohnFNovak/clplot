@@ -43,6 +43,7 @@ def main():
     global MULTIT
     global MULTIP
     global layout
+    global columnsfirst
     MULTIT = None
     MULTIP = None
     global Ucolor
@@ -67,6 +68,8 @@ def main():
     x_range = y_range = x_label = y_label = None
 
     LefttoPlot = False
+    columnsfirst = False
+    layout = None
 
     if len(sys.argv)==1:
         givehelp(0)
@@ -75,42 +78,46 @@ def main():
     for i in range(1,len(sys.argv)):
             #KN: Its way simpler to just iterate over the items. Just do "for flag in sys.argv" and replace sys.argv[i] with flag.
             #Also, performance tweak: Check if the flag has a dash in it first, otherwise its a filename, i.e. "if '-' in flag: " 
-        if "-f" == sys.argv[i][:2]:
+        if "-f" == sys.argv[i]:
             # format flag
             case = 2
-        elif "-i" == sys.argv[i][:2]:
+        elif "-i" == sys.argv[i]:
             # input file flag
             case = 0
-        elif "-o" == sys.argv[i][:2]:
+        elif "-o" == sys.argv[i]:
             # output file flag
             case = 1
-        elif "-t" == sys.argv[i][:2]:
+        elif "-t" == sys.argv[i]:
             # output type flag
             case = 3
-        elif "-mp" == sys.argv[i][:3]:
+        elif "-mp" == sys.argv[i]:
             # multiplot pile flag
             case = 4
-        elif "-mt" == sys.argv[i][:3]:
+        elif "-mt" == sys.argv[i]:
             # multiplot tile flag
             case = 5
         elif "-h" == sys.argv[i][:2]:
             givehelp(1)
-        elif "-c" == sys.argv[i][:2]:
+        elif "-c" == sys.argv[i]:
             case = 6
-        elif "-s" == sys.argv[i][:2]:
+        elif "-s" == sys.argv[i]:
             case = 7
-        elif "-xr" == sys.argv[i][:3]:
+        elif "-xr" == sys.argv[i]:
             case = 8
-        elif "-yr" == sys.argv[i][:3]:
+        elif "-yr" == sys.argv[i]:
             case = 9
-        elif "-xl" == sys.argv[i][:3]:
+        elif "-xl" == sys.argv[i]:
             case = 10
-        elif "-yl" == sys.argv[i][:3]:
+        elif "-yl" == sys.argv[i]:
             case = 11
-        elif "-logx" == sys.argv[i][:5]:
+        elif "-logx" == sys.argv[i]:
             x_log = True
-        elif "-logy" == sys.argv[i][:5]:
+        elif "-logy" == sys.argv[i]:
             y_log = True
+        elif '-layout' == sys.argv[i]:
+            case = 12
+        elif '-columnsfirst' == sys.argv[i]:
+            columnsfirst = True
         #elif "-" == sys.argv[i][:1]:
         #    case = -1
         #    print "flag",sys.argv[i],"not recognized"
@@ -128,7 +135,11 @@ def main():
                 MULTIP=sys.argv[i] # number of plots per plot
             if case == 5:
                 MULTIT = sys.argv[i] # number of plots per plot
-                layout = plot_arragnement()
+                #if not layout:
+                #    layout = plot_arragnement()
+                #if layout and (layout[0]*layout[1] < int(MULTIT)):
+                #    print "The layout that you specified was too small"
+                #    layout = plot_arragnement()
             if case == 6:
                 Ucolor.append(sys.argv[i])
             if case == 7:
@@ -141,8 +152,22 @@ def main():
                 x_label = sys.argv[i]
             if case == 11:
                 y_label = sys.argv[i]
+            if case == 12:
+                layout = tuple(map(int,sys.argv[i].split(":")))
+                #if MULTIT and (layout[0]*layout[1] < int(MULTIT)):
+                #    print "The layout that you specified was too small"
+                #    layout = plot_arragnement()
             if case == -1:
                 print "ignoring",sys.argv[i]
+
+    if MULTIT and layout:
+        if (layout[0]*layout[1] < int(MULTIT)):
+            print "The layout that you specified was too small"
+            layout = plot_arragnement()
+        else:
+            print "We are using the layout you specified:",layout[0],"by",layout[1]
+    if MULTIT and not layout:
+        layout = plot_arragnement()
     
     if outputs and (len(outputs)!=len(files)) and not (MULTIT or MULTIP):
         print "If you are going to specify output names, you must specify one output file per input file."
@@ -162,33 +187,14 @@ def main():
         print "plotting",filename
         currentfile=filename
         numbered = 0;
-        data=[]
         
         #Use a context manager for this, python handles opening and closing files way more efficiently that way
         #with open(filename, 'r') as datafile:
         #     do stuff
         #http://effbot.org/zone/python-with-statement.htm
-        
-        datafile=open(filename,"r");
 
         # Now read data file
-        test = datafile.readline()
-        while test[0] == "#" and len(test) > 1: # Not a comment or empty
-            test = datafile.readline()
-        delimiter = ""
-        if len(test.split(" "))>1:
-            delimiter = " "
-        elif len(test.split(","))>1:
-            delimiter = ","
-        elif len(test.split(";"))>1:
-            delimiter = ";"
-        elif len(test.split("."))>1:
-            delimiter = "."
-        else:
-            print "Um, we can't figure out what you are using for data seperation"
-        datafile.seek(0)
-        for line in datafile:
-            data.append(tuple(line.split(delimiter)))
+        data=read_data(filename)
 
         # Make decisions about what is in the file
         if len(data) > 0:
@@ -240,15 +246,9 @@ def main():
 
 
 def detect_blocks(dataarray):
-    #KN: Use doctstrings instead of comments
-    # This function runs over an array of data pulled from a file and detects
-    # the structure so that the proper plotting method can be deduced
-    #
-    # the structure is returned as a list. Each entry is one block of the 
-    # data in the form of (width of block, height of block)
-    #
-    # This will detect contiguous rectangular blocks of data with the same 
-    # formats of text vs numbers
+    """This function runs over an array of data pulled from a file and detects the structure so that the proper plotting method can be deduced
+    the structure is returned as a list. Each entry is one block of the data in the form of (width of block, height of block)
+    This will detect contiguous rectangular blocks of data with the same formats of text vs numbers"""
     global Messy
     
     width=[]
@@ -261,13 +261,13 @@ def detect_blocks(dataarray):
     height.append(1)
     mixed = False
     for i in range(len(dataarray[0])):
-        if check_type(dataarray[0][i])=="str":
-            previous.append("str")
+        if check_type(dataarray[0][i])=='str':
+            previous.append(check_type(dataarray[0][i]))
             if i != 0:
                 mixed = True
                 Messy = True
         else:
-            previous.append("num")
+            previous.append(check_type(dataarray[0][i]))
     if mixed:
         print "you seem to have text interspersed with your data"
         print "Does this look familiar?:",' '.join(dataarray[0])
@@ -287,13 +287,13 @@ def detect_blocks(dataarray):
                 width.append(len(dataarray[i]))
                 previous=[]
                 for x in range(len(dataarray[i])):
-                    if check_type(dataarray[i][x])=="str":
-                        previous.append("str")
+                    if check_type(dataarray[i][x])=='str':
+                        previous.append(check_type(dataarray[i][x]))
                         if x != 0:
                             mixed = True
                             Messy = True
                     else:
-                        previous.append("num")
+                        previous.append(check_type(dataarray[i][x]))
             if mixed:
                 print "you seem to have text interspersed with your data"
                 print "Does this look familiar?:",' '.join(dataarray[i])
@@ -303,13 +303,13 @@ def detect_blocks(dataarray):
             width.append(len(dataarray[i]))
             previous=[]
             for x in range(len(dataarray[i])):
-                if check_type(dataarray[i][x])=="str":
-                    previous.append("str")
+                if check_type(dataarray[i][x])=='str':
+                    previous.append(check_type(dataarray[i][x]))
                     if x != 0:
                         mixed = True
                         Messy = True
                 else:
-                    previous.append("num")
+                    previous.append(check_type(dataarray[i][x]))
             if mixed:
                 print "you seem to have text interspersed with your data"
                 print "Does this look familiar?:",' '.join(dataarray[i])
@@ -321,9 +321,7 @@ def detect_blocks(dataarray):
     return structure
 
 def smart_plot(X):
-    # This function takes a rectangular arry of data and plots it
-    # it first looks at the dimensions of the data, the it 
-    # 'decides' the best way to plot it. Hence, 'smart plot'
+    """This function takes a rectangular arry of data and plots it first looks at the dimensions of the data, the it 'decides' the best way to plot it. Hence, 'smart plot'"""
     global numbered
     global Numbering
     global LefttoPlot
@@ -361,7 +359,7 @@ def smart_plot(X):
                 x = range(height)
             count = 0
             for j in range(len(Form)-1):
-                if check_type(Form[j+1+mults]) == "num":
+                if check_type(Form[j+1+mults]) == 'num':
                     if int(Form[j+1+mults]) == 1:
                         print "You are a moron, there should be no 1's in your format flag, stupid"
                     for k in range(1,int(Form[j+1+mults])):
@@ -406,7 +404,7 @@ def smart_plot(X):
                 x = range(width)
             count = 0
             for j in range(len(Form)-1):
-                if check_type(Form[j+1+mults]) == "num":
+                if check_type(Form[j+1+mults]) == 'num':
                     if int(Form[j+1+mults]) == 1:
                         print "You are a moron, there should be no 1's in your format flag, stupid"
                     for k in range(1,int(Form[j+1+mults])):
@@ -606,8 +604,7 @@ def smart_plot(X):
 
 
 def is_it_ordered(vals):
-    # This function takes a list of numbers are returns whether
-    # or not they are in order
+    """This function takes a list of numbers are returns whether or not they are in order"""
 
     ordered = False
 
@@ -620,8 +617,7 @@ def is_it_ordered(vals):
 
 
 def remove_empties(struct,x):
-    # This function runs through the data and the structure array and
-    # removes entries that are either empty or are singular
+    """This function runs through the data and the structure array and removes entries that are either empty or are singular"""
 
     linenum=len(x)-1
     structBK=struct
@@ -669,8 +665,7 @@ def readdat(struct,block,data):
 
 
 def plot(z,errs):
-    # This function takes a list z of lists and trys to plot them.
-    # the first list is always x, and the folowing are always y's
+    """This function takes a list z of lists and trys to plot them. the first list is always x, and the folowing are always y's"""
 
     global multicounttile
     global multicountpile
@@ -685,6 +680,7 @@ def plot(z,errs):
     global y_label
     global x_log
     global y_log
+    global columnsfirst
     points=[]
 
     if Ucolor:
@@ -701,7 +697,10 @@ def plot(z,errs):
 
     if MULTIT:
         multicounttile = multicounttile + 1
-        plt.subplot2grid((layout[0],layout[1]),(((multicounttile-1)-(multicounttile-1)%layout[1])/layout[1],((multicounttile-1)%layout[1])))
+        if not columnsfirst:
+            plt.subplot2grid((layout[0],layout[1]),(((multicounttile-1)-(multicounttile-1)%layout[1])/layout[1],((multicounttile-1)%layout[1])))
+        if columnsfirst:
+            plt.subplot2grid((layout[0],layout[1]),((multicounttile-1)%layout[1])),(((multicounttile-1)-(multicounttile-1)%layout[1])/layout[1])
         plt.title(str(multicounttile))
         LefttoPlot = True
 
@@ -776,8 +775,7 @@ def plot(z,errs):
 
 
 def plot_arragnement():
-    # THis function looks at MULTIT and decides how to structure the multiplot
-    # it returns a 2 tuple which is the root for the first 2 argument of the subplot command
+    """This function looks at MULTIT and decides how to structure the multiplot it returns a 2 tuple which is the root for the first 2 argument of the subplot command"""
 
     found = False
 
@@ -864,6 +862,44 @@ def skip(iterator, n):
     collections.deque(itertools.islice(iterator, n), maxlen=0)
 
 
+def read_data(filename):   
+    data=[]
+    datafile=open(filename,"r");
+
+    test = datafile.readline()
+    while test[0] == "#" and len(test) > 1: # Not a comment or empty
+        test = datafile.readline()
+    delimiter = ""
+    if len(test.split(" "))>1:
+        delimiter = " "
+    elif len(test.split(","))>1:
+        delimiter = ","
+    elif len(test.split(";"))>1:
+        delimiter = ";"
+    elif len(test.split("."))>1:
+        delimiter = "."
+    else:
+        print "Um, we can't figure out what you are using for data seperation"
+    datafile.seek(0)
+    for line in datafile:
+        data.append(tuple(line.split(delimiter)))
+
+    data = remove_formating(data)
+    return data
+
+
+def remove_formating(data):
+    """This function removes thigns that will cause problems like endlines"""
+    cleaned=[]
+    for i in data:
+        temp=[]
+        for j in i:
+            if (j != '\n') and (j != ''):
+                temp.append(j)
+        cleaned.append(temp)
+
+    return cleaned
+
 def givehelp(a):
     # This command prints out some help
     #KN: Use triple quotes for this, it generates verbatim strings
@@ -898,6 +934,7 @@ def givehelp(a):
         print "-xl,-yl: Set X and y labels. SHould be followed by a string, which can be in quotes"
         print "-logx,-logy: set X and/or Y axes to be log scales"
         print "-xr,-yr: Set scale of X and Y ranges, should be followed with two numbers sepearated by a colon. Ex: -xr 1:5"
+        print "-layout: Used to specify the tiled output layout. Write input as <# rows>:<# columns>"
         print "Example:"
         print "        I have a large number of files and I would like them to be plotted with 9 plots tiled per output. I would like them to "
         print "        be eps files, and I have a thing for green circles. In each file the data is in columns 6 wide, but I only want the first"
