@@ -32,161 +32,106 @@ def main():
         #KN: Python tabs are 4 spaces, not 2 (http://www.python.org/dev/peps/pep-0008/)
         #KN: PEP-8 is the official python style guide. Read it, use it, love it.
     # Read in the command line parameters. NB: sys.argv[0] should be 'plot.py'
+    global dic
     files = []
-    #KN: Its usually simpler to just declare one global dictionary, and then fill in the various config settings as entries in the dict
-    global formats
-    formats = []
-    outputs = []
     case = 0 # 0 is reading files, 1 is outputs, 2 is formats
-    global TYPE
-    TYPE="eps" # the default output is in eps format
-    global MULTIT
-    global MULTIP
-    global layout
-    global columnsfirst
-    MULTIT = None
-    MULTIP = None
-    global Ucolor
-    global Ustyle
-    Ucolor = [] # user specified color
-    Ustyle = [] # user specified point styles
-    global Messy
-    Messy = False # This is a global flag the notes if there is text mixed with the data or other messyness
-    global remnants
-    remnants = [] # This is used if multiplot pile is called and a plot has to wait for the next file to be opened
-    global remnanterrors
-    remnanterrors = []
-    global LefttoPlot
-    global x_range
-    global y_range
-    global x_label
-    global y_label
-    global x_log
-    global y_log
-
-    x_log = y_log = False
-    x_range = y_range = x_label = y_label = None
-
-    LefttoPlot = False
-    columnsfirst = False
-    layout = None
 
     if len(sys.argv)==1:
         givehelp(0)
 
-        
-    for i in range(1,len(sys.argv)):
+    for flag in sys.argv[1:]:
             #KN: Its way simpler to just iterate over the items. Just do "for flag in sys.argv" and replace sys.argv[i] with flag.
             #Also, performance tweak: Check if the flag has a dash in it first, otherwise its a filename, i.e. "if '-' in flag: " 
-        if "-f" == sys.argv[i]:
+        if "-f" == flag:
             # format flag
             case = 2
-        elif "-i" == sys.argv[i]:
+        elif "-i" == flag:
             # input file flag
             case = 0
-        elif "-o" == sys.argv[i]:
+        elif "-o" == flag:
             # output file flag
             case = 1
-        elif "-t" == sys.argv[i]:
+        elif "-t" == flag:
             # output type flag
             case = 3
-        elif "-mp" == sys.argv[i]:
+        elif "-mp" == flag:
             # multiplot pile flag
             case = 4
-        elif "-mt" == sys.argv[i]:
+        elif "-mt" == flag:
             # multiplot tile flag
             case = 5
-        elif "-h" == sys.argv[i][:2]:
+        elif "-h" == flag[:2]:
             givehelp(1)
-        elif "-c" == sys.argv[i]:
+        elif "-c" == flag:
             case = 6
-        elif "-s" == sys.argv[i]:
+        elif "-s" == flag:
             case = 7
-        elif "-xr" == sys.argv[i]:
+        elif "-xr" == flag:
             case = 8
-        elif "-yr" == sys.argv[i]:
+        elif "-yr" == flag:
             case = 9
-        elif "-xl" == sys.argv[i]:
+        elif "-xl" == flag:
             case = 10
-        elif "-yl" == sys.argv[i]:
+        elif "-yl" == flag:
             case = 11
-        elif "-logx" == sys.argv[i]:
-            x_log = True
-        elif "-logy" == sys.argv[i]:
-            y_log = True
-        elif '-layout' == sys.argv[i]:
+        elif "-logx" == flag:
+            dic['x_log'] = True
+        elif "-logy" == flag:
+            dic['y_log'] = True
+        elif '-layout' == flag:
             case = 12
-        elif '-columnsfirst' == sys.argv[i]:
-            columnsfirst = True
-        #elif "-" == sys.argv[i][:1]:
+        elif '-columnsfirst' == flag:
+            dic['columnsfirst'] = True
+        #elif "-" == flag[:1]:
         #    case = -1
-        #    print "flag",sys.argv[i],"not recognized"
+        #    print "flag",flag,"not recognized"
         else:
             # if there is not a flag, and we are reading filenames or formats
             if case == 0:
-                files.append(sys.argv[i])
+                files.append(flag)
             if case == 1:
-                outputs.append(sys.argv[i])
+                dic['outputs'].append(flag)
             if case == 2:
-                formats.append(sys.argv[i])
+                dic['formats'].append(flag)
             if case == 3:
-                TYPE = sys.argv[i]
+                dic['TYPE'] = flag
             if case == 4:
-                MULTIP=sys.argv[i] # number of plots per plot
+                dic['MULTIP']=flag # number of plots per plot
             if case == 5:
-                MULTIT = sys.argv[i] # number of plots per plot
-                #if not layout:
-                #    layout = plot_arragnement()
-                #if layout and (layout[0]*layout[1] < int(MULTIT)):
-                #    print "The layout that you specified was too small"
-                #    layout = plot_arragnement()
+                dic['MULTIT'] = flag # number of plots per plot
             if case == 6:
-                Ucolor.append(sys.argv[i])
+                dic['Ucolor'].append(flag)
             if case == 7:
-                Ustyle.append(sys.argv[i])
+                dic['Ustyle'].append(flag)
             if case == 8:
-                x_range = map(float,sys.argv[i].split(":"))
+                dic['x_range'] = map(float,flag.split(":"))
             if case == 9:
-                y_range = map(float,sys.argv[i].split(":"))
+                dic['y_range'] = map(float,flag.split(":"))
             if case == 10:
-                x_label = sys.argv[i]
+                dic['x_label'] = flag
             if case == 11:
-                y_label = sys.argv[i]
+                dic['y_label'] = flag
             if case == 12:
-                layout = tuple(map(int,sys.argv[i].split(":")))
-                #if MULTIT and (layout[0]*layout[1] < int(MULTIT)):
-                #    print "The layout that you specified was too small"
-                #    layout = plot_arragnement()
+                dic['layout'] = tuple(map(int,flag.split(":")))
             if case == -1:
-                print "ignoring",sys.argv[i]
+                print "ignoring",flag
 
-    if MULTIT and layout:
-        if (layout[0]*layout[1] < int(MULTIT)):
-            print "The layout that you specified was too small"
-            layout = plot_arragnement()
+    if dic['MULTIT'] and dic['layout']:
+        if (dic['layout'][0]*dic['layout'][1] < int(dic['MULTIT'])):
+            print "The dic['layout'] that you specified was too small"
+            dic['layout'] = plot_arragnement()
         else:
-            print "We are using the layout you specified:",layout[0],"by",layout[1]
-    if MULTIT and not layout:
-        layout = plot_arragnement()
+            print "We are using the layout you specified:",dic['layout'][0],"by",dic['layout'][1]
+    if dic['MULTIT'] and not dic['layout']:
+        dic['layout'] = plot_arragnement()
     
-    if outputs and (len(outputs)!=len(files)) and not (MULTIT or MULTIP):
+    if dic['outputs'] and (len(dic['outputs'])!=len(files)) and not (dic['MULTIT'] or dic['MULTIP']):
         print "If you are going to specify output names, you must specify one output file per input file."
-
-    global currentfile
-    global numbered
-    global Numbering
-    global multicounttile
-    global multicountpile
-
-    Numbering = None
-
-    multicounttile = 0
-    multicountpile = 0
 
     for filename in files:
         print "plotting",filename
-        currentfile=filename
-        numbered = 0;
+        dic['currentfile']=filename
+        dic['numbered'] = 0;
         
         #Use a context manager for this, python handles opening and closing files way more efficiently that way
         #with open(filename, 'r') as datafile:
@@ -215,7 +160,7 @@ def main():
             if len(struct)>1:
                 # make multiple plots, each with the name of the input file followed by a _#
                 for i in range(len(struct)):
-                    Numbering = True
+                    dic['Numbering'] = True
                     x=readdat(struct,i,data)
                     smart_plot(np.array(x))
             else:
@@ -223,33 +168,32 @@ def main():
                 x=readdat(struct,0,data)
                 smart_plot(np.array(x))
 
-    if remnants:
-            #KN: Where is this imported?
-        plot(remnants,remnanterrors)
+    if dic['remnants']:
+        #KN: Where is this imported?
+        plot(dic['remnants'],dic['remnanterrors'])
 
-    if LefttoPlot:
-        outputname = string.split(currentfile,".")[0]
-        if numbered != 0:
-            outputname = outputname+"_"+str(numbered)
-        if MULTIT:
+    if dic['LefttoPlot']:
+        outputname = string.split(dic['currentfile'],".")[0]
+        if dic['numbered'] != 0:
+            outputname = outputname+"_"+str(dic['numbered'])
+        if dic['MULTIT']:
             outputname = outputname+"_tiled"
-        if multicountpile != 0:
-            outputname = outputname+"_"+str(multicountpile+1)
-        if MULTIP:
+        if dic['multicountpile'] != 0:
+            outputname = outputname+"_"+str(dic['multicountpile']+1)
+        if dic['MULTIP']:
             outputname = outputname+"_multip"
-        if TYPE[0]==".":
-            outputname=outputname+TYPE
+        if dic['TYPE'][0]==".":
+            outputname=outputname+dic['TYPE']
         else:
-            outputname=outputname+"."+TYPE
+            outputname=outputname+"."+dic['TYPE']
         plt.savefig(outputname)
         print"printed to",outputname
 
 
 def detect_blocks(dataarray):
-    """This function runs over an array of data pulled from a file and detects the structure so that the proper plotting method can be deduced
-    the structure is returned as a list. Each entry is one block of the data in the form of (width of block, height of block)
-    This will detect contiguous rectangular blocks of data with the same formats of text vs numbers"""
-    global Messy
+    """This function runs over an array of data pulled from a file and detects the structure so that the proper plotting method can be deduced the structure is returned as a list. Each entry is one block of the data in the form of (width of block, height of block) This will detect contiguous rectangular blocks of data with the same formats of text vs numbers"""
+    global dic
+    #global Messy
     
     width=[]
     height=[]
@@ -265,7 +209,7 @@ def detect_blocks(dataarray):
             previous.append(check_type(dataarray[0][i]))
             if i != 0:
                 mixed = True
-                Messy = True
+                dic['Messy'] = True
         else:
             previous.append(check_type(dataarray[0][i]))
     if mixed:
@@ -291,7 +235,7 @@ def detect_blocks(dataarray):
                         previous.append(check_type(dataarray[i][x]))
                         if x != 0:
                             mixed = True
-                            Messy = True
+                            dic['Messy'] = True
                     else:
                         previous.append(check_type(dataarray[i][x]))
             if mixed:
@@ -307,7 +251,7 @@ def detect_blocks(dataarray):
                     previous.append(check_type(dataarray[i][x]))
                     if x != 0:
                         mixed = True
-                        Messy = True
+                        dic['Messy'] = True
                 else:
                     previous.append(check_type(dataarray[i][x]))
             if mixed:
@@ -322,9 +266,7 @@ def detect_blocks(dataarray):
 
 def smart_plot(X):
     """This function takes a rectangular arry of data and plots it first looks at the dimensions of the data, the it 'decides' the best way to plot it. Hence, 'smart plot'"""
-    global numbered
-    global Numbering
-    global LefttoPlot
+    global dic
 
     Form = None
 
@@ -334,8 +276,8 @@ def smart_plot(X):
     width = len(list(X[0,:]))
     height = len(list(X[:,0]))
 
-    if len(formats)>0:
-        for entry in formats:
+    if len(dic['formats'])>0:
+        for entry in dic['formats']:
             #print entry,len(entry),width,height
             if entry[0] == "c" and (len(entry)-1 == width or (len(entry)-1 < width and entry[-1]=="*")) and not Form:
                 print "Using specified format:",entry
@@ -572,35 +514,32 @@ def smart_plot(X):
     #print errs
 
     if z:
-        if MULTIP:
-            global remnants
-            global remnanterrors
-            global multicountpile
-            z = remnants + z
-            errs = remnanterrors + errs
-            multicountpile = 0
-            #print (len(z)-len(z)%int(MULTIP))/int(MULTIP)/2
-            if (len(z)-len(z)%int(MULTIP))/int(MULTIP)/2 > 1:
-                multicountpile = 1
-            #print (len(z)-len(z)%int(MULTIP))/int(MULTIP)
-            if (len(z)-len(z)%int(MULTIP))/int(MULTIP) > 0:
-                for i in range(0,(len(z)-len(z)%int(MULTIP))/int(MULTIP)/2):
-                    #print z[:(int(MULTIP)*2)][0][:5]
-                    #print multicountpile,'\n'
-                    #print (int(MULTIP)*2),len(z)
-                    plot(z[:(int(MULTIP)*2)],errs[:(int(MULTIP)*2)])
-                    z = z[(int(MULTIP)*2):]
-                    errs = errs[(int(MULTIP)*2):]
-                    multicountpile = multicountpile + 1
-            remnants = z
-            remnanterrors = errs
-            if remnants:
-                LefttoPlot = True
+        if dic['MULTIP']:
+            z = dic['remnants'] + z
+            errs = dic['remnanterrors'] + errs
+            dic['multicountpile'] = 0
+            #print (len(z)-len(z)%int(dic['MULTIP']))/int(dic['MULTIP'])/2
+            if (len(z)-len(z)%int(dic['MULTIP']))/int(dic['MULTIP'])/2 > 1:
+                dic['multicountpile'] = 1
+            #print (len(z)-len(z)%int(dic['MULTIP']))/int(dic['MULTIP'])
+            if (len(z)-len(z)%int(dic['MULTIP']))/int(dic['MULTIP']) > 0:
+                for i in range(0,(len(z)-len(z)%int(dic['MULTIP']))/int(dic['MULTIP'])/2):
+                    #print z[:(int(dic['MULTIP'])*2)][0][:5]
+                    #print dic['multicountpile'],'\n'
+                    #print (int(dic['MULTIP'])*2),len(z)
+                    plot(z[:(int(dic['MULTIP'])*2)],errs[:(int(dic['MULTIP'])*2)])
+                    z = z[(int(dic['MULTIP'])*2):]
+                    errs = errs[(int(dic['MULTIP'])*2):]
+                    dic['multicountpile'] = dic['multicountpile'] + 1
+            dic['remnants'] = z
+            dic['remnanterrors'] = errs
+            if dic['remnants']:
+                dic['LefttoPlot'] = True
         else:
             # just plot it
             plot(z,errs)
-        if Numbering:
-            numbered = numbered + 1
+        if dic['Numbering']:
+            dic['numbered'] = dic['numbered'] + 1
 
 
 def is_it_ordered(vals):
@@ -667,42 +606,29 @@ def readdat(struct,block,data):
 def plot(z,errs):
     """This function takes a list z of lists and trys to plot them. the first list is always x, and the folowing are always y's"""
 
-    global multicounttile
-    global multicountpile
-    global multifile
-    global layout
-    global Ucolor
-    global Ustyle
-    global LefttoPlot
-    global x_range
-    global y_range
-    global x_label
-    global y_label
-    global x_log
-    global y_log
-    global columnsfirst
+    global dic
     points=[]
 
-    if Ucolor:
-        colors=Ucolor
+    if dic['Ucolor']:
+        colors=dic['Ucolor']
     else:
         colors=['b','g','r','c','m','y','k']
-    if Ustyle:
-        style=Ustyle
+    if dic['Ustyle']:
+        style=dic['Ustyle']
     else:
         style=['o','.',',','v','^','<','>','-','--','-.',':','1','2','3','4','s','p','*','h','H','+','x','D','d','|','_']
     for s in style:
         for c in colors:
             points.append(str(c+s))
 
-    if MULTIT:
-        multicounttile = multicounttile + 1
-        if not columnsfirst:
-            plt.subplot2grid((layout[0],layout[1]),(((multicounttile-1)-(multicounttile-1)%layout[1])/layout[1],((multicounttile-1)%layout[1])))
-        if columnsfirst:
-            plt.subplot2grid((layout[0],layout[1]),((multicounttile-1)%layout[1])),(((multicounttile-1)-(multicounttile-1)%layout[1])/layout[1])
-        plt.title(str(multicounttile))
-        LefttoPlot = True
+    if dic['MULTIT']:
+        dic['multicounttile'] = dic['multicounttile'] + 1
+        if not dic['columnsfirst']:
+            plt.subplot2grid((dic['layout'][0],dic['layout'][1]),(((dic['multicounttile']-1)-(dic['multicounttile']-1)%dic['layout'][1])/dic['layout'][1],((dic['multicounttile']-1)%dic['layout'][1])))
+        if dic['columnsfirst']:
+            plt.subplot2grid((dic['layout'][0],dic['layout'][1]),((dic['multicounttile']-1)%dic['layout'][1])),(((dic['multicounttile']-1)-(dic['multicounttile']-1)%dic['layout'][1])/dic['layout'][1])
+        plt.title(str(dic['multicounttile']))
+        dic['LefttoPlot'] = True
 
     plottingerrors = True
     #for k in errs:
@@ -736,89 +662,89 @@ def plot(z,errs):
     if not plottingerrors:
         plt.plot(*arg)
 
-    if x_range:
-        plt.xlim(x_range)
-    if y_range:
-        plt.ylim(y_range)
-    if x_label:
-        plt.xlabel(x_label)
-    if y_label:
-        plt.ylabel(y_label)
-    if x_log:
+    if dic['x_range']:
+        plt.xlim(dic['x_range'])
+    if dic['y_range']:
+        plt.ylim(dic['y_range'])
+    if dic['x_label']:
+        plt.xlabel(dic['x_label'])
+    if dic['y_label']:
+        plt.ylabel(dic['y_label'])
+    if dic['x_log']:
         plt.xscale('log')
-    if y_log:
+    if dic['y_log']:
         plt.yscale('log')
 
-    outputname = string.split(currentfile,".")[0]
+    outputname = string.split(dic['currentfile'],".")[0]
 
-    if numbered != 0:
-        outputname = outputname+"_"+str(numbered)
-    if MULTIT:
+    if dic['numbered'] != 0:
+        outputname = outputname+"_"+str(dic['numbered'])
+    if dic['MULTIT']:
         outputname = outputname+"_tiled"
-    if multicountpile != 0:
-        outputname = outputname+"_"+str(multicountpile)
-    if MULTIP:
+    if dic['multicountpile'] != 0:
+        outputname = outputname+"_"+str(dic['multicountpile'])
+    if dic['MULTIP']:
         outputname = outputname+"_multip"
-    if TYPE[0]==".":
-        outputname=outputname+TYPE
+    if dic['TYPE'][0]==".":
+        outputname=outputname+dic['TYPE']
     else:
-        outputname=outputname+"."+TYPE
+        outputname=outputname+"."+dic['TYPE']
 
-    if not MULTIT or (MULTIT and multicounttile == int(MULTIT)):
+    if not dic['MULTIT'] or (dic['MULTIT'] and dic['multicounttile'] == int(dic['MULTIT'])):
         plt.savefig(outputname)
         print"printed to",outputname
         plt.clf()
-        LefttoPlot = False
+        dic['LefttoPlot'] = False
 
-    if MULTIT and multicounttile == int(MULTIT):
-            multicounttile = 0
+    if dic['MULTIT'] and dic['multicounttile'] == int(dic['MULTIT']):
+            dic['multicounttile'] = 0
 
 
 def plot_arragnement():
-    """This function looks at MULTIT and decides how to structure the multiplot it returns a 2 tuple which is the root for the first 2 argument of the subplot command"""
+    """This function looks at dic['MULTIT'] and decides how to structure the multiplot it returns a 2 tuple which is the root for the first 2 argument of the subplot command"""
 
     found = False
 
-    if math.sqrt(float(MULTIT))%1 == 0:
+    if math.sqrt(float(dic['MULTIT']))%1 == 0:
         # Or multiplot can be square
-        form=(int(math.sqrt(float(MULTIT))),int(math.sqrt(float(MULTIT))))
+        form=(int(math.sqrt(float(dic['MULTIT']))),int(math.sqrt(float(dic['MULTIT']))))
         found = True
-    elif int(MULTIT) == 3:
+    elif int(dic['MULTIT']) == 3:
         form=(1,3)
         found = True
     if not found:
         looking = True
         a = 1
-        while looking and a*(a+1) <= int(MULTIT):
-            if float(MULTIT) == float(a*(a+1)):
+        while looking and a*(a+1) <= int(dic['MULTIT']):
+            if float(dic['MULTIT']) == float(a*(a+1)):
                 looking = False
                 found = True
             else:
                 a = a+1
         if found:
             form = (a,a+1)
-    if not found and math.sqrt(float(MULTIT)+1)%1 == 0:
-        form=(int(math.sqrt(float(MULTIT)+1)),int(math.sqrt(float(MULTIT)+1)))
+    if not found and math.sqrt(float(dic['MULTIT'])+1)%1 == 0:
+        form=(int(math.sqrt(float(dic['MULTIT'])+1)),int(math.sqrt(float(dic['MULTIT'])+1)))
         found = True
     if not found:
         looking = True
         a = 1
-        while looking and a*(a+1) <= int(MULTIT)+1:
-            if float(MULTIT)+1 == float(a*(a+1)):
+        while looking and a*(a+1) <= int(dic['MULTIT'])+1:
+            if float(dic['MULTIT'])+1 == float(a*(a+1)):
                 looking = False
                 found = True
             else:
                 a = a+1
         if found:
             form = (a,a+1)
-    if not found and math.sqrt(float(MULTIT)+2)%1 == 0:
-        form=(int(math.sqrt(float(MULTIT)+2)),int(math.sqrt(float(MULTIT)+2)))
+    if not found and math.sqrt(float(dic['MULTIT'])+2)%1 == 0:
+        form=(int(math.sqrt(float(dic['MULTIT'])+2)),int(math.sqrt(float(dic['MULTIT'])+2)))
         found = True
     if not found:
         looking = True
         a = 1
-        while looking and a*(a+1) <= int(MULTIT)+2:
-            if float(MULTIT)+2 == float(a*(a+1)):
+        while looking and a*(a+1) <= int(dic['MULTIT'])+2:
+            if float(dic['MULTIT'])+2 == float(a*(a+1)):
                 looking = False
                 found = True
             else:
@@ -828,8 +754,8 @@ def plot_arragnement():
     if not found:
         looking = True
         a = 1
-        while looking and a*(a+1) <= int(MULTIT):
-            if float(MULTIT) <= float(a*(a+1)):
+        while looking and a*(a+1) <= int(dic['MULTIT']):
+            if float(dic['MULTIT']) <= float(a*(a+1)):
                 looking = False
                 found = True
             else:
@@ -845,7 +771,8 @@ def plot_arragnement():
 def check_type(x):
     #KN: While this is a nice job, you just recreated python's type() function
     #http://stackoverflow.com/questions/2225038/python-determine-the-type-of-an-object
-    # This function returns a string. It returns "str" if x is a string, and "num" if x is a number
+    #JN: This function is actually slightly different from type() because it returns a string, not a type, and because it aggregates all types of numerals: float=num, int=num. Not to say I couldn't reach the same end with type()
+    """This function returns a string. It returns "str" if x is a string, and "num" if x is a number"""
 
     try:
         float(x)
@@ -869,7 +796,7 @@ def read_data(filename):
     test = datafile.readline()
     while test[0] == "#" and len(test) > 1: # Not a comment or empty
         test = datafile.readline()
-    delimiter = ""
+    delimiter = " "
     if len(test.split(" "))>1:
         delimiter = " "
     elif len(test.split(","))>1:
@@ -901,49 +828,35 @@ def remove_formating(data):
     return cleaned
 
 def givehelp(a):
-    # This command prints out some help
-    #KN: Use triple quotes for this, it generates verbatim strings
-    print "\nThis is a function which trys to inteligently create plots from text files."
-    print "This program is 'inteligent' in that it will try various assumptions about the format of the data in the files"
-    print "and the form the output should be given in. So, in many cases it can produce reasonable plots even if no information"
-    print "is provided by the user other than the filenames\n"
+    """This command prints out some help"""
+    
+    print """This is a function which trys to inteligently create plots from text files. This program is 'inteligent' in that it will try various assumptions about the format of the data in the files and the form the output should be given in. So, in many cases it can produce reasonable plots even if no information is provided by the user other than the filenames\n"""
     if a==0:
         print "for more help call this program with the '-help' flag"
     if a==1:
-        print "This program takes a number of flags:"
-        print "-i: Input. The input files can be listed first, or they can be listed following the '-i' flag.\n"
-        print "-o: Output. The output files will be given the same names as the input files unless otherwise specified"
-        print "        The output files can be specifiec by listing them after the '-o' flag"
-        print "-f: Format: the format of the data in the input files can be specified with '-f'. Each format flag should start"
-        print "        with either 'c' or 'r', specifying wether the data should be read as columns or row. The following characters"
-        print "        each represent a row or column. They can be: 'x','y','_','*', or a numeral (<10). 'x' specifies the x values, 'y' "
-        print "        specifies 'y' values'. Rows or columens marked with '_' will be skipped. 'y's or '_'s can be proceeded by a"
-        print "        numeral, and the 'y' or '_' will be read that many times. Formats will only be used if their dimensions exactly fit"
-        print "        the data found in the file, unless the format string is ended with a '*', then the format will be used of any data"
-        print "        found in the file which has dimensions greater than or equal to that stated in the format flag."
-        print "-mp: Multiplot Pile. This flag should be followed by the number of y's which the user wants to have plotted"
-        print "        in the same window. It should be noted that if one block of text contains multiple y columns or rows,"
-        print "        the '-mp' flag will cause them to be treated individually"
-        print "-mt: Multiplot Tile. This flag should be followed by the number of tiles desired for each plot printed to file"
-        print "-t: Type. The '-t' flag can be used to change the output type."
-        print "        The following are acceptable: bmp, emf, eps, gif, jpeg, jpg, pdf, png, ps, raw, rgba, svg, svgz, tif, tiff"
-        print "-c: Color. The '-c' flag can be used to set the color. Multiple colors can be specified and they will be iterated"
-        print "        over. The color options are: b,g,r,c,m,y,k"
-        print "-s: Point Style: The '-s' flag can be used to specify the point style. Multiple styles can be specified and they"
-        print "        will be iterated over. The point style options are:-,--,-.,:,.,,,o,v,^,<,>,1,2,3,4,s,p,*,h,H,+,x,D,d,|,_\n"
-        print "-xl,-yl: Set X and y labels. SHould be followed by a string, which can be in quotes"
-        print "-logx,-logy: set X and/or Y axes to be log scales"
-        print "-xr,-yr: Set scale of X and Y ranges, should be followed with two numbers sepearated by a colon. Ex: -xr 1:5"
-        print "-layout: Used to specify the tiled output layout. Write input as <# rows>:<# columns>"
-        print "Example:"
-        print "        I have a large number of files and I would like them to be plotted with 9 plots tiled per output. I would like them to "
-        print "        be eps files, and I have a thing for green circles. In each file the data is in columns 6 wide, but I only want the first"
-        print "        and fourth columns plotted. The first column is x, the other will be y. I would type:"
-        print "        # python plot.py * -t eps -mt 9 -c b -s o -f x3_y*"
+        print """This program takes a number of flags:
+        -i: Input. The input files can be listed first, or they can be listed following the '-i' flag.\n
+        -o: Output. The output files will be given the same names as the input files unless otherwise specified. The output files can be specifiec by listing them after the '-o' flag
+        -f: Format: the format of the data in the input files can be specified with '-f'. Each format flag should start with either 'c' or 'r', specifying wether the data should be read as columns or row. The following characters each represent a row or column. They can be: 'x','y','_','*', or a numeral (<10). 'x' specifies the x values, 'y' specifies 'y' values'. Rows or columens marked with '_' will be skipped. 'y's or '_'s can be proceeded by a numeral, and the 'y' or '_' will be read that many times. Formats will only be used if their dimensions exactly fit the data found in the file, unless the format string is ended with a '*', then the format will be used of any data found in the file which has dimensions greater than or equal to that stated in the format flag.
+        -mp: Multiplot Pile. This flag should be followed by the number of y's which the user wants to have plotted in the same window. It should be noted that if one block of text contains multiple y columns or rows, the '-mp' flag will cause them to be treated individually
+        -mt: Multiplot Tile. This flag should be followed by the number of tiles desired for each plot printed to file
+        -t: Type. The '-t' flag can be used to change the output type. The following are acceptable: bmp, emf, eps, gif, jpeg, jpg, pdf, png, ps, raw, rgba, svg, svgz, tif, tiff
+        -c: Color. The '-c' flag can be used to set the color. Multiple colors can be specified and they will be iterated over. The color options are: b,g,r,c,m,y,k
+        -s: Point Style: The '-s' flag can be used to specify the point style. Multiple styles can be specified and they will be iterated over. The point style options are:-,--,-.,:,.,,,o,v,^,<,>,1,2,3,4,s,p,*,h,H,+,x,D,d,|,_
+        -xl,-yl: Set X and y labels. SHould be followed by a string, which can be in quotes
+        -logx,-logy: set X and/or Y axes to be log scales
+        -xr,-yr: Set scale of X and Y ranges, should be followed with two numbers sepearated by a colon. Ex: -xr 1:5
+        -layout: Used to specify the tiled output layout. Write input as <# rows>:<# columns>
+        
+        Example:
+            I have a large number of files and I would like them to be plotted with 9 plots tiled per output. I would like them to be eps files, and I have a thing for green circles. In each file the data is in columns 6 wide, but I only want the first and fourth columns plotted. The first column is x, the other will be y. I would type:
+            # python plot.py * -t eps -mt 9 -c b -s o -f x3_y*"""
 
     exit(1)
 
 
 # This is the standard boilerplate that calls the main() function.
 if __name__ == '__main__':
+    global dic
+    dic = { 'formats':[],'outputs':[],'TYPE':'eps','MULTIT':None,'MULTIP':None,'layout':None,'columnsfirst':False,'Ucolor':[],'Ustyle':[],'Messy':False,'remnants':[],'remnanterrors':[],'LefttoPlot':False,'x_range':None,'y_range':None,'x_label':None,'y_label':None,'x_log':False,'y_log':False,'currentfile':None,'numbered':None,'Numbering':None,'multicounttile':0,'multicountpile':0}
     main()
