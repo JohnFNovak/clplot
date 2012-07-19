@@ -56,14 +56,14 @@ def main():
         # Make decisions about what is in the file
         if len(data) > 0:
             struct=detect_blocks(data)
-            print struct
+            #print struct
             #for i in range(len(data)):
             #    print data[i]
             
             #KN: This can be done far more efficiently using a filter() function. Either specify a one liner using a lambda function or
             #write a function that returns True or False
             struct,data=remove_empties(struct,data)
-            print struct
+            #print struct
             #for i in range(len(data)):
             #    print data[i]
 
@@ -911,6 +911,100 @@ def parse_legend():
                     if k != len(hold)-1-i:
                         temp.append(dic['labels'][j].split('/')[k])
                 dic['labels'][j]=string.join(temp,'/')
+#====================================================================================
+
+    tester=dic['labels'][0].split('_')
+
+    for i in dic['labels']:
+        if len(i.split('_')) > len(tester):
+            tester=i.split('_')
+    hold=[0]*len(tester)
+
+    for i in range(1,len(dic['labels'])):
+        for j in range(len(dic['labels'][i].split('_'))):
+            if tester[j] == dic['labels'][i].split('_')[j] and hold[j] == 0:
+                hold[j]=1
+            if tester[j] != dic['labels'][i].split('_')[j] and hold[j] == 1:
+                hold[j]=0
+
+    for i in range(len(hold)):
+        if hold[len(hold)-1-i] == 1:
+            for j in range(len(dic['labels'])):
+                temp=[]
+                for k in range(len(dic['labels'][j].split('_'))):
+                    if k != len(hold)-1-i:
+                        temp.append(dic['labels'][j].split('_')[k])
+                dic['labels'][j]=string.join(temp,'_')
+
+    tester=dic['labels'][0].split('_')
+
+    for i in dic['labels']:
+        if len(i.split('_')) > len(tester):
+            tester=i.split('_')
+    hold=[0]*len(tester)
+
+    for i in range(1,len(dic['labels'])):
+        for j in range(len(dic['labels'][i].split('_'))):
+            if tester[len(dic['labels'][i].split('_'))-1-j] == dic['labels'][i].split('_')[len(dic['labels'][i].split('_'))-1-j] and hold[len(dic['labels'][i].split('_'))-1-j] == 0:
+                hold[len(dic['labels'][i].split('_'))-1-j]=1
+            if tester[len(dic['labels'][i].split('_'))-1-j] != dic['labels'][i].split('_')[len(dic['labels'][i].split('_'))-1-j] and hold[len(dic['labels'][i].split('_'))-1-j] == 1:
+                hold[len(dic['labels'][i].split('_'))-1-j]=0
+
+    for i in range(len(hold)):
+        if hold[len(hold)-1-i] == 1:
+            for j in range(len(dic['labels'])):
+                temp=[]
+                for k in range(len(dic['labels'][j].split('_'))):
+                    if k != len(hold)-1-i:
+                        temp.append(dic['labels'][j].split('_')[k])
+                dic['labels'][j]=string.join(temp,'_')
+#====================================================================================
+
+    tester=dic['labels'][0].split('.')
+
+    for i in dic['labels']:
+        if len(i.split('.')) > len(tester):
+            tester=i.split('.')
+    hold=[0]*len(tester)
+
+    for i in range(1,len(dic['labels'])):
+        for j in range(len(dic['labels'][i].split('.'))):
+            if tester[j] == dic['labels'][i].split('.')[j] and hold[j] == 0:
+                hold[j]=1
+            if tester[j] != dic['labels'][i].split('.')[j] and hold[j] == 1:
+                hold[j]=0
+
+    for i in range(len(hold)):
+        if hold[len(hold)-1-i] == 1:
+            for j in range(len(dic['labels'])):
+                temp=[]
+                for k in range(len(dic['labels'][j].split('.'))):
+                    if k != len(hold)-1-i:
+                        temp.append(dic['labels'][j].split('.')[k])
+                dic['labels'][j]=string.join(temp,'.')
+
+    tester=dic['labels'][0].split('.')
+
+    for i in dic['labels']:
+        if len(i.split('.')) > len(tester):
+            tester=i.split('.')
+    hold=[0]*len(tester)
+
+    for i in range(1,len(dic['labels'])):
+        for j in range(len(dic['labels'][i].split('.'))):
+            if tester[len(dic['labels'][i].split('.'))-1-j] == dic['labels'][i].split('.')[len(dic['labels'][i].split('.'))-1-j] and hold[len(dic['labels'][i].split('.'))-1-j] == 0:
+                hold[len(dic['labels'][i].split('.'))-1-j]=1
+            if tester[len(dic['labels'][i].split('.'))-1-j] != dic['labels'][i].split('.')[len(dic['labels'][i].split('.'))-1-j] and hold[len(dic['labels'][i].split('.'))-1-j] == 1:
+                hold[len(dic['labels'][i].split('.'))-1-j]=0
+
+    for i in range(len(hold)):
+        if hold[len(hold)-1-i] == 1:
+            for j in range(len(dic['labels'])):
+                temp=[]
+                for k in range(len(dic['labels'][j].split('.'))):
+                    if k != len(hold)-1-i:
+                        temp.append(dic['labels'][j].split('.')[k])
+                dic['labels'][j]=string.join(temp,'.')
 
 
 def givehelp(a):
