@@ -130,7 +130,9 @@ def main():
 
     for filename in files:
         print "plotting",filename
-        dic['currentfile']=filename
+        dic['currentfile'] = filename
+        if dic['outputs']:
+            dic['currentoutput'] = dic['outputs'].pop(0)
         dic['numbered'] = 0;
         
         #Use a context manager for this, python handles opening and closing files way more efficiently that way
@@ -193,7 +195,6 @@ def main():
 def detect_blocks(dataarray):
     """This function runs over an array of data pulled from a file and detects the structure so that the proper plotting method can be deduced the structure is returned as a list. Each entry is one block of the data in the form of (width of block, height of block) This will detect contiguous rectangular blocks of data with the same formats of text vs numbers"""
     global dic
-    #global Messy
     
     width=[]
     height=[]
@@ -676,6 +677,8 @@ def plot(z,errs):
         plt.yscale('log')
 
     outputname = string.split(dic['currentfile'],".")[0]
+    if dic['currentoutput']:
+        outputname = dic['currentoutput']
 
     if dic['numbered'] != 0:
         outputname = outputname+"_"+str(dic['numbered'])
@@ -829,7 +832,7 @@ def remove_formating(data):
 
 def givehelp(a):
     """This command prints out some help"""
-    
+
     print """This is a function which trys to inteligently create plots from text files. This program is 'inteligent' in that it will try various assumptions about the format of the data in the files and the form the output should be given in. So, in many cases it can produce reasonable plots even if no information is provided by the user other than the filenames\n"""
     if a==0:
         print "for more help call this program with the '-help' flag"
@@ -857,6 +860,6 @@ def givehelp(a):
 
 # This is the standard boilerplate that calls the main() function.
 if __name__ == '__main__':
-    global dic
-    dic = { 'formats':[],'outputs':[],'TYPE':'eps','MULTIT':None,'MULTIP':None,'layout':None,'columnsfirst':False,'Ucolor':[],'Ustyle':[],'Messy':False,'remnants':[],'remnanterrors':[],'LefttoPlot':False,'x_range':None,'y_range':None,'x_label':None,'y_label':None,'x_log':False,'y_log':False,'currentfile':None,'numbered':None,'Numbering':None,'multicounttile':0,'multicountpile':0}
+    global dic # All global values are being dumped in here
+    dic = { 'formats':[],'outputs':[],'TYPE':'eps','MULTIT':None,'MULTIP':None,'layout':None,'columnsfirst':False,'Ucolor':[],'Ustyle':[],'Messy':False,'remnants':[],'remnanterrors':[],'LefttoPlot':False,'x_range':None,'y_range':None,'x_label':None,'y_label':None,'x_log':False,'y_log':False,'currentfile':None,'numbered':None,'Numbering':None,'multicounttile':0,'multicountpile':0,'currentoutput':None}
     main()
