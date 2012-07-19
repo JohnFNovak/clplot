@@ -1,18 +1,14 @@
-#!/usr/bin/python -tt
-#KN: While OK, this isn't normal python convention. Normally, comments at the beginning of a python script say what kind of python script it is,
-#or commands to the terminal on how to execute, i.e. #bin/bash/python for a python script, #bin/bash/pypi for a PyPi script, etc. Move your
-#copyright/info to a README.
+#!/usr/bin/python
 
-# A universal plotting script
+# A universal command line plotting script
 #
 # John Novak
-# June 4, 2012
+# June 4, 2012 - July 19, 2012
 
+# Run with: python plot.py
+# or just: ./plot.py (after making it executable, obviously)
 
-#KN: This isn't the place to put this. Docstrings go inside functions.
-"""A Python program that takes a file or list of files
-and creates plots of the data.
-"""
+# written for Python 2.6. Requires Scipy, Numpy, and Matplotlib
 
 import sys
 import numpy as np
@@ -24,111 +20,25 @@ import time
 import string
 
 
-#Poor Python style. Variable definitions can go into the if __name__ == "__main__" part, the rest should be
-#more specific functions.
-
 # Define a main() function
 def main():
-        #KN: Python tabs are 4 spaces, not 2 (http://www.python.org/dev/peps/pep-0008/)
-        #KN: PEP-8 is the official python style guide. Read it, use it, love it.
-    # Read in the command line parameters. NB: sys.argv[0] should be 'plot.py'
     global dic
-    files = []
-    case = 0 # 0 is reading files, 1 is outputs, 2 is formats
 
-    if len(sys.argv)==1:
-        givehelp(0)
-
-    for flag in sys.argv[1:]:
-            #KN: Its way simpler to just iterate over the items. Just do "for flag in sys.argv" and replace sys.argv[i] with flag.
-            #Also, performance tweak: Check if the flag has a dash in it first, otherwise its a filename, i.e. "if '-' in flag: " 
-        if "-f" == flag:
-            # format flag
-            case = 2
-        elif "-i" == flag:
-            # input file flag
-            case = 0
-        elif "-o" == flag:
-            # output file flag
-            case = 1
-        elif "-t" == flag:
-            # output type flag
-            case = 3
-        elif "-mp" == flag:
-            # multiplot pile flag
-            case = 4
-        elif "-mt" == flag:
-            # multiplot tile flag
-            case = 5
-        elif "-h" == flag[:2]:
-            givehelp(1)
-        elif "-c" == flag:
-            case = 6
-        elif "-s" == flag:
-            case = 7
-        elif "-xr" == flag:
-            case = 8
-        elif "-yr" == flag:
-            case = 9
-        elif "-xl" == flag:
-            case = 10
-        elif "-yl" == flag:
-            case = 11
-        elif "-logx" == flag:
-            dic['x_log'] = True
-        elif "-logy" == flag:
-            dic['y_log'] = True
-        elif '-layout' == flag:
-            case = 12
-        elif '-columnsfirst' == flag:
-            dic['columnsfirst'] = True
-        #elif "-" == flag[:1]:
-        #    case = -1
-        #    print "flag",flag,"not recognized"
-        else:
-            # if there is not a flag, and we are reading filenames or formats
-            if case == 0:
-                files.append(flag)
-            if case == 1:
-                dic['outputs'].append(flag)
-            if case == 2:
-                dic['formats'].append(flag)
-            if case == 3:
-                dic['TYPE'] = flag
-            if case == 4:
-                dic['MULTIP']=flag # number of plots per plot
-            if case == 5:
-                dic['MULTIT'] = flag # number of plots per plot
-            if case == 6:
-                dic['Ucolor'].append(flag)
-            if case == 7:
-                dic['Ustyle'].append(flag)
-            if case == 8:
-                dic['x_range'] = map(float,flag.split(":"))
-            if case == 9:
-                dic['y_range'] = map(float,flag.split(":"))
-            if case == 10:
-                dic['x_label'] = flag
-            if case == 11:
-                dic['y_label'] = flag
-            if case == 12:
-                dic['layout'] = tuple(map(int,flag.split(":")))
-            if case == -1:
-                print "ignoring",flag
+    read_flags()
 
     if dic['MULTIT'] and dic['layout']:
         if (dic['layout'][0]*dic['layout'][1] < int(dic['MULTIT'])):
-            print "The dic['layout'] that you specified was too small"
+            print "The layout that you specified was too small"
             dic['layout'] = plot_arragnement()
         else:
             print "We are using the layout you specified:",dic['layout'][0],"by",dic['layout'][1]
     if dic['MULTIT'] and not dic['layout']:
         dic['layout'] = plot_arragnement()
     
-    if dic['outputs'] and (len(dic['outputs'])!=len(files)) and not (dic['MULTIT'] or dic['MULTIP']):
+    if dic['outputs'] and (len(dic['outputs'])!=len(dic['files'])) and not (dic['MULTIT'] or dic['MULTIP']):
         print "If you are going to specify output names, you must specify one output file per input file."
 
-    for filename in files:
+    for filename in dic['files']:
         print "plotting",filename
         dic['currentfile'] = filename
         if dic['outputs']:
@@ -146,14 +56,14 @@ def main():
         # Make decisions about what is in the file
         if len(data) > 0:
             struct=detect_blocks(data)
-            #print struct
+            print struct
             #for i in range(len(data)):
             #    print data[i]
             
             #KN: This can be done far more efficiently using a filter() function. Either specify a one liner using a lambda function or
             #write a function that returns True or False
             struct,data=remove_empties(struct,data)
-            #print struct
+            print struct
             #for i in range(len(data)):
             #    print data[i]
 
@@ -162,6 +72,7 @@ def main():
             if len(struct)>1:
                 # make multiple plots, each with the name of the input file followed by a _#
                 for i in range(len(struct)):
+                    dic['currentstruct']=i
                     dic['Numbering'] = True
                     x=readdat(struct,i,data)
                     smart_plot(np.array(x))
@@ -171,7 +82,6 @@ def main():
                 smart_plot(np.array(x))
 
     if dic['remnants']:
-        #KN: Where is this imported?
         plot(dic['remnants'],dic['remnanterrors'])
 
     if dic['LefttoPlot']:
@@ -216,6 +126,11 @@ def detect_blocks(dataarray):
     if mixed:
         print "you seem to have text interspersed with your data"
         print "Does this look familiar?:",' '.join(dataarray[0])
+    if mixed and len(dataarray[0]) == len(dataarray[1]):
+        print "we are going to use",string.join(dataarray[0]),"as labels"
+        dic['columnlabel'].append(dataarray[0])
+    else: 
+        dic['columnlabel'].append(range(len(dataarray[0])))
 
     for i in range(1,len(dataarray)):
         mixed = False
@@ -242,6 +157,12 @@ def detect_blocks(dataarray):
             if mixed:
                 print "you seem to have text interspersed with your data"
                 print "Does this look familiar?:",' '.join(dataarray[i])
+            if mixed and len(dataarray) != i+1:
+                if len(dataarray[i]) == len(dataarray[i+1]):
+                    print "we are going to use",string.join(dataarray[i]),"as labels"
+                    dic['columnlabel'].append(dataarray[i])
+            else: 
+                dic['columnlabel'].append(range(len(dataarray[i])))
         else:
             block=block+1;
             height.append(1);
@@ -258,6 +179,12 @@ def detect_blocks(dataarray):
             if mixed:
                 print "you seem to have text interspersed with your data"
                 print "Does this look familiar?:",' '.join(dataarray[i])
+            if mixed and len(dataarray) != i+1:
+                if len(dataarray[i]) == len(dataarray[i+1]):
+                    print "we are going to use",string.join(dataarray[i]),"as labels"
+                    dic['columnlabel'].append(dataarray[i])
+            else: 
+                dic['columnlabel'].append(range(len(dataarray[i])))
 
     for i in range(block+1):
         #print "block",i,"is",width[i],"by",height[i]
@@ -265,11 +192,14 @@ def detect_blocks(dataarray):
 
     return structure
 
+
 def smart_plot(X):
-    """This function takes a rectangular arry of data and plots it first looks at the dimensions of the data, the it 'decides' the best way to plot it. Hence, 'smart plot'"""
+    """This function takes a rectangular array of data and plots it first looks at the dimensions of the data, the it 'decides' the best way to plot it. Hence, 'smart plot'"""
     global dic
 
     Form = None
+
+    #print X
 
     z=[]
     errs=[]
@@ -277,6 +207,7 @@ def smart_plot(X):
     width = len(list(X[0,:]))
     height = len(list(X[:,0]))
 
+    # Check if a prespecified format will work
     if len(dic['formats'])>0:
         for entry in dic['formats']:
             #print entry,len(entry),width,height
@@ -287,8 +218,7 @@ def smart_plot(X):
                 print "Using specified format:",entry
                 Form=entry
 
-    if Form:
-        # Use the specified form
+    if Form: # If a form was specified, then use it
         mults = 0
         if Form[0] == "c":
             needx=True
@@ -309,10 +239,9 @@ def smart_plot(X):
                         if Form[j+2+mults] == "y":
                             z.append(x)
                             z.append(list(X[:,count]))
+                            dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][j+mults]))
                             errs.append([0]*len(x))
                             errs.append([0]*len(list(X[count,:])))
-                        #if Form[j+2+mults] == "x":
-                        #    errs.append(0)
                         elif Form[j+2+mults] == "e":
                             if Form[j+1+mults] == "y": 
                                 errs[-1]=list(X[count,:])
@@ -323,10 +252,9 @@ def smart_plot(X):
                 elif Form[j+1+mults] == "y":
                     z.append(x)
                     z.append(list(X[:,count]))
+                    dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][j+mults]))
                     errs.append([0]*len(x))
                     errs.append([0]*len(list(X[:,count])))
-                #elif Form[j+1+mults] == "x":
-                #    errs.append(0)
                 elif Form[j+1+mults] == "e":
                     if Form[j+mults] == "y": 
                         errs[-1]=list(X[:,count])
@@ -354,10 +282,9 @@ def smart_plot(X):
                         if Form[j+2+mults] == "y":
                             z.append(x)
                             z.append(list(X[count,:]))
+                            dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][j+mults]))
                             errs.append([0]*len(x))
                             errs.append([0]*len(list(X[count,:])))
-                        #if Form[j+2+mults] == "x":
-                        #    errs.append(0)
                         elif Form[j+2+mults] == "e":
                             if Form[j+1+mults] == "y": 
                                 errs[-1]=list(X[count,:])
@@ -368,10 +295,9 @@ def smart_plot(X):
                 elif Form[j+1+mults] == "y":
                     z.append(x)
                     z.append(list(X[:,count]))
+                    dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][j+mults]))
                     errs.append([0]*len(x))
                     errs.append([0]*len(list(X[:,count])))
-                #elif Form[j+1+mults] == "x":
-                #    errs.append(0)
                 elif Form[j+1+mults] == "e":
                     if Form[j+mults] == "y": 
                         errs[-1]=list(X[:,count])
@@ -386,17 +312,20 @@ def smart_plot(X):
         if is_it_ordered(list(X[:,0])):
             # ordered by the first column
             z=[list(X[:,0]),list(X[:,1])]
+            dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
             errs = [[0] * len(z[0])] * 2
             #errs = [[0]*len(z[0])] + errs
         elif is_it_ordered(list(X[:,1])):
             # ordered by the second column
             z[list(X[:,1]),list(X[:,0])]
+            dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
             errs = [[0] * len(z[0])] * 2
             #errs = [[0]*len(z[0])] + errs
         else:
             # not ordered
             print "No deducable ordering, I'll just pick which column is x"
             z=[list(X[:,0]),list(X[:,1])]
+            dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
             errs = [[0] * len(z[0])] * 2
             #errs = [[0]*len(z[0])] + errs
     elif width!=2 and height==2:
@@ -405,11 +334,13 @@ def smart_plot(X):
         if is_it_ordered(list(X[0,:])):
             # ordered by the first row
             z=[list(X[0,:]),list(X[1,:])]
+            dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
             errs = [[0] * len(z[0])] * 2
             #errs = [[0]*len(z[0])] + errs
         elif is_it_ordered(list(X[1,:])):
             # ordered by the second row
             z=[list(X[1,:]),list(X[0,:])]
+            dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
             errs = [[0] * len(z[0])] * 2
             #errs = [[0]*len(z[0])] + errs
         else:
@@ -433,6 +364,7 @@ def smart_plot(X):
                     errs.append([0]*len(list(X[:,i])))
                     z.append(list(X[:,xcol]))
                     z.append(list(X[:,i]))
+                    dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
         if needx:
             for i in range(height):
                 if is_it_ordered(list(X[i,:])):
@@ -446,6 +378,7 @@ def smart_plot(X):
                         errs.append([0]*len(list(X[i,:])))
                         z.append(list(X[xrow,:]))
                         z.append(list(X[i,:]))
+                        dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
         if needx:
             print "I don't know what to do with this block. It's",width,"by",height,"and neither axis seems to be ordered"
     elif width < 5 and height > 7:
@@ -463,6 +396,7 @@ def smart_plot(X):
                     errs.append([0]*len(list(X[:,i])))
                     z.append(list(X[:,xcol]))
                     z.append(list(X[:,i]))
+                    dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
     elif width > 7 and height < 5:
         # we will assume that it is in rows
         needx = True
@@ -478,6 +412,7 @@ def smart_plot(X):
                     errs.append([0]*len(list(X[i,:])))
                     z.append(list(X[xrow,:]))
                     z.append(list(X[i,:]))
+                    dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
     elif width > 5 and height > 5:
         # will will have to look around for oredered things
         needx = True
@@ -493,6 +428,7 @@ def smart_plot(X):
                     errs.append([0]*len(list(X[:,i])))
                     z.append(list(X[:,xcol]))
                     z.append(list(X[:,i]))
+                    dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
         if needx:
             for i in range(height):
                 if is_it_ordered(list(X[i,:])):
@@ -506,6 +442,7 @@ def smart_plot(X):
                         errs.append([0]*len(list(X[i,:])))
                         z.append(list(X[xrow,:]))
                         z.append(list(X[i,:]))
+                        dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
         if needx:
             print "I don't know what to do with this block. It's",width,"by",height,"and neither axis seems to be ordered"
     else:
@@ -562,8 +499,9 @@ def remove_empties(struct,x):
     linenum=len(x)-1
     structBK=struct
     count=0
+    blocks=len(structBK)
 
-    for i in range(len(structBK)):
+    for i in range(blocks):
         j=-i-1+count # do this backward
         if structBK[j][0] > 1 and structBK[j][1] > 1:
             # the entry is good: it's more than a single column or single line
@@ -574,8 +512,6 @@ def remove_empties(struct,x):
             del x[linenum]
             linenum=linenum-1
             count=count+1
-        if i+count==len(structBK):
-            break
 
     return struct,x
 
@@ -641,28 +577,6 @@ def plot(z,errs):
     #print z
     #print errs
 
-    for k in range(0,len(z),2):
-        z[k]=map(float,z[k])
-        z[k+1]=map(float,z[k+1])
-        if plottingerrors:
-            if errs[k] == 0:
-                errs[k]=[0]*len(z[k])
-            else:
-                errs[k]=map(float,errs[k])
-            if errs[k+1] == 0:
-                plt.errorbar(z[k],z[k+1],xerr=errs[k],yerr=[0]*len(z[k+1]),fmt=points[((k+1)/2)%len(points)])
-            if errs[k+1] != 0:
-                errs[k+1]=map(float,errs[k+1])
-                #print (z[k],z[k+1],errs[k/2],points[(k/2)%len(points)])
-                plt.errorbar(z[k],z[k+1],xerr=errs[k],yerr=errs[k+1],fmt=points[((k+1)/2)%len(points)])
-        if not plottingerrors:
-            arg.append(z[k]) # x vector
-            arg.append(z[k+1])
-            arg.append(points[(k/2)%len(points)])
-
-    if not plottingerrors:
-        plt.plot(*arg)
-
     if dic['x_range']:
         plt.xlim(dic['x_range'])
     if dic['y_range']:
@@ -676,9 +590,38 @@ def plot(z,errs):
     if dic['y_log']:
         plt.yscale('log')
 
-    outputname = string.split(dic['currentfile'],".")[0]
+    if dic['legend'] and len(dic['labels']) > 1:
+        parse_legend();
+
+    for k in range(0,len(z),2):
+        z[k]=map(float,z[k])
+        z[k+1]=map(float,z[k+1])
+        if plottingerrors:
+            if errs[k] == 0:
+                errs[k]=[0]*len(z[k])
+            else:
+                errs[k]=map(float,errs[k])
+            if errs[k+1] == 0:
+                plt.errorbar(z[k],z[k+1],xerr=errs[k],yerr=[0]*len(z[k+1]),fmt=points[((k+1)/2)%len(points)],label=dic['labels'][(k+1)/2])
+            if errs[k+1] != 0:
+                errs[k+1]=map(float,errs[k+1])
+                plt.errorbar(z[k],z[k+1],xerr=errs[k],yerr=errs[k+1],fmt=points[((k+1)/2)%len(points)],label=dic['labels'][(k+1)/2])
+        if not plottingerrors:
+            arg.append(z[k]) # x vector
+            arg.append(z[k+1])
+            arg.append(points[(k/2)%len(points)])
+
+    if not plottingerrors:
+        plt.plot(*arg)
+
+    if dic['legend']:
+        plt.legend()
+        dic['labels']=[]
+
     if dic['currentoutput']:
         outputname = dic['currentoutput']
+    else:
+        outputname = string.split(dic['currentfile'],".")[0]
 
     if dic['numbered'] != 0:
         outputname = outputname+"_"+str(dic['numbered'])
@@ -792,7 +735,7 @@ def skip(iterator, n):
     collections.deque(itertools.islice(iterator, n), maxlen=0)
 
 
-def read_data(filename):   
+def read_data(filename):
     data=[]
     datafile=open(filename,"r");
 
@@ -824,11 +767,151 @@ def remove_formating(data):
     for i in data:
         temp=[]
         for j in i:
-            if (j != '\n') and (j != ''):
-                temp.append(j)
+            temp2=[]
+            for k in j:
+                if (k != '\n') and (k != ''):
+                    temp2.append(k)
+            temp.append(string.join(temp2,''))
         cleaned.append(temp)
 
     return cleaned
+
+
+def read_flags():
+    global dic
+    case = 0 # 0 is reading files, 1 is outputs, 2 is formats, etc
+
+    if len(sys.argv)==1:
+        givehelp(0)
+
+    for flag in sys.argv[1:]:
+            #performance tweak: Check if the flag has a dash in it first, otherwise its a filename, i.e. "if '-' in flag: " 
+        if "-f" == flag:
+            # format flag
+            case = 2
+        elif "-i" == flag:
+            # input file flag
+            case = 0
+        elif "-o" == flag:
+            # output file flag
+            case = 1
+        elif "-t" == flag:
+            # output type flag
+            case = 3
+        elif "-mp" == flag:
+            # multiplot pile flag
+            case = 4
+        elif "-mt" == flag:
+            # multiplot tile flag
+            case = 5
+        elif "-h" == flag[:2]:
+            givehelp(1)
+        elif "-c" == flag:
+            case = 6
+        elif "-s" == flag:
+            case = 7
+        elif "-xr" == flag:
+            case = 8
+        elif "-yr" == flag:
+            case = 9
+        elif "-xl" == flag:
+            case = 10
+        elif "-yl" == flag:
+            case = 11
+        elif "-logx" == flag:
+            dic['x_log'] = True
+        elif "-logy" == flag:
+            dic['y_log'] = True
+        elif '-layout' == flag:
+            case = 12
+        elif '-columnsfirst' == flag:
+            dic['columnsfirst'] = True
+        elif "-legend" == flag:
+            dic['legend'] = True
+        elif "-" == flag[:1] and case != 7:
+            case = -1
+            print "flag",flag,"not recognized"
+        else:
+            # if there is not a flag, and we are reading filenames or formats
+            if case == 0:
+                dic['files'].append(flag)
+            if case == 1:
+                dic['outputs'].append(flag)
+            if case == 2:
+                dic['formats'].append(flag)
+            if case == 3:
+                dic['TYPE'] = flag
+            if case == 4:
+                dic['MULTIP']=flag # number of plots per plot
+            if case == 5:
+                dic['MULTIT'] = flag # number of plots per plot
+            if case == 6:
+                dic['Ucolor'].append(flag)
+            if case == 7:
+                dic['Ustyle'].append(flag)
+            if case == 8:
+                dic['x_range'] = map(float,flag.split(":"))
+            if case == 9:
+                dic['y_range'] = map(float,flag.split(":"))
+            if case == 10:
+                dic['x_label'] = flag
+            if case == 11:
+                dic['y_label'] = flag
+            if case == 12:
+                dic['layout'] = tuple(map(int,flag.split(":")))
+            if case == -1:
+                print "ignoring",flag
+
+
+def parse_legend():
+    global dic
+
+    tester=dic['labels'][0].split('/')
+
+    for i in dic['labels']:
+        if len(i.split('/')) > len(tester):
+            tester=i.split('/')
+    hold=[0]*len(tester)
+
+    for i in range(1,len(dic['labels'])):
+        for j in range(len(dic['labels'][i].split('/'))):
+            if tester[j] == dic['labels'][i].split('/')[j] and hold[j] == 0:
+                hold[j]=1
+            if tester[j] != dic['labels'][i].split('/')[j] and hold[j] == 1:
+                hold[j]=0
+
+    for i in range(len(hold)):
+        if hold[len(hold)-1-i] == 1:
+            for j in range(len(dic['labels'])):
+                temp=[]
+                for k in range(len(dic['labels'][j].split('/'))):
+                    if k != len(hold)-1-i:
+                        temp.append(dic['labels'][j].split('/')[k])
+                dic['labels'][j]=string.join(temp,'/')
+
+    tester=dic['labels'][0].split('/')
+
+    for i in dic['labels']:
+        if len(i.split('/')) > len(tester):
+            tester=i.split('/')
+    hold=[0]*len(tester)
+
+    for i in range(1,len(dic['labels'])):
+        for j in range(len(dic['labels'][i].split('/'))):
+            if tester[len(dic['labels'][i].split('/'))-1-j] == dic['labels'][i].split('/')[len(dic['labels'][i].split('/'))-1-j] and hold[len(dic['labels'][i].split('/'))-1-j] == 0:
+                hold[len(dic['labels'][i].split('/'))-1-j]=1
+            if tester[len(dic['labels'][i].split('/'))-1-j] != dic['labels'][i].split('/')[len(dic['labels'][i].split('/'))-1-j] and hold[len(dic['labels'][i].split('/'))-1-j] == 1:
+                hold[len(dic['labels'][i].split('/'))-1-j]=0
+
+    for i in range(len(hold)):
+        if hold[len(hold)-1-i] == 1:
+            for j in range(len(dic['labels'])):
+                temp=[]
+                for k in range(len(dic['labels'][j].split('/'))):
+                    if k != len(hold)-1-i:
+                        temp.append(dic['labels'][j].split('/')[k])
+                dic['labels'][j]=string.join(temp,'/')
+
 
 def givehelp(a):
     """This command prints out some help"""
@@ -860,6 +943,8 @@ def givehelp(a):
 
 # This is the standard boilerplate that calls the main() function.
 if __name__ == '__main__':
+    """A Python program that takes a file or list of filesand creates plots of the data."""
+
     global dic # All global values are being dumped in here
-    dic = { 'formats':[],'outputs':[],'TYPE':'eps','MULTIT':None,'MULTIP':None,'layout':None,'columnsfirst':False,'Ucolor':[],'Ustyle':[],'Messy':False,'remnants':[],'remnanterrors':[],'LefttoPlot':False,'x_range':None,'y_range':None,'x_label':None,'y_label':None,'x_log':False,'y_log':False,'currentfile':None,'numbered':None,'Numbering':None,'multicounttile':0,'multicountpile':0,'currentoutput':None}
+    dic = { 'formats':[],'outputs':[],'TYPE':'eps','MULTIT':None,'MULTIP':None,'layout':None,'columnsfirst':False,'Ucolor':[],'Ustyle':[],'Messy':False,'remnants':[],'remnanterrors':[],'LefttoPlot':False,'x_range':None,'y_range':None,'x_label':None,'y_label':None,'x_log':False,'y_log':False,'currentfile':None,'numbered':None,'Numbering':None,'multicounttile':0,'multicountpile':0,'currentoutput':None,'files':[],'legend':False,'labels':[],'columnlabel':[],'currentstruct':0}
     main()
