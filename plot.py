@@ -865,146 +865,54 @@ def read_flags():
 
 def parse_legend():
     global dic
+    delimiters = ['/','.','_','-']
 
-    tester=dic['labels'][0].split('/')
+    for divider in delimiters:
+        tester=dic['labels'][0].split(divider)
 
-    for i in dic['labels']:
-        if len(i.split('/')) > len(tester):
-            tester=i.split('/')
-    hold=[0]*len(tester)
+        for i in dic['labels']:
+            if len(i.split(divider)) > len(tester):
+                tester=i.split(divider)
+        hold=[0]*len(tester)
 
-    for i in range(1,len(dic['labels'])):
-        for j in range(len(dic['labels'][i].split('/'))):
-            if tester[j] == dic['labels'][i].split('/')[j] and hold[j] == 0:
-                hold[j]=1
-            if tester[j] != dic['labels'][i].split('/')[j] and hold[j] == 1:
-                hold[j]=0
+        for i in range(1,len(dic['labels'])):
+            for j in range(len(dic['labels'][i].split(divider))):
+                if tester[j] == dic['labels'][i].split(divider)[j] and hold[j] == 0:
+                    hold[j]=1
+                if tester[j] != dic['labels'][i].split(divider)[j] and hold[j] == 1:
+                    hold[j]=0
 
-    for i in range(len(hold)):
-        if hold[len(hold)-1-i] == 1:
-            for j in range(len(dic['labels'])):
-                temp=[]
-                for k in range(len(dic['labels'][j].split('/'))):
-                    if k != len(hold)-1-i:
-                        temp.append(dic['labels'][j].split('/')[k])
-                dic['labels'][j]=string.join(temp,'/')
+        for i in range(len(hold)):
+            if hold[len(hold)-1-i] == 1:
+                for j in range(len(dic['labels'])):
+                    temp=[]
+                    for k in range(len(dic['labels'][j].split(divider))):
+                        if k != len(hold)-1-i:
+                            temp.append(dic['labels'][j].split(divider)[k])
+                    dic['labels'][j]=string.join(temp,divider)
 
-    tester=dic['labels'][0].split('/')
+        tester=dic['labels'][0].split(divider)
 
-    for i in dic['labels']:
-        if len(i.split('/')) > len(tester):
-            tester=i.split('/')
-    hold=[0]*len(tester)
+        for i in dic['labels']:
+            if len(i.split(divider)) > len(tester):
+                tester=i.split(divider)
+        hold=[0]*len(tester)
 
-    for i in range(1,len(dic['labels'])):
-        for j in range(len(dic['labels'][i].split('/'))):
-            if tester[len(dic['labels'][i].split('/'))-1-j] == dic['labels'][i].split('/')[len(dic['labels'][i].split('/'))-1-j] and hold[len(dic['labels'][i].split('/'))-1-j] == 0:
-                hold[len(dic['labels'][i].split('/'))-1-j]=1
-            if tester[len(dic['labels'][i].split('/'))-1-j] != dic['labels'][i].split('/')[len(dic['labels'][i].split('/'))-1-j] and hold[len(dic['labels'][i].split('/'))-1-j] == 1:
-                hold[len(dic['labels'][i].split('/'))-1-j]=0
+        for i in range(1,len(dic['labels'])):
+            for j in range(len(dic['labels'][i].split(divider))):
+                if tester[len(dic['labels'][i].split(divider))-1-j] == dic['labels'][i].split(divider)[len(dic['labels'][i].split(divider))-1-j] and hold[len(dic['labels'][i].split(divider))-1-j] == 0:
+                    hold[len(dic['labels'][i].split(divider))-1-j]=1
+                if tester[len(dic['labels'][i].split(divider))-1-j] != dic['labels'][i].split(divider)[len(dic['labels'][i].split(divider))-1-j] and hold[len(dic['labels'][i].split(divider))-1-j] == 1:
+                    hold[len(dic['labels'][i].split(divider))-1-j]=0
 
-    for i in range(len(hold)):
-        if hold[len(hold)-1-i] == 1:
-            for j in range(len(dic['labels'])):
-                temp=[]
-                for k in range(len(dic['labels'][j].split('/'))):
-                    if k != len(hold)-1-i:
-                        temp.append(dic['labels'][j].split('/')[k])
-                dic['labels'][j]=string.join(temp,'/')
-#====================================================================================
-
-    tester=dic['labels'][0].split('_')
-
-    for i in dic['labels']:
-        if len(i.split('_')) > len(tester):
-            tester=i.split('_')
-    hold=[0]*len(tester)
-
-    for i in range(1,len(dic['labels'])):
-        for j in range(len(dic['labels'][i].split('_'))):
-            if tester[j] == dic['labels'][i].split('_')[j] and hold[j] == 0:
-                hold[j]=1
-            if tester[j] != dic['labels'][i].split('_')[j] and hold[j] == 1:
-                hold[j]=0
-
-    for i in range(len(hold)):
-        if hold[len(hold)-1-i] == 1:
-            for j in range(len(dic['labels'])):
-                temp=[]
-                for k in range(len(dic['labels'][j].split('_'))):
-                    if k != len(hold)-1-i:
-                        temp.append(dic['labels'][j].split('_')[k])
-                dic['labels'][j]=string.join(temp,'_')
-
-    tester=dic['labels'][0].split('_')
-
-    for i in dic['labels']:
-        if len(i.split('_')) > len(tester):
-            tester=i.split('_')
-    hold=[0]*len(tester)
-
-    for i in range(1,len(dic['labels'])):
-        for j in range(len(dic['labels'][i].split('_'))):
-            if tester[len(dic['labels'][i].split('_'))-1-j] == dic['labels'][i].split('_')[len(dic['labels'][i].split('_'))-1-j] and hold[len(dic['labels'][i].split('_'))-1-j] == 0:
-                hold[len(dic['labels'][i].split('_'))-1-j]=1
-            if tester[len(dic['labels'][i].split('_'))-1-j] != dic['labels'][i].split('_')[len(dic['labels'][i].split('_'))-1-j] and hold[len(dic['labels'][i].split('_'))-1-j] == 1:
-                hold[len(dic['labels'][i].split('_'))-1-j]=0
-
-    for i in range(len(hold)):
-        if hold[len(hold)-1-i] == 1:
-            for j in range(len(dic['labels'])):
-                temp=[]
-                for k in range(len(dic['labels'][j].split('_'))):
-                    if k != len(hold)-1-i:
-                        temp.append(dic['labels'][j].split('_')[k])
-                dic['labels'][j]=string.join(temp,'_')
-#====================================================================================
-
-    tester=dic['labels'][0].split('.')
-
-    for i in dic['labels']:
-        if len(i.split('.')) > len(tester):
-            tester=i.split('.')
-    hold=[0]*len(tester)
-
-    for i in range(1,len(dic['labels'])):
-        for j in range(len(dic['labels'][i].split('.'))):
-            if tester[j] == dic['labels'][i].split('.')[j] and hold[j] == 0:
-                hold[j]=1
-            if tester[j] != dic['labels'][i].split('.')[j] and hold[j] == 1:
-                hold[j]=0
-
-    for i in range(len(hold)):
-        if hold[len(hold)-1-i] == 1:
-            for j in range(len(dic['labels'])):
-                temp=[]
-                for k in range(len(dic['labels'][j].split('.'))):
-                    if k != len(hold)-1-i:
-                        temp.append(dic['labels'][j].split('.')[k])
-                dic['labels'][j]=string.join(temp,'.')
-
-    tester=dic['labels'][0].split('.')
-
-    for i in dic['labels']:
-        if len(i.split('.')) > len(tester):
-            tester=i.split('.')
-    hold=[0]*len(tester)
-
-    for i in range(1,len(dic['labels'])):
-        for j in range(len(dic['labels'][i].split('.'))):
-            if tester[len(dic['labels'][i].split('.'))-1-j] == dic['labels'][i].split('.')[len(dic['labels'][i].split('.'))-1-j] and hold[len(dic['labels'][i].split('.'))-1-j] == 0:
-                hold[len(dic['labels'][i].split('.'))-1-j]=1
-            if tester[len(dic['labels'][i].split('.'))-1-j] != dic['labels'][i].split('.')[len(dic['labels'][i].split('.'))-1-j] and hold[len(dic['labels'][i].split('.'))-1-j] == 1:
-                hold[len(dic['labels'][i].split('.'))-1-j]=0
-
-    for i in range(len(hold)):
-        if hold[len(hold)-1-i] == 1:
-            for j in range(len(dic['labels'])):
-                temp=[]
-                for k in range(len(dic['labels'][j].split('.'))):
-                    if k != len(hold)-1-i:
-                        temp.append(dic['labels'][j].split('.')[k])
-                dic['labels'][j]=string.join(temp,'.')
+        for i in range(len(hold)):
+            if hold[len(hold)-1-i] == 1:
+                for j in range(len(dic['labels'])):
+                    temp=[]
+                    for k in range(len(dic['labels'][j].split(divider))):
+                        if k != len(hold)-1-i:
+                            temp.append(dic['labels'][j].split(divider)[k])
+                    dic['labels'][j]=string.join(temp,divider)
 
 
 def givehelp(a):
@@ -1027,6 +935,7 @@ def givehelp(a):
         -logx,-logy: set X and/or Y axes to be log scales
         -xr,-yr: Set scale of X and Y ranges, should be followed with two numbers sepearated by a colon. Ex: -xr 1:5
         -layout: Used to specify the tiled output layout. Write input as <# rows>:<# columns>
+        -legend: This will turn on keys in the plots. On each plot things will be named using a unique combination of column heading, column number, and filename
         
         Example:
             I have a large number of files and I would like them to be plotted with 9 plots tiled per output. I would like them to be eps files, and I have a thing for green circles. In each file the data is in columns 6 wide, but I only want the first and fourth columns plotted. The first column is x, the other will be y. I would type:
