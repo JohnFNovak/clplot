@@ -101,7 +101,6 @@ def main():
         plt.savefig(outputname)
         print"printed to",outputname
 
-
 def detect_blocks(dataarray):
     """This function runs over an array of data pulled from a file and detects the structure so that the proper plotting method can be deduced the structure is returned as a list. Each entry is one block of the data in the form of (width of block, height of block) This will detect contiguous rectangular blocks of data with the same formats of text vs numbers"""
     global dic
@@ -126,6 +125,7 @@ def detect_blocks(dataarray):
     if mixed:
         print "you seem to have text interspersed with your data"
         print "Does this look familiar?:",' '.join(dataarray[0])
+        #print "Does this look familiar?:",dataarray[0]
     if mixed and len(dataarray[0]) == len(dataarray[1]):
         print "we are going to use",string.join(dataarray[0]),"as labels"
         dic['columnlabel'].append(dataarray[0])
@@ -191,7 +191,6 @@ def detect_blocks(dataarray):
         structure.append((width[i],height[i]));
 
     return structure
-
 
 def smart_plot(X):
     """This function takes a rectangular array of data and plots it first looks at the dimensions of the data, the it 'decides' the best way to plot it. Hence, 'smart plot'"""
@@ -294,15 +293,15 @@ def smart_plot(X):
                     mults = mults + 1
                 elif Form[j+1+mults] == "y":
                     z.append(x)
-                    z.append(list(X[:,count]))
+                    z.append(list(X[count,:]))
                     dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][j+mults]))
                     errs.append([0]*len(x))
-                    errs.append([0]*len(list(X[:,count])))
+                    errs.append([0]*len(list(X[count,:])))
                 elif Form[j+1+mults] == "e":
                     if Form[j+mults] == "y": 
-                        errs[-1]=list(X[:,count])
+                        errs[-1]=list(X[count,:])
                     if Form[j+mults] == "x": 
-                        errs[-2]=list(X[:,count])
+                        errs[-2]=list(X[count,:])
                 count = count + 1
                 if j+mults+2 == len(Form):
                     break
@@ -479,7 +478,6 @@ def smart_plot(X):
         if dic['Numbering']:
             dic['numbered'] = dic['numbered'] + 1
 
-
 def is_it_ordered(vals):
     """This function takes a list of numbers are returns whether or not they are in order"""
 
@@ -491,7 +489,6 @@ def is_it_ordered(vals):
         ordered = True
 
     return ordered
-
 
 def remove_empties(struct,x):
     """This function runs through the data and the structure array and removes entries that are either empty or are singular"""
@@ -514,7 +511,6 @@ def remove_empties(struct,x):
             count=count+1
 
     return struct,x
-
 
 def readdat(struct,block,data):
     x=[]
@@ -539,9 +535,11 @@ def readdat(struct,block,data):
 
     return x
 
-
 def plot(z,errs):
     """This function takes a list z of lists and trys to plot them. the first list is always x, and the folowing are always y's"""
+
+    #print z
+    #print errs
 
     global dic
     points=[]
@@ -553,7 +551,7 @@ def plot(z,errs):
     if dic['Ustyle']:
         style=dic['Ustyle']
     else:
-        style=['o','.',',','v','^','<','>','-','--','-.',':','1','2','3','4','s','p','*','h','H','+','x','D','d','|','_']
+        style=['o','v','^','<','>','1','2','3','4','-','--','-.',':','s','p','*','h','H','+','x','D','d','|','_','.',',']
     for s in style:
         for c in colors:
             points.append(str(c+s))
@@ -614,6 +612,8 @@ def plot(z,errs):
     if not plottingerrors:
         plt.plot(*arg)
 
+    plt.grid(True)
+
     if dic['legend']:
         plt.legend()
         dic['labels']=[]
@@ -644,7 +644,6 @@ def plot(z,errs):
 
     if dic['MULTIT'] and dic['multicounttile'] == int(dic['MULTIT']):
             dic['multicounttile'] = 0
-
 
 def plot_arragnement():
     """This function looks at dic['MULTIT'] and decides how to structure the multiplot it returns a 2 tuple which is the root for the first 2 argument of the subplot command"""
@@ -713,7 +712,6 @@ def plot_arragnement():
 
     return form
 
-
 def check_type(x):
     #KN: While this is a nice job, you just recreated python's type() function
     #http://stackoverflow.com/questions/2225038/python-determine-the-type-of-an-object
@@ -729,11 +727,9 @@ def check_type(x):
 
     return verdict
 
-
 def skip(iterator, n):
     '''Advance the iterator n-steps ahead. If n is none, consume entirely.'''
     collections.deque(itertools.islice(iterator, n), maxlen=0)
-
 
 def read_data(filename):
     data=[]
@@ -753,13 +749,14 @@ def read_data(filename):
         delimiter = "."
     else:
         print "Um, we can't figure out what you are using for data seperation"
+
     datafile.seek(0)
     for line in datafile:
         data.append(tuple(line.split(delimiter)))
+    datafile.close()
 
     data = remove_formating(data)
     return data
-
 
 def remove_formating(data):
     """This function removes thigns that will cause problems like endlines"""
@@ -769,13 +766,13 @@ def remove_formating(data):
         for j in i:
             temp2=[]
             for k in j:
-                if (k != '\n') and (k != ''):
+                if (k != '\n') and (k != '') and (k!='\r'):
                     temp2.append(k)
-            temp.append(string.join(temp2,''))
+            if(len(temp2)>0):
+                temp.append(string.join(temp2,''))
         cleaned.append(temp)
 
     return cleaned
-
 
 def read_flags():
     global dic
@@ -828,7 +825,7 @@ def read_flags():
             dic['columnsfirst'] = True
         elif "-legend" == flag:
             dic['legend'] = True
-        elif "-" == flag[:1] and case != 7:
+        elif "-" == flag[0] and case != 7 and case != 8 and case != 9:
             case = -1
             print "flag",flag,"not recognized"
         else:
@@ -862,14 +859,14 @@ def read_flags():
             if case == -1:
                 print "ignoring",flag
 
-
 def parse_legend():
     global dic
-    delimiters = ['/','.','_','-']
+    delimiters = ['/','-','.','/','-','.']
 
     for divider in delimiters:
         tester=dic['labels'][0].split(divider)
 
+        #From the front
         for i in dic['labels']:
             if len(i.split(divider)) > len(tester):
                 tester=i.split(divider)
@@ -893,6 +890,7 @@ def parse_legend():
 
         tester=dic['labels'][0].split(divider)
 
+        #From the back
         for i in dic['labels']:
             if len(i.split(divider)) > len(tester):
                 tester=i.split(divider)
@@ -913,7 +911,6 @@ def parse_legend():
                         if k != len(hold)-1-i:
                             temp.append(dic['labels'][j].split(divider)[k])
                     dic['labels'][j]=string.join(temp,divider)
-
 
 def givehelp(a):
     """This command prints out some help"""
