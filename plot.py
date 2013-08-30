@@ -521,7 +521,7 @@ def plot(z,errs):
     #print errs
 
     global dic
-    points=[]
+    points=dic['colorstyle']
 
     if dic['Ucolor']:
         colors=dic['Ucolor']
@@ -534,6 +534,12 @@ def plot(z,errs):
     for s in style:
         for c in colors:
             points.append(str(c+s))
+
+    size = [dic['default_marker_size']]*len(points)
+    for i in range(len(points)):
+        if len(points[i].split(';')) == 2:
+            points[i] = points[i].split(';')[0]
+            size[i] = float(points[i].split(';')[1])
 
     if dic['MULTIT']:
         dic['multicounttile'] = dic['multicounttile'] + 1
