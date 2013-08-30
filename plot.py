@@ -547,7 +547,7 @@ def plot(z,errs):
             plt.subplot2grid((dic['layout'][0],dic['layout'][1]),(((dic['multicounttile']-1)-(dic['multicounttile']-1)%dic['layout'][1])/dic['layout'][1],((dic['multicounttile']-1)%dic['layout'][1])))
         if dic['columnsfirst']:
             plt.subplot2grid((dic['layout'][0],dic['layout'][1]),((dic['multicounttile']-1)%dic['layout'][1])),(((dic['multicounttile']-1)-(dic['multicounttile']-1)%dic['layout'][1])/dic['layout'][1])
-        plt.title(str(dic['multicounttile']))
+        #plt.title(str(dic['multicounttile']), fontsize = dic['fontsize'])
         dic['LefttoPlot'] = True
 
     plottingerrors = True
