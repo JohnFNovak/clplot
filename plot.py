@@ -972,12 +972,22 @@ def givehelp(a):
         -mt: Multiplot Tile. This flag should be followed by the number of tiles desired for each plot printed to file
         -t: Type. The '-t' flag can be used to change the output type. The following are acceptable: bmp, emf, eps, gif, jpeg, jpg, pdf, png, ps, raw, rgba, svg, svgz, tif, tiff
         -c: Color. The '-c' flag can be used to set the color. Multiple colors can be specified and they will be iterated over. The color options are: b,g,r,c,m,y,k
-        -s: Point Style: The '-s' flag can be used to specify the point style. Multiple styles can be specified and they will be iterated over. The point style options are:-,--,-.,:,.,,,o,v,^,<,>,1,2,3,4,s,p,*,h,H,+,x,D,d,|,_
+        -s: Point Style: The '-s' flag can be used to specify the point style. Multiple styles can be specified and they will be iterated over. The point style options are:-,--,-.,:,.,,,o,v,^,<,>,1,2,3,4,s,p,*,h,H,+,x,D,d,|,_ . To plot with hollow points, append the style with '!'. Note that it may be necessary to put a style in quotes because the command line my try to interpret it.
+        -cs: Color/Style, or Custom Style: The '-cs' flag can be used to directly specify the point color and style to be used. All of the colors and styles listed previously will work. The flags must be a valid color followed (without a space) by a valid point style. Ex: blue, big diamond, hollow -'bD!'
         -xl,-yl: Set X and y labels. SHould be followed by a string, which can be in quotes
         -logx,-logy: set X and/or Y axes to be log scales
         -xr,-yr: Set scale of X and Y ranges, should be followed with two numbers sepearated by a colon. Ex: -xr 1:5
         -layout: Used to specify the tiled output layout. Write input as <# rows>:<# columns>
         -legend: This will turn on keys in the plots. On each plot things will be named using a unique combination of column heading, column number, and filename
+        -bands: This will plot all y error bars as y error bands
+        -fontsize: This sets the size of the font used for axis labels and titles. The default it 20.
+        -grid : This turns on background grids
+        -systematic: This sets the size of the systematic error. It is a percent and is added to the y error bars.
+        -sys_err: This turns on the plotting of systematic errors.
+        -markersize: changes the default marker size. Default 5
+        -yscaled: Scale all of the y values by a constant number
+        -xscaled: Scale all of the x values by a constant number
+        -alpha: Sets the 'opaque-ness' of shaded objects (like error bars). Number [0,1], default 0.25
         
         Example:
             I have a large number of files and I would like them to be plotted with 9 plots tiled per output. I would like them to be eps files, and I have a thing for green circles. In each file the data is in columns 6 wide, but I only want the first and fourth columns plotted. The first column is x, the other will be y. I would type:
