@@ -618,7 +618,7 @@ def plot(z,errs):
     if not plottingerrors:
         plt.plot(*arg)
 
-    plt.grid(True)
+    plt.grid(dic['grid'])
 
     if dic['legend']:
         plt.legend()
