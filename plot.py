@@ -886,12 +886,27 @@ def read_flags():
                 dic['y_label'] = flag
             if case == 12:
                 dic['layout'] = tuple(map(int,flag.split(":")))
+            if case == 13:
+                dic['colorstyle'].append(flag)
+            if case == 14:
+                dic['fontsize'] = float(flag)
+            if case == 15:
+                dic['sys_err_default'] = float(flag)
+            if case == 16:
+                dic['xscaled'] = float(flag)
+            if case == 17:
+                dic['yscaled'] = float(flag)
+            if case == 18:
+                dic['default_marker_size'] = float(flag)
+            if case == 19:
+                dic['alpha'] = float(flag)
             if case == -1:
                 print "ignoring",flag
 
 def parse_legend():
     global dic
-    delimiters = ['/','-','.','/','-','.']
+    #delimiters = ['/','-','.','/','-','.']
+    delimiters = ['/','-']
 
     for divider in delimiters:
         tester=dic['labels'][0].split(divider)
