@@ -643,6 +643,7 @@ def plot(z,errs):
         outputname=outputname+"."+dic['TYPE']
 
     if not dic['MULTIT'] or (dic['MULTIT'] and dic['multicounttile'] == int(dic['MULTIT'])):
+        plt.tight_layout() # Experimental, and may cause problems
         plt.savefig(outputname)
         print"printed to",outputname
         plt.clf()
