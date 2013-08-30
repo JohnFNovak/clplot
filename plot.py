@@ -39,6 +39,10 @@ def main():
     for filename in dic['files']:
         print "plotting",filename
         dic['currentfile'] = filename
+        dic['sys_err'] = dic['sys_err_default']
+        if len(filename.split('#')) == 2:
+            dic['sys_err'] = float(filename.split('#')[1])
+            filename = filename.split('#')[0]
         if dic['outputs']:
             dic['currentoutput'] = dic['outputs'].pop(0)
         dic['numbered'] = 0;
@@ -426,6 +430,17 @@ def smart_plot(X):
         print "I don't know what to do with this block. It's",width,"by",height
 
     if z:
+        new_err = []
+        new_z = []
+        for k in range(len(z)/2):
+            new_err.append([[],[]])
+            new_err.append([[],[]])
+            for l in range(len(z[2*k+1])):
+                new_err[2*k][0].append(errs[2*k][l])
+                new_err[2*k][1].append(errs[2*k][l])
+                new_err[2*k+1][0].append(float(errs[2*k+1][l]))
+                new_err[2*k+1][1].append(dic['sys_err']*float(z[2*k+1][l]))
+        errs = new_err
         if dic['MULTIP']:
             z = dic['remnants'] + z
             errs = dic['remnanterrors'] + errs
@@ -536,38 +551,59 @@ def plot(z,errs):
 
     arg = []
 
-    #print z
-    #print errs
-
     if dic['x_range']:
         plt.xlim(dic['x_range'])
     if dic['y_range']:
         plt.ylim(dic['y_range'])
     if dic['x_label']:
-        plt.xlabel(dic['x_label'])
+        plt.xlabel(dic['x_label'], fontsize = dic['fontsize'])
     if dic['y_label']:
-        plt.ylabel(dic['y_label'])
+        plt.ylabel(dic['y_label'], fontsize = dic['fontsize'])
     if dic['x_log']:
-        plt.xscale('log')
+        plt.xscale('log', nonposx='clip')
     if dic['y_log']:
-        plt.yscale('log')
+        plt.yscale('log', nonposy='clip')
+
+    plt.tick_params(axis='both', which='major', labelsize=dic['fontsize']*0.75)
+    plt.tick_params(axis='both', which='minor', labelsize=dic['fontsize']*0.75)
 
     if dic['legend'] and len(dic['labels']) > 1:
         parse_legend();
 
     for k in range(0,len(z),2):
-        z[k]=map(float,z[k])
-        z[k+1]=map(float,z[k+1])
-        if plottingerrors:
-            if errs[k] == 0:
-                errs[k]=[0]*len(z[k])
+        marker = points[((k+1)/2)%len(points)]
+        msize  = size[((k+1)/2)%len(points)]
+        ecolor = points[((k+1)/2)%len(points)][0]
+        fcolor = points[((k+1)/2)%len(points)][0]
+        if marker[-1] == '!':
+            fcolor = 'white'
+            marker = marker[:-1]
+        z[k]=map(lambda x: float(x) * dic['xscaled'],z[k])
+        z[k+1]=map(lambda x: float(x) * dic['yscaled'],z[k+1])
+        #z[k+1]=map(float,z[k+1])
+        if plottingerrors and not dic['errorbands']:
+            if errs[k][0] == 0:
+                errs[k][0]=[0]*len(z[k])
             else:
-                errs[k]=map(float,errs[k])
-            if errs[k+1] == 0:
-                plt.errorbar(z[k],z[k+1],xerr=errs[k],yerr=[0]*len(z[k+1]),fmt=points[((k+1)/2)%len(points)],label=dic['labels'][(k+1)/2])
-            if errs[k+1] != 0:
-                errs[k+1]=map(float,errs[k+1])
-                plt.errorbar(z[k],z[k+1],xerr=errs[k],yerr=errs[k+1],fmt=points[((k+1)/2)%len(points)],label=dic['labels'][(k+1)/2])
+                errs[k][0]=map(lambda x: float(x) * dic['xscaled'],errs[k][0])
+            if errs[k+1][0] == 0:
+                plt.errorbar(z[k],z[k+1],xerr=errs[k][0],yerr=[0]*len(z[k+1]),fmt=marker,label=dic['labels'][(k+1)/2],mec=ecolor,mfc=fcolor,ms=msize)
+            if errs[k+1][0] != 0:
+                errs[k+1][0]=map(lambda x: float(x) * dic['yscaled'],errs[k+1][0])
+                plt.errorbar(z[k],z[k+1],xerr=errs[k][0],yerr=errs[k+1][0],fmt=marker,label=dic['labels'][(k+1)/2],mec=ecolor,mfc=fcolor,ms=msize)
+        if plottingerrors and dic['errorbands']:
+            if errs[k][0] == 0:
+                errs[k][0]=[0]*len(z[k])
+            else:
+                errs[k][0]=map(lambda x: float(x) * dic['xscaled'],errs[k][0])
+            if errs[k+1][0] == 0:
+                plt.errorbar(z[k],z[k+1],xerr=[0]*len(errs[k][0]),yerr=[0]*len(z[k+1]),fmt=marker,label=dic['labels'][(k+1)/2],mec=ecolor,mfc=fcolor,ms=msize)
+            if errs[k+1][0] != 0:
+                errs[k+1][0]=map(lambda x: float(x) * dic['yscaled'],errs[k+1][0])
+                plt.errorbar(z[k],z[k+1],xerr=[0]*len(errs[k][0]),yerr=[0]*len(errs[k+1][0]),fmt=marker,label=dic['labels'][(k+1)/2],mec=ecolor,mfc=fcolor,ms=msize)
+                plt.fill_between(np.array(z[k]),np.array(z[k+1])+np.array(errs[k+1][0]),np.array(z[k+1])-np.array(errs[k+1][0]),facecolor=ecolor,alpha=dic['alpha'],interpolate=True,linewidth=0)
+        if dic['plot_sys_err']:
+            plt.fill_between(np.array(z[k]),np.array(z[k+1])+np.array(errs[k+1][1]),np.array(z[k+1])-np.array(errs[k+1][1]),facecolor=ecolor,alpha=dic['alpha'],interpolate=True,linewidth=0)
         if not plottingerrors:
             arg.append(z[k]) # x vector
             arg.append(z[k+1])
@@ -778,14 +814,40 @@ def read_flags():
             case = 11
         elif "-logx" == flag:
             dic['x_log'] = True
+            if dic['x_range']:
+                if dic['x_range'][0] <= 0:
+                    dic['x_range'] = None
         elif "-logy" == flag:
             dic['y_log'] = True
+            if dic['y_range']:
+                if dic['y_range'][0] <= 0:
+                    dic['y_range'] = None
         elif '-layout' == flag:
             case = 12
+        elif '-cs' == flag:
+            case = 13
+        elif '-fontsize' == flag:
+            case = 14
+        elif '-systematic' == flag:
+            case = 15
+        elif '-xscaled' == flag:
+            case = 16
+        elif '-yscaled' == flag:
+            case = 17
+        elif '-markersize' == flag:
+            case = 18
+        elif '-alpha' == flag:
+            case = 19
         elif '-columnsfirst' == flag:
             dic['columnsfirst'] = True
         elif "-legend" == flag:
             dic['legend'] = True
+        elif '-bands' == flag:
+            dic['errorbands'] = True
+        elif '-grid' == flag:
+            dic['grid'] = True
+        elif '-sys_err' == flag:
+            dic['plot_sys_err'] = True
         elif "-" == flag[0] and case != 7 and case != 8 and case != 9:
             case = -1
             print "flag",flag,"not recognized"
@@ -905,5 +967,5 @@ def givehelp(a):
 if __name__ == '__main__':
     """A Python program that takes a file or list of filesand creates plots of the data."""
     global dic # All global values are being dumped in here
-    dic = { 'formats':[],'outputs':[],'TYPE':'eps','MULTIT':None,'MULTIP':None,'layout':None,'columnsfirst':False,'Ucolor':[],'Ustyle':[],'Messy':False,'remnants':[],'remnanterrors':[],'LefttoPlot':False,'x_range':None,'y_range':None,'x_label':None,'y_label':None,'x_log':False,'y_log':False,'currentfile':None,'numbered':None,'Numbering':None,'multicounttile':0,'multicountpile':0,'currentoutput':None,'files':[],'legend':False,'labels':[],'columnlabel':[],'currentstruct':0}
+    dic = { 'formats':[],'outputs':[],'TYPE':'pdf','MULTIT':None,'MULTIP':None,'layout':None,'columnsfirst':False,'Ucolor':[],'Ustyle':[],'Messy':False,'remnants':[],'remnanterrors':[],'LefttoPlot':False,'x_range':None,'y_range':None,'x_label':None,'y_label':None,'x_log':False,'y_log':False,'currentfile':None,'numbered':None,'Numbering':None,'multicounttile':0,'multicountpile':0,'currentoutput':None,'files':[],'legend':False,'labels':[],'columnlabel':[],'currentstruct':0,'colorstyle':[],'errorbands':False, 'fontsize':20, 'grid':False,'sys_err_default':0,'default_marker_size':5,'sys_err':0,'plot_sys_err':False, 'yscaled':1, 'xscaled':1, 'alpha':0.25}
     main()
