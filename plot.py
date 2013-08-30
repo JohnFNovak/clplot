@@ -19,8 +19,6 @@ import os
 import time
 import string
 
-
-# Define a main() function
 def main():
     global dic
 
@@ -45,27 +43,16 @@ def main():
             dic['currentoutput'] = dic['outputs'].pop(0)
         dic['numbered'] = 0;
         
-        #Use a context manager for this, python handles opening and closing files way more efficiently that way
-        #with open(filename, 'r') as datafile:
-        #     do stuff
-        #http://effbot.org/zone/python-with-statement.htm
-
         # Now read data file
         data=read_data(filename)
 
         # Make decisions about what is in the file
         if len(data) > 0:
             struct=detect_blocks(data)
-            #print struct
-            #for i in range(len(data)):
-            #    print data[i]
             
             #KN: This can be done far more efficiently using a filter() function. Either specify a one liner using a lambda function or
             #write a function that returns True or False
             struct,data=remove_empties(struct,data)
-            #print struct
-            #for i in range(len(data)):
-            #    print data[i]
 
             # Plot the stuff
             #KN: Not needed. Make sure the struct is a list, and just have the for loop, followed by Numbering = len(struct) > 1
@@ -125,7 +112,6 @@ def detect_blocks(dataarray):
     if mixed:
         print "you seem to have text interspersed with your data"
         print "Does this look familiar?:",' '.join(dataarray[0])
-        #print "Does this look familiar?:",dataarray[0]
     if mixed and len(dataarray[0]) == len(dataarray[1]):
         print "we are going to use",string.join(dataarray[0]),"as labels"
         dic['columnlabel'].append(dataarray[0])
@@ -197,8 +183,6 @@ def smart_plot(X):
     global dic
 
     Form = None
-
-    #print X
 
     z=[]
     errs=[]
@@ -313,20 +297,17 @@ def smart_plot(X):
             z=[list(X[:,0]),list(X[:,1])]
             dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
             errs = [[0] * len(z[0])] * 2
-            #errs = [[0]*len(z[0])] + errs
         elif is_it_ordered(list(X[:,1])):
             # ordered by the second column
             z[list(X[:,1]),list(X[:,0])]
             dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
             errs = [[0] * len(z[0])] * 2
-            #errs = [[0]*len(z[0])] + errs
         else:
             # not ordered
             print "No deducable ordering, I'll just pick which column is x"
             z=[list(X[:,0]),list(X[:,1])]
             dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
             errs = [[0] * len(z[0])] * 2
-            #errs = [[0]*len(z[0])] + errs
     elif width!=2 and height==2:
         # the good old fashioned two rows
         print "the good old fashioned two rows"
@@ -335,19 +316,16 @@ def smart_plot(X):
             z=[list(X[0,:]),list(X[1,:])]
             dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
             errs = [[0] * len(z[0])] * 2
-            #errs = [[0]*len(z[0])] + errs
         elif is_it_ordered(list(X[1,:])):
             # ordered by the second row
             z=[list(X[1,:]),list(X[0,:])]
             dic['labels'].append(dic['currentfile']+"/"+str(dic['columnlabel'][dic['currentstruct']][int(len(z)/2)]))
             errs = [[0] * len(z[0])] * 2
-            #errs = [[0]*len(z[0])] + errs
         else:
             # not ordered
             print "No deducable ordering, I'll just pick which row is x"
             z=[list(X[0,:]),list(X[1,:])]
             errs = [[0] * len(z[0])] * 2
-            #errs = [[0]*len(z[0])] + errs
     elif width < 5 and height < 5:
         # we are going to have to look around for ordered things
         needx = True
@@ -447,23 +425,15 @@ def smart_plot(X):
     else:
         print "I don't know what to do with this block. It's",width,"by",height
 
-    #print z
-    #print errs
-
     if z:
         if dic['MULTIP']:
             z = dic['remnants'] + z
             errs = dic['remnanterrors'] + errs
             dic['multicountpile'] = 0
-            #print (len(z)-len(z)%int(dic['MULTIP']))/int(dic['MULTIP'])/2
             if (len(z)-len(z)%int(dic['MULTIP']))/int(dic['MULTIP'])/2 > 1:
                 dic['multicountpile'] = 1
-            #print (len(z)-len(z)%int(dic['MULTIP']))/int(dic['MULTIP'])
             if (len(z)-len(z)%int(dic['MULTIP']))/int(dic['MULTIP']) > 0:
                 for i in range(0,(len(z)-len(z)%int(dic['MULTIP']))/int(dic['MULTIP'])/2):
-                    #print z[:(int(dic['MULTIP'])*2)][0][:5]
-                    #print dic['multicountpile'],'\n'
-                    #print (int(dic['MULTIP'])*2),len(z)
                     plot(z[:(int(dic['MULTIP'])*2)],errs[:(int(dic['MULTIP'])*2)])
                     z = z[(int(dic['MULTIP'])*2):]
                     errs = errs[(int(dic['MULTIP'])*2):]
@@ -519,20 +489,14 @@ def readdat(struct,block,data):
     for i in range(len(struct)):
         if i == block:
             # this is the block you want
-            #print range(struct[i][1])
-            #print data
             for j in range(struct[i][1]):
                 k=j+linenum
-                #print k
                 x.append(data[k])
             break
         else:
             # count how many lines down you have to look
             linenum=linenum+struct[i][1]
     
-    #for i in range(len(x)):
-    #    print i,x[i]
-
     return x
 
 def plot(z,errs):
@@ -713,9 +677,6 @@ def plot_arragnement():
     return form
 
 def check_type(x):
-    #KN: While this is a nice job, you just recreated python's type() function
-    #http://stackoverflow.com/questions/2225038/python-determine-the-type-of-an-object
-    #JN: This function is actually slightly different from type() because it returns a string, not a type, and because it aggregates all types of numerals: float=num, int=num. Not to say I couldn't reach the same end with type()
     """This function returns a string. It returns "str" if x is a string, and "num" if x is a number"""
 
     try:
@@ -941,10 +902,8 @@ def givehelp(a):
     exit(1)
 
 
-# This is the standard boilerplate that calls the main() function.
 if __name__ == '__main__':
     """A Python program that takes a file or list of filesand creates plots of the data."""
-
     global dic # All global values are being dumped in here
     dic = { 'formats':[],'outputs':[],'TYPE':'eps','MULTIT':None,'MULTIP':None,'layout':None,'columnsfirst':False,'Ucolor':[],'Ustyle':[],'Messy':False,'remnants':[],'remnanterrors':[],'LefttoPlot':False,'x_range':None,'y_range':None,'x_label':None,'y_label':None,'x_log':False,'y_log':False,'currentfile':None,'numbered':None,'Numbering':None,'multicounttile':0,'multicountpile':0,'currentoutput':None,'files':[],'legend':False,'labels':[],'columnlabel':[],'currentstruct':0}
     main()
