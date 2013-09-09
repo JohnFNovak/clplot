@@ -577,6 +577,14 @@ def plot(z,errs):
     if dic['legend'] and len(dic['labels']) > 1:
         parse_legend();
 
+    if dic['norm']:
+        for k in range(0,len(z),2):
+            X = np.array(z[k]).astype(float)
+            Y = np.array(z[k+1]).astype(float)
+            width = np.mean(X[1:] - X[:-1])
+            Y = Y / np.sum(Y * width)
+            z[k+1] = Y.tolist()
+
     for k in range(0,len(z),2):
         marker = points[((k+1)/2)%len(points)]
         msize  = size[((k+1)/2)%len(points)]
@@ -868,6 +876,8 @@ def read_flags():
             dic['grid'] = True
         elif '-sys_err' == flag:
             dic['plot_sys_err'] = True
+        elif '-norm' == flag:
+            dic['norm'] = True
         elif "-" == flag[0] and case != 7 and case != 8 and case != 9:
             case = -1
             print "flag",flag,"not recognized"
@@ -1001,6 +1011,7 @@ def givehelp(a):
         -yscaled: Scale all of the y values by a constant number
         -xscaled: Scale all of the x values by a constant number
         -alpha: Sets the 'opaque-ness' of shaded objects (like error bars). Number [0,1], default 0.25
+        -norm: Normalizes all plots
         
         Example:
             I have a large number of files and I would like them to be plotted with 9 plots tiled per output. I would like them to be eps files, and I have a thing for green circles. In each file the data is in columns 6 wide, but I only want the first and fourth columns plotted. The first column is x, the other will be y. I would type:
@@ -1012,5 +1023,5 @@ def givehelp(a):
 if __name__ == '__main__':
     """A Python program that takes a file or list of filesand creates plots of the data."""
     global dic # All global values are being dumped in here
-    dic = { 'formats':[],'outputs':[],'TYPE':'pdf','MULTIT':None,'MULTIP':None,'layout':None,'columnsfirst':False,'Ucolor':[],'Ustyle':[],'Messy':False,'remnants':[],'remnanterrors':[],'LefttoPlot':False,'x_range':None,'y_range':None,'x_label':None,'y_label':None,'x_log':False,'y_log':False,'currentfile':None,'numbered':None,'Numbering':None,'multicounttile':0,'multicountpile':0,'currentoutput':None,'files':[],'legend':False,'labels':[],'columnlabel':[],'currentstruct':0,'colorstyle':[],'errorbands':False, 'fontsize':20, 'grid':False,'sys_err_default':0,'default_marker_size':5,'sys_err':0,'plot_sys_err':False, 'yscaled':1, 'xscaled':1, 'alpha':0.25}
+    dic = { 'formats':[],'outputs':[],'TYPE':'pdf','MULTIT':None,'MULTIP':None,'layout':None,'columnsfirst':False,'Ucolor':[],'Ustyle':[],'Messy':False,'remnants':[],'remnanterrors':[],'LefttoPlot':False,'x_range':None,'y_range':None,'x_label':None,'y_label':None,'x_log':False,'y_log':False,'currentfile':None,'numbered':None,'Numbering':None,'multicounttile':0,'multicountpile':0,'currentoutput':None,'files':[],'legend':False,'labels':[],'columnlabel':[],'currentstruct':0,'colorstyle':[],'errorbands':False, 'fontsize':20, 'grid':False,'sys_err_default':0,'default_marker_size':5,'sys_err':0,'plot_sys_err':False, 'yscaled':1, 'xscaled':1, 'alpha':0.25, 'norm':False}
     main()
