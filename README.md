@@ -20,11 +20,16 @@ numpy<br />
 matplotlib<br />
 
 ####To use:<br />
-  python plot.py
+  python main.py
 
   for more information call<br />
-    python plot.py -help
+    python main.py -help
 
 ####Contents of this file:<br />
-plot.py - the program. <br />
+main.py - the heart of the program. <br />
+plot.py - sub-module handles the actual plotting. <br />
+structure.py - sub-module which handles the automatic structure determination. <br />
+helpers.py - sub-module which is collection of helper functions. <br />
+data\_handler.py - sub-module which handles file interactions. <br />
+globe.py - sub-module which holds shared globals. <br />
 various .txt files - testing files
