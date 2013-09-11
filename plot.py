@@ -67,11 +67,11 @@ def main():
                     dic['currentstruct']=i
                     dic['Numbering'] = True
                     x=readdat(struct,i,data)
-                    smart_plot(np.array(x))
+                    unstruct_plot(np.array(x))
             else:
                 # just make one plot, with the same name as the input file
                 x=readdat(struct,0,data)
-                smart_plot(np.array(x))
+                unstruct_plot(np.array(x))
 
     if dic['remnants']:
         plot(dic['remnants'],dic['remnanterrors'])
@@ -183,8 +183,8 @@ def detect_blocks(dataarray):
 
     return structure
 
-def smart_plot(X):
-    """This function takes a rectangular array of data and plots it first looks at the dimensions of the data, the it 'decides' the best way to plot it. Hence, 'smart plot'"""
+def unstruct_plot(X):
+    """This function takes a rectangular array of data and plots it first looks at the dimensions of the data, the it 'decides' the best way to plot it"""
     global dic
 
     Form = None
