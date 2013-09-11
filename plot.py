@@ -21,6 +21,7 @@ import string
 import subprocess
 import globe
 from structure import *
+from helpers import *
 
 def main():
     dic = globe.dic
