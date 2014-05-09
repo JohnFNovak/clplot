@@ -5,7 +5,7 @@
 #
 # John Novak
 
-# This sub-module handles file reading stuff
+# This sub-file handles file reading stuff
 
 # written for Python 2.6. Requires Scipy,  Numpy,  and Matplotlib
 

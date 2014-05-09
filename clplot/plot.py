@@ -5,8 +5,7 @@
 # John Novak
 # June 4, 2012 - July 19, 2012
 
-# Run with: python plot.py
-# or just: ./plot.py (after making it executable, obviously)
+# this sub-file holds the functions relating to generating the output
 
 # written for Python 2.6. Requires Scipy, Numpy, and Matplotlib
 

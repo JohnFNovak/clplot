@@ -5,7 +5,7 @@
 #
 # John Novak
 
-# This sub-module does some of the automatic structure determination
+# This sub-file just holds a global dictionary
 
 # written for Python 2.6. Requires Scipy, Numpy, and Matplotlib
 

@@ -4,7 +4,7 @@
 #
 # John Novak
 
-# This sub-module contains helper functions
+# This sub-file contains helper functions
 
 # written for Python 2.6. Requires Scipy, Numpy, and Matplotlib
 

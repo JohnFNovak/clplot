@@ -5,8 +5,8 @@
 # John Novak
 # June 4, 2012 - July 19, 2012
 
-# Run with: python plot.py
-# or just: ./plot.py (after making it executable, obviously)
+# Run with: python clplot.py
+# or just: ./clplot.py (after making it executable, obviously)
 
 # written for Python 2.6. Requires Scipy, Numpy, and Matplotlib
 
