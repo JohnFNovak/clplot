@@ -375,6 +375,21 @@ def EmbedData(outputname, z, errs):
     if dic['TYPE'] == 'jpg':
         with open(outputname, 'a') as f:
             f.write(StringToEmbed)
+    elif dic['TYPE'] == 'pdf':
+        print "Warning!!! Embedding data in pdfs is not reliable storage!"
+        print "Many PDF viewers will strip data which is not viewed!"
+        with open(outputname, 'r') as f:
+            filetext = f.read().split('\n')
+        obj_count = 0
+        for line in filetext:
+            if ' obj' in line:
+                obj_count = max(int(line.split()[0]), obj_count)
+            if 'xref' in line:
+                break
+        StringToEmbed = '%d 0 obj\n<</Novak\'s_EmbedData >>\nstream\n' % (
+                        obj_count + 1) + StringToEmbed + 'endstream\nendobj'
+        with open(outputname, 'w') as f:
+            f.write('\n'.join(filetext[:2] + [StringToEmbed] + filetext[2:]))
 
 
 if __name__ == '__main__':
