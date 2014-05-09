@@ -372,7 +372,7 @@ def EmbedData(outputname, z, errs):
         StringToEmbed += 'y ' + ' '.join(map(str, z[k + 1])) + '\n'
         StringToEmbed += 'y err ' + ' '.join(map(str, errs[k + 1])) + '\n'
     with open(outputname, 'a') as f:
-        if len(outputname) > 4 and outputname[-4:] == '.jpg':
+        if dic['TYPE'] == '.jpg':
             f.write(StringToEmbed)
 
 
