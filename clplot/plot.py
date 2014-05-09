@@ -163,17 +163,8 @@ def plot(z, errs):
         plt.tight_layout()  # Experimental, and may cause problems
         plt.savefig(outputname)
         print"printed to", outputname
-        f = open(outputname, 'a')
-        f.write("Creation time: " + time.ctime() + '\n')
-        f.write("Current directory: " + os.path.abspath('.') + '\n')
-        f.write("Creation command: " + ' '.join(sys.argv) + '\n')
-        f.write("Plotted values:" + '\n')
-        for k in range(0, len(z), 2):
-            f.write('x ' + ' '.join(map(str, z[k])) + '\n')
-            f.write('x err ' + ' '.join(map(str, errs[k])) + '\n')
-            f.write('y ' + ' '.join(map(str, z[k + 1])) + '\n')
-            f.write('y err ' + ' '.join(map(str, errs[k + 1])) + '\n')
-        f.close()
+        if dic['EmbedData']:
+            EmbedData(outputname, z, errs)
         #check = subprocess.call(['open', outputname])
         plt.clf()
         dic['LefttoPlot'] = False
@@ -368,6 +359,19 @@ def parse_legend():
                         if k != len(hold)-1-i:
                             temp.append(dic['labels'][j].split(divider)[k])
                     dic['labels'][j] = string.join(temp, divider)
+
+
+def EmbedData(outputname, z, errs):
+    with open(outputname, 'a') as f:
+        f.write("Creation time: " + time.ctime() + '\n')
+        f.write("Current directory: " + os.path.abspath('.') + '\n')
+        f.write("Creation command: " + ' '.join(sys.argv) + '\n')
+        f.write("Plotted values:" + '\n')
+        for k in range(0, len(z), 2):
+            f.write('x ' + ' '.join(map(str, z[k])) + '\n')
+            f.write('x err ' + ' '.join(map(str, errs[k])) + '\n')
+            f.write('y ' + ' '.join(map(str, z[k + 1])) + '\n')
+            f.write('y err ' + ' '.join(map(str, errs[k + 1])) + '\n')
 
 
 if __name__ == '__main__':
