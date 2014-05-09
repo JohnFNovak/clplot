@@ -163,17 +163,8 @@ def plot(z, errs):
         plt.tight_layout()  # Experimental, and may cause problems
         plt.savefig(outputname)
         print"printed to", outputname
-        f = open(outputname, 'a')
-        f.write("Creation time: " + time.ctime() + '\n')
-        f.write("Current directory: " + os.path.abspath('.') + '\n')
-        f.write("Creation command: " + ' '.join(sys.argv) + '\n')
-        f.write("Plotted values:" + '\n')
-        for k in range(0, len(z), 2):
-            f.write('x ' + ' '.join(map(str, z[k])) + '\n')
-            f.write('x err ' + ' '.join(map(str, errs[k])) + '\n')
-            f.write('y ' + ' '.join(map(str, z[k + 1])) + '\n')
-            f.write('y err ' + ' '.join(map(str, errs[k + 1])) + '\n')
-        f.close()
+        if dic['EmbedData']:
+            EmbedData(outputname, z, errs)
         #check = subprocess.call(['open', outputname])
         plt.clf()
         dic['LefttoPlot'] = False
@@ -368,6 +359,37 @@ def parse_legend():
                         if k != len(hold)-1-i:
                             temp.append(dic['labels'][j].split(divider)[k])
                     dic['labels'][j] = string.join(temp, divider)
+
+
+def EmbedData(outputname, z, errs):
+    dic = globe.dic
+    StringToEmbed = "Creation time: " + time.ctime() + '\n'
+    StringToEmbed += "Current directory: " + os.path.abspath('.') + '\n'
+    StringToEmbed += "Creation command: " + ' '.join(sys.argv) + '\n'
+    StringToEmbed += "Plotted values:" + '\n'
+    for k in range(0, len(z), 2):
+        StringToEmbed += 'x ' + ' '.join(map(str, z[k])) + '\n'
+        StringToEmbed += 'x err ' + ' '.join(map(str, errs[k])) + '\n'
+        StringToEmbed += 'y ' + ' '.join(map(str, z[k + 1])) + '\n'
+        StringToEmbed += 'y err ' + ' '.join(map(str, errs[k + 1])) + '\n'
+    if dic['TYPE'] == 'jpg':
+        with open(outputname, 'a') as f:
+            f.write(StringToEmbed)
+    elif dic['TYPE'] == 'pdf':
+        print "Warning!!! Embedding data in pdfs is not reliable storage!"
+        print "Many PDF viewers will strip data which is not viewed!"
+        with open(outputname, 'r') as f:
+            filetext = f.read().split('\n')
+        obj_count = 0
+        for line in filetext:
+            if ' obj' in line:
+                obj_count = max(int(line.split()[0]), obj_count)
+            if 'xref' in line:
+                break
+        StringToEmbed = '%d 0 obj\n<</Novak\'s_EmbedData >>\nstream\n' % (
+                        obj_count + 1) + StringToEmbed + 'endstream\nendobj'
+        with open(outputname, 'w') as f:
+            f.write('\n'.join(filetext[:2] + [StringToEmbed] + filetext[2:]))
 
 
 if __name__ == '__main__':
