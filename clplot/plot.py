@@ -20,7 +20,7 @@ from structure import *
 from helpers import *
 
 
-def plot(z, errs):
+def plot(z, errs, Force=False):
     """This function takes a list z of lists and trys to plot them. the first \
     list is always x, and the folowing are always y's"""
 
@@ -53,11 +53,10 @@ def plot(z, errs):
     if dic['MULTIT']:
         dic['multicounttile'] = dic['multicounttile'] + 1
         if not dic['columnsfirst']:
-            plt.subplot2grid((dic['layout'][0], dic['layout'][1]), (((dic['multicounttile']-1)-(dic['multicounttile']-1)%dic['layout'][1])/dic['layout'][1], ((dic['multicounttile']-1)%dic['layout'][1])))
+            plt.subplot2grid((dic['layout'][0], dic['layout'][1]), (((dic['multicounttile']-1)-(dic['multicounttile']-1) % dic['layout'][1])/dic['layout'][1], ((dic['multicounttile']-1) % dic['layout'][1])))
         if dic['columnsfirst']:
-            plt.subplot2grid((dic['layout'][0], dic['layout'][1]), ((dic['multicounttile']-1)%dic['layout'][1])), (((dic['multicounttile']-1)-(dic['multicounttile']-1)%dic['layout'][1])/dic['layout'][1])
+            plt.subplot2grid((dic['layout'][0], dic['layout'][1]), ((dic['multicounttile']-1) % dic['layout'][1])), (((dic['multicounttile']-1)-(dic['multicounttile']-1) % dic['layout'][1])/dic['layout'][1])
         #plt.title(str(dic['multicounttile']), fontsize = dic['fontsize'])
-        dic['LefttoPlot'] = True
 
     plottingerrors = True
     #for k in errs:
@@ -151,7 +150,10 @@ def plot(z, errs):
     if dic['MULTIT']:
         outputname = outputname + "_tiled"
     if dic['multicountpile'] != 0:
-        outputname = outputname + "_" + str(dic['multicountpile'])
+        if Force:
+            outputname = outputname + "_" + str(dic['multicountpile'] + 1)
+        else:
+            outputname = outputname + "_" + str(dic['multicountpile'])
     if dic['MULTIP']:
         outputname = outputname + "_multip"
     if dic['TYPE'][0] == ".":
@@ -159,7 +161,8 @@ def plot(z, errs):
     else:
         outputname = outputname + "." + dic['TYPE']
 
-    if not dic['MULTIT'] or (dic['MULTIT'] and dic['multicounttile'] == int(dic['MULTIT'])):
+    if not dic['MULTIT'] or (dic['MULTIT'] and dic['multicounttile'] ==
+                             int(dic['MULTIT'])) or Force:
         plt.tight_layout()  # Experimental, and may cause problems
         plt.savefig(outputname)
         print"printed to", outputname
@@ -167,7 +170,6 @@ def plot(z, errs):
             EmbedData(outputname, z, errs)
         #check = subprocess.call(['open', outputname])
         plt.clf()
-        dic['LefttoPlot'] = False
 
     if dic['MULTIT'] and dic['multicounttile'] == int(dic['MULTIT']):
             dic['multicounttile'] = 0

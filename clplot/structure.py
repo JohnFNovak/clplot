@@ -330,8 +330,6 @@ def unstruct_plot(X):
                     dic['multicountpile'] = dic['multicountpile'] + 1
             dic['remnants'] = z
             dic['remnanterrors'] = errs
-            if dic['remnants']:
-                dic['LefttoPlot'] = True
         else:
             # just plot it
             plot(z, errs)

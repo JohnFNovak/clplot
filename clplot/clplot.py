@@ -71,24 +71,7 @@ def main():
                 unstruct_plot(np.array(x))
 
     if dic['remnants']:
-        plot(dic['remnants'], dic['remnanterrors'])
-
-    if dic['LefttoPlot']:
-        outputname = string.split(dic['currentfile'], ".")[0]
-        if dic['numbered'] != 0:
-            outputname = outputname+"_"+str(dic['numbered'])
-        if dic['MULTIT']:
-            outputname = outputname+"_tiled"
-        if dic['multicountpile'] != 0:
-            outputname = outputname+"_"+str(dic['multicountpile']+1)
-        if dic['MULTIP']:
-            outputname = outputname+"_multip"
-        if dic['TYPE'][0] == ".":
-            outputname = outputname+dic['TYPE']
-        else:
-            outputname = outputname+"."+dic['TYPE']
-        plt.savefig(outputname)
-        print"printed to", outputname
+        plot(dic['remnants'], dic['remnanterrors'], Force=True)
 
 
 if __name__ == '__main__':
