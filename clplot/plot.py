@@ -362,6 +362,7 @@ def parse_legend():
 
 
 def EmbedData(outputname, z, errs):
+    dic = globe.dic
     StringToEmbed = "Creation time: " + time.ctime() + '\n'
     StringToEmbed += "Current directory: " + os.path.abspath('.') + '\n'
     StringToEmbed += "Creation command: " + ' '.join(sys.argv) + '\n'
