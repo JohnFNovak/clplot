@@ -22,7 +22,6 @@ from data_handler import *
 
 def main():
     dic = globe.dic
-
     read_flags()
 
     if dic['MULTIT'] and dic['layout']:
@@ -104,6 +103,5 @@ def main():
 if __name__ == '__main__':
     """A Python program that takes a file or list of filesand creates plots of
     the data."""
-    global dic  # All global values are being dumped in here
     dic = globe.dic
     main()
