@@ -1,4 +1,4 @@
-# !/usr/bin/python
+#!/usr/bin/env python
 
 # A universal command line plotting script
 #
