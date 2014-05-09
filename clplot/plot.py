@@ -479,7 +479,7 @@ def remove_formating(data):
 
 
 def read_flags():
-    global dic
+    dic = globe.dic
     case = 0  # 0 is reading files, 1 is outputs, 2 is formats, etc
 
     if len(sys.argv) == 1:

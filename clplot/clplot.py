@@ -21,7 +21,7 @@ from data_handler import *
 
 
 def main():
-    global dic
+    dic = globe.dic
 
     read_flags()
 
