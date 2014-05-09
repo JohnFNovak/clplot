@@ -183,23 +183,6 @@ def plot(z, errs):
             dic['multicounttile'] = 0
 
 
-def remove_formating(data):
-    """This function removes thigns that will cause problems like endlines"""
-    cleaned = []
-    for i in data:
-        temp = []
-        for j in i:
-            temp2 = []
-            for k in j:
-                if (k != '\n') and (k != '') and (k != '\r'):
-                    temp2.append(k)
-            if(len(temp2) > 0):
-                temp.append(string.join(temp2, ''))
-        cleaned.append(temp)
-
-    return cleaned
-
-
 def read_flags():
     dic = globe.dic
     case = 0  # 0 is reading files, 1 is outputs, 2 is formats, etc
