@@ -362,16 +362,18 @@ def parse_legend():
 
 
 def EmbedData(outputname, z, errs):
+    StringToEmbed = "Creation time: " + time.ctime() + '\n'
+    StringToEmbed += "Current directory: " + os.path.abspath('.') + '\n'
+    StringToEmbed += "Creation command: " + ' '.join(sys.argv) + '\n'
+    StringToEmbed += "Plotted values:" + '\n'
+    for k in range(0, len(z), 2):
+        StringToEmbed += 'x ' + ' '.join(map(str, z[k])) + '\n'
+        StringToEmbed += 'x err ' + ' '.join(map(str, errs[k])) + '\n'
+        StringToEmbed += 'y ' + ' '.join(map(str, z[k + 1])) + '\n'
+        StringToEmbed += 'y err ' + ' '.join(map(str, errs[k + 1])) + '\n'
     with open(outputname, 'a') as f:
-        f.write("Creation time: " + time.ctime() + '\n')
-        f.write("Current directory: " + os.path.abspath('.') + '\n')
-        f.write("Creation command: " + ' '.join(sys.argv) + '\n')
-        f.write("Plotted values:" + '\n')
-        for k in range(0, len(z), 2):
-            f.write('x ' + ' '.join(map(str, z[k])) + '\n')
-            f.write('x err ' + ' '.join(map(str, errs[k])) + '\n')
-            f.write('y ' + ' '.join(map(str, z[k + 1])) + '\n')
-            f.write('y err ' + ' '.join(map(str, errs[k + 1])) + '\n')
+        if len(outputname) > 4 and outputname[-4:] == '.jpg':
+            f.write(StringToEmbed)
 
 
 if __name__ == '__main__':
