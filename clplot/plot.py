@@ -5,8 +5,7 @@
 # John Novak
 # June 4, 2012 - July 19, 2012
 
-# Run with: python plot.py
-# or just: ./plot.py (after making it executable, obviously)
+# this sub-file holds the functions relating to generating the output
 
 # written for Python 2.6. Requires Scipy, Numpy, and Matplotlib
 
@@ -21,239 +20,7 @@ from structure import *
 from helpers import *
 
 
-def main():
-    dic = globe.dic
-
-    read_flags()
-
-    if dic['MULTIT'] and dic['layout']:
-        if (dic['layout'][0]*dic['layout'][1] < int(dic['MULTIT'])):
-            print "The layout that you specified was too small"
-            dic['layout'] = plot_arragnement()
-        else:
-            print "We are using the layout you specified:", dic['layout'][0],
-            print "by", dic['layout'][1]
-    if dic['MULTIT'] and not dic['layout']:
-        dic['layout'] = plot_arragnement()
-
-    if dic['outputs'] and (len(dic['outputs']) != len(dic['files'])) and not (dic['MULTIT'] or dic['MULTIP']):
-        print "If you are going to specify output names,",
-        print "you must specify one output file per input file."
-
-    for filename in dic['files']:
-        print "plotting", filename
-        dic['currentfile'] = filename
-        dic['sys_err'] = dic['sys_err_default']
-        if len(filename.split('#')) == 2:
-            dic['sys_err'] = float(filename.split('#')[1])
-            filename = filename.split('#')[0]
-        if dic['outputs']:
-            dic['currentoutput'] = dic['outputs'].pop(0)
-        dic['numbered'] = 0
-
-        # Now read data file
-        data = read_data(filename)
-
-        # Make decisions about what is in the file
-        if len(data) > 0:
-            struct = detect_blocks(data)
-
-            # KN: This can be done far more efficiently using a filter() \
-            # function. Either specify a one liner using a lambda function or
-            # write a function that returns True or False
-            struct, data = remove_empties(struct, data)
-
-            # Plot the stuff
-            # KN: Not needed. Make sure the struct is a list, and just have \
-            # the for loop, followed by Numbering = len(struct) > 1
-            if len(struct) > 1:
-                # make multiple plots, each with the name of the input file \
-                # followed by a _
-                for i in range(len(struct)):
-                    dic['currentstruct'] = i
-                    dic['Numbering'] = True
-                    x = readdat(struct, i, data)
-                    unstruct_plot(np.array(x))
-            else:
-                # just make one plot, with the same name as the input file
-                x = readdat(struct, 0, data)
-                unstruct_plot(np.array(x))
-
-    if dic['remnants']:
-        plot(dic['remnants'], dic['remnanterrors'])
-
-    if dic['LefttoPlot']:
-        outputname = string.split(dic['currentfile'], ".")[0]
-        if dic['numbered'] != 0:
-            outputname = outputname + "_" + str(dic['numbered'])
-        if dic['MULTIT']:
-            outputname = outputname + "_tiled"
-        if dic['multicountpile'] != 0:
-            outputname = outputname + "_" + str(dic['multicountpile'] + 1)
-        if dic['MULTIP']:
-            outputname = outputname + "_multip"
-        if dic['TYPE'][0] == ".":
-            outputname = outputname + dic['TYPE']
-        else:
-            outputname = outputname + "." + dic['TYPE']
-        plt.savefig(outputname)
-        print"printed to", outputname
-
-
-def detect_blocks(dataarray):
-    """This function runs over an array of data pulled from a file and \
-    detects the structure so that the proper plotting method can be deduced \
-    the structure is returned as a list. Each entry is one block of the data \
-    in the form of (width of block, height of block) This will detect \
-    contiguous rectangular blocks of data with the same formats of text vs \
-    numbers"""
-    dic = globe.dic
-
-    width = []
-    height = []
-    block = 0
-    structure = []
-    previous = []
-
-    width.append(len(dataarray[0]))
-    height.append(1)
-    mixed = False
-    for i in range(len(dataarray[0])):
-        if check_type(dataarray[0][i]) == 'str':
-            previous.append(check_type(dataarray[0][i]))
-            if i != 0:
-                mixed = True
-                dic['Messy'] = True
-        else:
-            previous.append(check_type(dataarray[0][i]))
-    if mixed:
-        print "you seem to have text interspersed with your data"
-        print "Does this look familiar?:", ' '.join(dataarray[0])
-    if mixed and len(dataarray[0]) == len(dataarray[1]):
-        print "we are going to use", string.join(dataarray[0]), "as labels"
-        dic['columnlabel'].append(dataarray[0])
-    else:
-        dic['columnlabel'].append(range(len(dataarray[0])))
-
-    for i in range(1, len(dataarray)):
-        mixed = False
-        if(len(dataarray[i]) == width[block]):
-            good = True
-            for x in range(len(dataarray[i])):
-                if check_type(dataarray[i][x]) != previous[x]:
-                    good = False
-            if good:
-                height[block] = height[block] + 1
-            else:
-                block = block + 1
-                height.append(1)
-                width.append(len(dataarray[i]))
-                previous = []
-                for x in range(len(dataarray[i])):
-                    if check_type(dataarray[i][x]) == 'str':
-                        previous.append(check_type(dataarray[i][x]))
-                        if x != 0:
-                            mixed = True
-                            dic['Messy'] = True
-                    else:
-                        previous.append(check_type(dataarray[i][x]))
-            if mixed:
-                print "you seem to have text interspersed with your data"
-                print "Does this look familiar?:", ' '.join(dataarray[i])
-            if mixed and len(dataarray) != i + 1:
-                if len(dataarray[i]) == len(dataarray[i + 1]):
-                    print "we are going to use", string.join(dataarray[i]),
-                    print "as labels"
-                    dic['columnlabel'].append(dataarray[i])
-            else:
-                dic['columnlabel'].append(range(len(dataarray[i])))
-        else:
-            block = block + 1
-            height.append(1)
-            width.append(len(dataarray[i]))
-            previous = []
-            for x in range(len(dataarray[i])):
-                if check_type(dataarray[i][x]) == 'str':
-                    previous.append(check_type(dataarray[i][x]))
-                    if x != 0:
-                        mixed = True
-                        dic['Messy'] = True
-                else:
-                    previous.append(check_type(dataarray[i][x]))
-            if mixed:
-                print "you seem to have text interspersed with your data"
-                print "Does this look familiar?:", ' '.join(dataarray[i])
-            if mixed and len(dataarray) != i + 1:
-                if len(dataarray[i]) == len(dataarray[i + 1]):
-                    print "we are going to use", string.join(dataarray[i]),
-                    print "as labels"
-                    dic['columnlabel'].append(dataarray[i])
-            else:
-                dic['columnlabel'].append(range(len(dataarray[i])))
-
-    for i in range(block + 1):
-        #print "block", i, "is", width[i], "by", height[i]
-        structure.append((width[i], height[i]))
-
-    return structure
-
-
-def is_it_ordered(vals):
-    """This function takes a list of numbers are returns whether or not they \
-    are in order"""
-
-    ordered = False
-
-    if vals == sorted(vals):
-        ordered = True
-    if vals == sorted(vals, reverse=True):
-        ordered = True
-
-    return ordered
-
-
-def remove_empties(struct, x):
-    """This function runs through the data and the structure array and \
-    removes entries that are either empty or are singular"""
-
-    linenum = len(x)-1
-    structBK = struct
-    count = 0
-    blocks = len(structBK)
-
-    for i in range(blocks):
-        j = -i - 1 + count  # do this backward
-        if structBK[j][0] > 1 and structBK[j][1] > 1:
-            # the entry is good: it's more than a single column or single line
-            linenum = linenum-struct[j][1]
-        else:
-            # the entry is worthless: it's a single line
-            del struct[len(structBK) + j]
-            del x[linenum]
-            linenum = linenum-1
-            count = count + 1
-
-    return struct, x
-
-
-def readdat(struct, block, data):
-    x = []
-    linenum = 0
-
-    for i in range(len(struct)):
-        if i == block:
-            # this is the block you want
-            for j in range(struct[i][1]):
-                k = j + linenum
-                x.append(data[k])
-            break
-        else:
-            # count how many lines down you have to look
-            linenum = linenum + struct[i][1]
-    return x
-
-
-def plot(z, errs):
+def plot(z, errs, Force=False):
     """This function takes a list z of lists and trys to plot them. the first \
     list is always x, and the folowing are always y's"""
 
@@ -286,11 +53,10 @@ def plot(z, errs):
     if dic['MULTIT']:
         dic['multicounttile'] = dic['multicounttile'] + 1
         if not dic['columnsfirst']:
-            plt.subplot2grid((dic['layout'][0], dic['layout'][1]), (((dic['multicounttile']-1)-(dic['multicounttile']-1)%dic['layout'][1])/dic['layout'][1], ((dic['multicounttile']-1)%dic['layout'][1])))
+            plt.subplot2grid((dic['layout'][0], dic['layout'][1]), (((dic['multicounttile']-1)-(dic['multicounttile']-1) % dic['layout'][1])/dic['layout'][1], ((dic['multicounttile']-1) % dic['layout'][1])))
         if dic['columnsfirst']:
-            plt.subplot2grid((dic['layout'][0], dic['layout'][1]), ((dic['multicounttile']-1)%dic['layout'][1])), (((dic['multicounttile']-1)-(dic['multicounttile']-1)%dic['layout'][1])/dic['layout'][1])
+            plt.subplot2grid((dic['layout'][0], dic['layout'][1]), ((dic['multicounttile']-1) % dic['layout'][1])), (((dic['multicounttile']-1)-(dic['multicounttile']-1) % dic['layout'][1])/dic['layout'][1])
         #plt.title(str(dic['multicounttile']), fontsize = dic['fontsize'])
-        dic['LefttoPlot'] = True
 
     plottingerrors = True
     #for k in errs:
@@ -384,7 +150,10 @@ def plot(z, errs):
     if dic['MULTIT']:
         outputname = outputname + "_tiled"
     if dic['multicountpile'] != 0:
-        outputname = outputname + "_" + str(dic['multicountpile'])
+        if Force:
+            outputname = outputname + "_" + str(dic['multicountpile'] + 1)
+        else:
+            outputname = outputname + "_" + str(dic['multicountpile'])
     if dic['MULTIP']:
         outputname = outputname + "_multip"
     if dic['TYPE'][0] == ".":
@@ -392,90 +161,18 @@ def plot(z, errs):
     else:
         outputname = outputname + "." + dic['TYPE']
 
-    if not dic['MULTIT'] or (dic['MULTIT'] and dic['multicounttile'] == int(dic['MULTIT'])):
+    if not dic['MULTIT'] or (dic['MULTIT'] and dic['multicounttile'] ==
+                             int(dic['MULTIT'])) or Force:
         plt.tight_layout()  # Experimental, and may cause problems
         plt.savefig(outputname)
         print"printed to", outputname
-        f = open(outputname, 'a')
-        f.write("Creation time: " + time.ctime() + '\n')
-        f.write("Current directory: " + os.path.abspath('.') + '\n')
-        f.write("Creation command: " + ' '.join(sys.argv) + '\n')
-        f.write("Plotted values:" + '\n')
-        for k in range(0, len(z), 2):
-            f.write('x ' + ' '.join(map(str, z[k])) + '\n')
-            f.write('x err ' + ' '.join(map(str, errs[k])) + '\n')
-            f.write('y ' + ' '.join(map(str, z[k + 1])) + '\n')
-            f.write('y err ' + ' '.join(map(str, errs[k + 1])) + '\n')
-        f.close()
+        if dic['EmbedData']:
+            EmbedData(outputname, z, errs)
         #check = subprocess.call(['open', outputname])
         plt.clf()
-        dic['LefttoPlot'] = False
 
     if dic['MULTIT'] and dic['multicounttile'] == int(dic['MULTIT']):
             dic['multicounttile'] = 0
-
-
-def check_type(x):
-    """This function returns a string. It returns "str" if x is a string, """\
-        """and "num" if x is a number"""
-    try:
-        float(x)
-    except ValueError:
-        verdict = "str"
-    else:
-        verdict = "num"
-
-    return verdict
-
-
-def skip(iterator, n):
-    '''Advance the iterator n-steps ahead. If n is none, consume entirely.'''
-    collections.deque(itertools.islice(iterator, n), maxlen=0)
-
-
-def read_data(filename):
-    data = []
-    datafile = open(filename, "r")
-
-    test = datafile.readline()
-    while test[0] == "#" and len(test) > 1:  # Not a comment or empty
-        test = datafile.readline()
-    delimiter = " "
-    if len(test.split(" ")) > 1:
-        delimiter = " "
-    elif len(test.split(", ")) > 1:
-        delimiter = ", "
-    elif len(test.split(";")) > 1:
-        delimiter = ";"
-    elif len(test.split(".")) > 1:
-        delimiter = "."
-    else:
-        print "Um, we can't figure out what you are using for data seperation"
-
-    datafile.seek(0)
-    for line in datafile:
-        data.append(tuple(line.split(delimiter)))
-    datafile.close()
-
-    data = remove_formating(data)
-    return data
-
-
-def remove_formating(data):
-    """This function removes thigns that will cause problems like endlines"""
-    cleaned = []
-    for i in data:
-        temp = []
-        for j in i:
-            temp2 = []
-            for k in j:
-                if (k != '\n') and (k != '') and (k != '\r'):
-                    temp2.append(k)
-            if(len(temp2) > 0):
-                temp.append(string.join(temp2, ''))
-        cleaned.append(temp)
-
-    return cleaned
 
 
 def read_flags():
@@ -666,44 +363,35 @@ def parse_legend():
                     dic['labels'][j] = string.join(temp, divider)
 
 
-def givehelp(a):
-    """This command prints out some help"""
-
-    print """This is a function which trys to inteligently create plots from text files. This program is 'inteligent' in that it will try various assumptions about the format of the data in the files and the form the output should be given in. So, in many cases it can produce reasonable plots even if no information is provided by the user other than the filenames\n"""
-    if a == 0:
-        print "for more help call this program with the '-help' flag"
-    if a == 1:
-        print """This program takes a number of flags:
-        -i: Input. The input files can be listed first, or they can be listed following the '-i' flag.
-        -o: Output. The output files will be given the same names as the input files unless otherwise specified. The output files can be specifiec by listing them after the '-o' flag
-        -f: Format: the format of the data in the input files can be specified with '-f'. Each format flag should start with either 'c' or 'r', specifying wether the data should be read as columns or row. The following characters each represent a row or column. They can be: 'x', 'y', '_', '*', or a numeral (<10). 'x' specifies the x values, 'y' specifies 'y' values'. Rows or columens marked with '_' will be skipped. 'y's or '_'s can be proceeded by a numeral, and the 'y' or '_' will be read that many times. Formats will only be used if their dimensions exactly fit the data found in the file, unless the format string is ended with a '*', then the format will be used of any data found in the file which has dimensions greater than or equal to that stated in the format flag.
-        -mp: Multiplot Pile. This flag should be followed by the number of y's which the user wants to have plotted in the same window. It should be noted that if one block of text contains multiple y columns or rows, the '-mp' flag will cause them to be treated individually
-        -mt: Multiplot Tile. This flag should be followed by the number of tiles desired for each plot printed to file
-        -t: Type. The '-t' flag can be used to change the output type. The following are acceptable: bmp, emf, eps, gif, jpeg, jpg, pdf, png, ps, raw, rgba, svg, svgz, tif, tiff
-        -c: Color. The '-c' flag can be used to set the color. Multiple colors can be specified and they will be iterated over. The color options are: b, g, r, c, m, y, k
-        -s: Point Style: The '-s' flag can be used to specify the point style. Multiple styles can be specified and they will be iterated over. The point style options are:-, --, -., :, ., , , o, v, ^, <, >, 1, 2, 3, 4, s, p, *, h, H, +, x, D, d, |, _ . To plot with hollow points, append the style with '!'. Note that it may be necessary to put a style in quotes because the command line my try to interpret it.
-        -cs: Color/Style, or Custom Style: The '-cs' flag can be used to directly specify the point color and style to be used. All of the colors and styles listed previously will work. The flags must be a valid color followed (without a space) by a valid point style. Ex: blue, big diamond, hollow -'bD!'
-        -xl, -yl: Set X and y labels. SHould be followed by a string, which can be in quotes
-        -logx, -logy: set X and/or Y axes to be log scales
-        -xr, -yr: Set scale of X and Y ranges, should be followed with two numbers sepearated by a colon. Ex: -xr 1:5
-        -layout: Used to specify the tiled output layout. Write input as <# rows>:<# columns>
-        -legend: This will turn on keys in the plots. On each plot things will be named using a unique combination of column heading, column number, and filename
-        -bands: This will plot all y error bars as y error bands
-        -fontsize: This sets the size of the font used for axis labels and titles. The default it 20.
-        -grid : This turns on background grids
-        -systematic: This sets the size of the systematic error. It is a percent and is added to the y error bars.
-        -sys_err: This turns on the plotting of systematic errors.
-        -markersize: changes the default marker size. Default 5
-        -yscaled: Scale all of the y values by a constant number
-        -xscaled: Scale all of the x values by a constant number
-        -alpha: Sets the 'opaque-ness' of shaded objects (like error bars). Number [0, 1], default 0.25
-        -norm: Normalizes all plots
-
-        Example:
-            I have a large number of files and I would like them to be plotted with 9 plots tiled per output. I would like them to be eps files, and I have a thing for green circles. In each file the data is in columns 6 wide, but I only want the first and fourth columns plotted. The first column is x, the other will be y. I would type:
-            # python plot.py * -t eps -mt 9 -c b -s o -f x3_y*"""
-
-    exit(1)
+def EmbedData(outputname, z, errs):
+    dic = globe.dic
+    StringToEmbed = "Creation time: " + time.ctime() + '\n'
+    StringToEmbed += "Current directory: " + os.path.abspath('.') + '\n'
+    StringToEmbed += "Creation command: " + ' '.join(sys.argv) + '\n'
+    StringToEmbed += "Plotted values:" + '\n'
+    for k in range(0, len(z), 2):
+        StringToEmbed += 'x ' + ' '.join(map(str, z[k])) + '\n'
+        StringToEmbed += 'x err ' + ' '.join(map(str, errs[k])) + '\n'
+        StringToEmbed += 'y ' + ' '.join(map(str, z[k + 1])) + '\n'
+        StringToEmbed += 'y err ' + ' '.join(map(str, errs[k + 1])) + '\n'
+    if dic['TYPE'] == 'jpg':
+        with open(outputname, 'a') as f:
+            f.write(StringToEmbed)
+    elif dic['TYPE'] == 'pdf':
+        print "Warning!!! Embedding data in pdfs is not reliable storage!"
+        print "Many PDF viewers will strip data which is not viewed!"
+        with open(outputname, 'r') as f:
+            filetext = f.read().split('\n')
+        obj_count = 0
+        for line in filetext:
+            if ' obj' in line:
+                obj_count = max(int(line.split()[0]), obj_count)
+            if 'xref' in line:
+                break
+        StringToEmbed = '%d 0 obj\n<</Novak\'s_EmbedData >>\nstream\n' % (
+                        obj_count + 1) + StringToEmbed + 'endstream\nendobj'
+        with open(outputname, 'w') as f:
+            f.write('\n'.join(filetext[:2] + [StringToEmbed] + filetext[2:]))
 
 
 if __name__ == '__main__':

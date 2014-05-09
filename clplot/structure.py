@@ -5,7 +5,7 @@
 #
 # John Novak
 
-# This sub-module does some of the automatic structure determination
+# This sub-file does some of the automatic structure determination
 
 # written for Python 2.6. Requires Scipy, Numpy, and Matplotlib
 
@@ -330,8 +330,6 @@ def unstruct_plot(X):
                     dic['multicountpile'] = dic['multicountpile'] + 1
             dic['remnants'] = z
             dic['remnanterrors'] = errs
-            if dic['remnants']:
-                dic['LefttoPlot'] = True
         else:
             # just plot it
             plot(z, errs)

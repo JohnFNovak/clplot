@@ -5,7 +5,7 @@
 #
 # John Novak
 
-# This sub-module handles file reading stuff
+# This sub-file handles file reading stuff
 
 # written for Python 2.6. Requires Scipy,  Numpy,  and Matplotlib
 
@@ -15,11 +15,7 @@ from helpers import *
 
 
 def detect_blocks(dataarray):
-    """This function runs over an array of data pulled from a file and \
-detects the structure so that the proper plotting method can be deduced the \
-structure is returned as a list. Each entry is one block of the data in the \
-form of (width of block,  height of block) This will detect contiguous \
-rectangular blocks of data with the same formats of text vs numbers"""
+    """This function runs over an array of data pulled from a file and detects the structure so that the proper plotting method can be deduced the structure is returned as a list. Each entry is one block of the data in the form of (width of block,  height of block) This will detect contiguous rectangular blocks of data with the same formats of text vs numbers"""
     dic = globe.dic
 
     width = []

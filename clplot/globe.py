@@ -5,7 +5,7 @@
 #
 # John Novak
 
-# This sub-module does some of the automatic structure determination
+# This sub-file just holds a global dictionary
 
 # written for Python 2.6. Requires Scipy, Numpy, and Matplotlib
 
@@ -21,7 +21,6 @@ dic = {'formats': [],
        'Messy': False,
        'remnants': [],
        'remnanterrors': [],
-       'LefttoPlot': False,
        'x_range': None,
        'y_range': None,
        'x_label': None,
@@ -50,7 +49,8 @@ dic = {'formats': [],
        'yscaled': 1,
        'xscaled': 1,
        'alpha': 0.25,
-       'norm': False}
+       'norm': False,
+       'EmbedData': True}
 
 
 if __name__ == '__main__':

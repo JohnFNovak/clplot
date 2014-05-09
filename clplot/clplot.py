@@ -5,8 +5,8 @@
 # John Novak
 # June 4, 2012 - July 19, 2012
 
-# Run with: python plot.py
-# or just: ./plot.py (after making it executable, obviously)
+# Run with: python clplot.py
+# or just: ./clplot.py (after making it executable, obviously)
 
 # written for Python 2.6. Requires Scipy, Numpy, and Matplotlib
 
@@ -22,7 +22,6 @@ from data_handler import *
 
 def main():
     dic = globe.dic
-
     read_flags()
 
     if dic['MULTIT'] and dic['layout']:
@@ -65,45 +64,18 @@ def main():
             struct, data = remove_empties(struct, data)
 
             # Plot the stuff
-            # KN: Not needed. Make sure the struct is a list, and just have the
-            # for loop, followed by Numbering = len(struct) > 1
-            if len(struct) > 1:
-                # make multiple plots, each with the name of the input file
-                # followed by a _
-                for i in range(len(struct)):
-                    dic['currentstruct'] = i
-                    dic['Numbering'] = True
-                    x = readdat(struct, i, data)
-                    unstruct_plot(np.array(x))
-            else:
-                # just make one plot, with the same name as the input file
-                x = readdat(struct, 0, data)
+            for i in range(len(struct)):
+                dic['currentstruct'] = i
+                dic['Numbering'] = len(struct) > 1
+                x = readdat(struct, i, data)
                 unstruct_plot(np.array(x))
 
     if dic['remnants']:
-        plot(dic['remnants'], dic['remnanterrors'])
-
-    if dic['LefttoPlot']:
-        outputname = string.split(dic['currentfile'], ".")[0]
-        if dic['numbered'] != 0:
-            outputname = outputname+"_"+str(dic['numbered'])
-        if dic['MULTIT']:
-            outputname = outputname+"_tiled"
-        if dic['multicountpile'] != 0:
-            outputname = outputname+"_"+str(dic['multicountpile']+1)
-        if dic['MULTIP']:
-            outputname = outputname+"_multip"
-        if dic['TYPE'][0] == ".":
-            outputname = outputname+dic['TYPE']
-        else:
-            outputname = outputname+"."+dic['TYPE']
-        plt.savefig(outputname)
-        print"printed to", outputname
+        plot(dic['remnants'], dic['remnanterrors'], Force=True)
 
 
 if __name__ == '__main__':
     """A Python program that takes a file or list of filesand creates plots of
     the data."""
-    global dic  # All global values are being dumped in here
     dic = globe.dic
     main()
