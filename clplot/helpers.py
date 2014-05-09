@@ -14,8 +14,7 @@ import string
 
 
 def is_it_ordered(vals):
-    """This function takes a list of numbers are returns whether or not they \
-are in order"""
+    """This function takes a list of numbers are returns whether or not they are in order"""
 
     ordered = False
 
@@ -28,8 +27,7 @@ are in order"""
 
 
 def remove_empties(struct, x):
-    """This function runs through the data and the structure array and \
-removes entries that are either empty or are singular"""
+    """This function runs through the data and the structure array and removes entries that are either empty or are singular"""
 
     linenum = len(x)-1
     structBK = struct
@@ -52,8 +50,7 @@ removes entries that are either empty or are singular"""
 
 
 def check_type(x):
-    """This function returns a string. It returns "str" if x is a string, \
-and "num" if x is a number"""
+    """This function returns a string. It returns "str" if x is a string, and "num" if x is a number"""
 
     try:
         float(x)
