@@ -58,17 +58,17 @@ def main():
         if len(data) > 0:
             struct = detect_blocks(data)
 
-            #KN: This can be done far more efficiently using a filter() \
-            function. Either specify a one liner using a lambda function or
-            #write a function that returns True or False
+            # KN: This can be done far more efficiently using a filter() \
+            # function. Either specify a one liner using a lambda function or
+            # write a function that returns True or False
             struct, data = remove_empties(struct, data)
 
             # Plot the stuff
-            #KN: Not needed. Make sure the struct is a list, and just have \
-            the for loop, followed by Numbering = len(struct) > 1
+            # KN: Not needed. Make sure the struct is a list, and just have \
+            # the for loop, followed by Numbering = len(struct) > 1
             if len(struct) > 1:
                 # make multiple plots, each with the name of the input file \
-                followed by a _#
+                # followed by a _
                 for i in range(len(struct)):
                     dic['currentstruct'] = i
                     dic['Numbering'] = True
