@@ -64,19 +64,10 @@ def main():
             struct, data = remove_empties(struct, data)
 
             # Plot the stuff
-            # KN: Not needed. Make sure the struct is a list, and just have the
-            # for loop, followed by Numbering = len(struct) > 1
-            if len(struct) > 1:
-                # make multiple plots, each with the name of the input file
-                # followed by a _
-                for i in range(len(struct)):
-                    dic['currentstruct'] = i
-                    dic['Numbering'] = True
-                    x = readdat(struct, i, data)
-                    unstruct_plot(np.array(x))
-            else:
-                # just make one plot, with the same name as the input file
-                x = readdat(struct, 0, data)
+            for i in range(len(struct)):
+                dic['currentstruct'] = i
+                dic['Numbering'] = len(struct) > 1
+                x = readdat(struct, i, data)
                 unstruct_plot(np.array(x))
 
     if dic['remnants']:
