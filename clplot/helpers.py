@@ -51,7 +51,6 @@ def remove_empties(struct, x):
 
 def check_type(x):
     """This function returns a string. It returns "str" if x is a string, and "num" if x is a number"""
-
     try:
         float(x)
     except ValueError:
