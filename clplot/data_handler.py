@@ -36,8 +36,9 @@ def detect_blocks(dataarray):
         else:
             previous.append(check_type(dataarray[0][i]))
     if mixed:
-        print "you seem to have text interspersed with your data"
-        print "Does this look familiar?:", ' '.join(dataarray[0])
+        if dic['Verbose'] > -1:
+            print "you seem to have text interspersed with your data"
+            print "Does this look familiar?:", ' '.join(dataarray[0])
     if mixed and len(dataarray[0]) == len(dataarray[1]):
         print "we are going to use", string.join(dataarray[0]), "as labels"
         dic['columnlabel'].append(dataarray[0])
@@ -67,8 +68,9 @@ def detect_blocks(dataarray):
                     else:
                         previous.append(check_type(dataarray[i][x]))
             if mixed:
-                print "you seem to have text interspersed with your data"
-                print "Does this look familiar?:", ' '.join(dataarray[i])
+                if dic['Verbose'] > -1:
+                    print "you seem to have text interspersed with your data"
+                    print "Does this look familiar?:", ' '.join(dataarray[i])
             if mixed and len(dataarray) != i+1:
                 if len(dataarray[i]) == len(dataarray[i+1]):
                     print "we are going to use", string.join(dataarray[i]),
@@ -90,8 +92,9 @@ def detect_blocks(dataarray):
                 else:
                     previous.append(check_type(dataarray[i][x]))
             if mixed:
-                print "you seem to have text interspersed with your data"
-                print "Does this look familiar?:", ' '.join(dataarray[i])
+                if dic['Verbose'] > -1:
+                    print "you seem to have text interspersed with your data"
+                    print "Does this look familiar?:", ' '.join(dataarray[i])
             if mixed and len(dataarray) != i+1:
                 if len(dataarray[i]) == len(dataarray[i+1]):
                     print "we are going to use", string.join(dataarray[i]),
