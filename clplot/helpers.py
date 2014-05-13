@@ -208,7 +208,7 @@ def read_flags():
             dic['plot_sys_err'] = True
         elif '-norm' == flag:
             dic['norm'] = True
-        elif "-" == flag[0] and case != 7 and case != 8 and case != 9 and case != 20:
+        elif "-" == flag[0] and not case in [7, 8, 9, 20]:
             case = -1
             print "flag", flag, "not recognized"
         else:
