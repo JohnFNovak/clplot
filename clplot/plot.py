@@ -175,7 +175,7 @@ def plot(z, errs, Force=False):
 
 
 def parse_legend():
-    global dic
+    dic = globe.dic
     # delimiters = ['/', '-', '.', '/', '-', '.']
     delimiters = ['/', '-']
 

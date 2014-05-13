@@ -342,6 +342,7 @@ def plot_arragnement():
     multiplot it returns a 2 tuple which is the root for the first 2 argument \
     of the subplot command"""
 
+    dic = globe.dic
     found = False
 
     if math.sqrt(float(dic['MULTIT'])) % 1 == 0:
