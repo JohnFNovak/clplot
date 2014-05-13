@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
 
+# Part of CLP
 # A universal command line plotting script
 #
 # John Novak
