@@ -11,7 +11,7 @@
 
 import string
 import globe
-from helpers import *
+from helpers import remove_formating, check_type
 
 
 def detect_blocks(dataarray):

@@ -12,13 +12,11 @@
 # written for Python 2.6. Requires Scipy, Numpy, and Matplotlib
 
 import numpy as np
-import matplotlib.pyplot as plt
-import string
 import globe
-from structure import *
-from helpers import *
-from plot import *
-from data_handler import *
+from structure import unstruct_plot, plot_arragnement
+from helpers import read_flags, remove_empties
+from plot import plot
+from data_handler import read_data, detect_blocks, readdat
 
 
 def main():

@@ -17,8 +17,6 @@ import os
 import time
 import string
 import globe
-from structure import *
-from helpers import *
 
 
 def plot(z, errs, Force=False):
