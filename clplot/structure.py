@@ -33,11 +33,13 @@ def unstruct_plot(X):
             #print entry, len(entry), width, height
             if entry[0] == "c" and (len(entry)-1 == width or (len(entry)-1 <
                                     width and entry[-1] == "*")) and not Form:
-                print "Using specified format:", entry
+                if dic['Verbose'] > 0:
+                    print "Using specified format:", entry
                 Form = entry
             elif entry[0] == "r" and (len(entry)-1 == height or (len(entry)-1 <
                                       height and entry[-1] == "*")) and not Form:
-                print "Using specified format:", entry
+                if dic['Verbose'] > 0:
+                    print "Using specified format:", entry
                 Form = entry
 
     if Form:  # If a form was specified, then use it
@@ -144,7 +146,8 @@ def unstruct_plot(X):
                     break
     elif width == 2 and height != 2:
         # the good old fashioned two columns
-        print "the good old fashioned two columns"
+        if dic['Verbose'] > 0:
+            print "the good old fashioned two columns"
         if is_it_ordered(list(X[:, 0])):
             # ordered by the first column
             z = [list(X[:, 0]), list(X[:, 1])]
@@ -169,7 +172,8 @@ def unstruct_plot(X):
             errs = [[0] * len(z[0])] * 2
     elif width != 2 and height == 2:
         # the good old fashioned two rows
-        print "the good old fashioned two rows"
+        if dic['Verbose'] > 0:
+            print "the good old fashioned two rows"
         if is_it_ordered(list(X[0, :])):
             # ordered by the first row
             z = [list(X[0, :]), list(X[1, :])]
@@ -404,7 +408,8 @@ def plot_arragnement():
         if found:
             form = (a, a + 1)
 
-    print " I have decided that the multiplots will be", form[0], "by", form[1]
+    if dic['Verbose'] > 0:
+        print " I have decided that the multiplots will be", form[0], "by", form[1]
 
     return form
 

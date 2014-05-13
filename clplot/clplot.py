@@ -40,7 +40,8 @@ def main():
         print "you must specify one output file per input file."
 
     for filename in dic['files']:
-        print "plotting", filename
+        if dic['Verbose'] > 0:
+            print "plotting", filename
         dic['currentfile'] = filename
         dic['sys_err'] = dic['sys_err_default']
         if len(filename.split('# ')) == 2:

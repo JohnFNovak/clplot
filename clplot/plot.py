@@ -164,7 +164,8 @@ def plot(z, errs, Force=False):
                              int(dic['MULTIT'])) or Force:
         plt.tight_layout()  # Experimental, and may cause problems
         plt.savefig(outputname)
-        print"printed to", outputname
+        if dic['Verbose'] > 0:
+            print"printed to", outputname
         if dic['EmbedData']:
             EmbedData(outputname, z, errs)
         #check = subprocess.call(['open', outputname])
@@ -248,8 +249,9 @@ def EmbedData(outputname, z, errs):
         with open(outputname, 'a') as f:
             f.write(StringToEmbed)
     elif dic['TYPE'] == 'pdf':
-        print "Warning!!! Embedding data in pdfs is not reliable storage!"
-        print "Many PDF viewers will strip data which is not viewed!"
+        if dic['Verbose'] > 0:
+            print "Warning!!! Embedding data in pdfs is not reliable storage!"
+            print "Many PDF viewers will strip data which is not viewed!"
         with open(outputname, 'r') as f:
             filetext = f.read().split('\n')
         obj_count = 0
