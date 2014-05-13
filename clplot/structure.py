@@ -16,9 +16,7 @@ from plot import plot
 
 
 def unstruct_plot(X):
-    """This function takes a rectangular array of data and plots it first \
-    looks at the dimensions of the data, the it 'decides' the best way to \
-    plot it. Hence, 'smart plot'"""
+    """This function takes a rectangular array of data and plots it. First looks at the dimensions of the data, the it 'decides' the best way to plot it.'"""
     dic = globe.dic
 
     Form = None
