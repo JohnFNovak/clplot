@@ -194,7 +194,7 @@ def read_flags():
             case = 18
         elif '-alpha' == flag:
             case = 19
-        elif len(flag) > 2 and '-v' == flag[:1]:
+        elif len(flag) >= 2 and '-v' == flag[:2]:
             case = 20
         elif '-columnsfirst' == flag:
             dic['columnsfirst'] = True
@@ -208,7 +208,7 @@ def read_flags():
             dic['plot_sys_err'] = True
         elif '-norm' == flag:
             dic['norm'] = True
-        elif "-" == flag[0] and case != 7 and case != 8 and case != 9:
+        elif "-" == flag[0] and case != 7 and case != 8 and case != 9 and case != 20:
             case = -1
             print "flag", flag, "not recognized"
         else:
