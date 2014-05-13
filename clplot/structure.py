@@ -9,10 +9,10 @@
 
 # written for Python 2.6. Requires Scipy, Numpy, and Matplotlib
 
-import math
+import math as m
 import globe
-from helpers import *
-from plot import *
+from helpers import check_type, is_it_ordered
+from plot import plot
 
 
 def unstruct_plot(X):
@@ -345,10 +345,10 @@ def plot_arragnement():
     dic = globe.dic
     found = False
 
-    if math.sqrt(float(dic['MULTIT'])) % 1 == 0:
+    if m.sqrt(float(dic['MULTIT'])) % 1 == 0:
         # Or multiplot can be square
-        form = (int(math.sqrt(float(dic['MULTIT']))),
-                int(math.sqrt(float(dic['MULTIT']))))
+        form = (int(m.sqrt(float(dic['MULTIT']))),
+                int(m.sqrt(float(dic['MULTIT']))))
         found = True
     elif int(dic['MULTIT']) == 3:
         form = (1, 3)
@@ -364,9 +364,9 @@ def plot_arragnement():
                 a = a + 1
         if found:
             form = (a, a + 1)
-    if not found and math.sqrt(float(dic['MULTIT']) + 1) % 1 == 0:
-        form = (int(math.sqrt(float(dic['MULTIT']) + 1)),
-                int(math.sqrt(float(dic['MULTIT']) + 1)))
+    if not found and m.sqrt(float(dic['MULTIT']) + 1) % 1 == 0:
+        form = (int(m.sqrt(float(dic['MULTIT']) + 1)),
+                int(m.sqrt(float(dic['MULTIT']) + 1)))
         found = True
     if not found:
         looking = True
@@ -379,9 +379,9 @@ def plot_arragnement():
                 a = a + 1
         if found:
             form = (a, a + 1)
-    if not found and math.sqrt(float(dic['MULTIT']) + 2) % 1 == 0:
-        form = (int(math.sqrt(float(dic['MULTIT']) + 2)),
-                int(math.sqrt(float(dic['MULTIT']) + 2)))
+    if not found and m.sqrt(float(dic['MULTIT']) + 2) % 1 == 0:
+        form = (int(m.sqrt(float(dic['MULTIT']) + 2)),
+                int(m.sqrt(float(dic['MULTIT']) + 2)))
         found = True
     if not found:
         looking = True
