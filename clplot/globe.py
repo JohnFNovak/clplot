@@ -50,7 +50,8 @@ dic = {'formats': [],
        'xscaled': 1,
        'alpha': 0.25,
        'norm': False,
-       'EmbedData': True}
+       'EmbedData': True,
+       'Verbose': 0}
 
 
 if __name__ == '__main__':

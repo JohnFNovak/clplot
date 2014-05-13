@@ -194,6 +194,8 @@ def read_flags():
             case = 18
         elif '-alpha' == flag:
             case = 19
+        elif len(flag) > 2 and '-v' == flag[:1]:
+            case = 20
         elif '-columnsfirst' == flag:
             dic['columnsfirst'] = True
         elif "-legend" == flag:
@@ -251,6 +253,8 @@ def read_flags():
                 dic['default_marker_size'] = float(flag)
             if case == 19:
                 dic['alpha'] = float(flag)
+            if case == 20:
+                dic['Verbose'] = int(flag)
             if case == -1:
                 print "ignoring", flag
 
