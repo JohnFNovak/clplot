@@ -56,62 +56,6 @@ def structure(data):
                         print "Using specified format:", f
                     Form = f
 
-        if Form:  # If a form was specified, then use it
-            mults = 0
-            if Form[0] == 'r':
-                block = block.T
-            needx = True
-            for j, c in enumerate(Form[1:]):
-                if c == "x":
-                    x = block[:, j + 1].tolist()
-                    needx = False
-                    break
-            if needx:
-                print "No x specified in format"
-                x = range(h)
-            count = 0
-            for j in range(len(Form) - 1):
-                if check_type(Form[j + 1 + mults]) == 'num':
-                    for k in range(1, int(Form[j + 1 + mults])):
-                        if Form[j + 2 + mults] == "y":
-                            new.append([d[1], d[2]])
-                            if d[3]['labels']:
-                                new[-1].append(d[3]['labels'])
-                            else:
-                                new[-1].append('_'.join(map(str, [d[1],
-                                               'block', d[0][1], 'col',
-                                               j + mults])))
-                            new[-1] = new[-1] + [x, block[:, count].tolist()]
-                            new[-1].append([0]*len(x))
-                            new[-1].append([0]*len(x))
-                        elif Form[j + 2 + mults] == "e":
-                            if Form[j + 1 + mults] == "y":
-                                new[-1][-1] = block[:, count].tolist()
-                            if Form[j + 1 + mults] == "x":
-                                new[-1][-2] = block[:, count].tolist()
-                        count = count + 1
-                    mults = mults + 1
-                elif Form[j + 2 + mults] == "y":
-                    new.append([d[1], d[2]])
-                    if d[3]['labels']:
-                        new[-1].append(d[3]['labels'])
-                    else:
-                        new[-1].append('_'.join(map(str, [d[1],
-                                       'block', d[0][1], 'col',
-                                       j + mults])))
-                    new[-1] = new[-1] + [x, block[:, count].tolist()]
-                    new[-1].append([0]*len(x))
-                    new[-1].append([0]*len(x))
-                elif Form[j + 2 + mults] == "x":
-                    x = block[:, count].tolist()
-                elif Form[j + 2 + mults] == "e":
-                    if Form[j + 1 + mults] == "y":
-                        new[-1][-1] = block[:, count].tolist()
-                    if Form[j + 1 + mults] == "x":
-                        new[-1][-2] = block[:, count].tolist()
-                count = count + 1
-                if j + mults + 2 == len(Form):
-                    break
         elif w == 2 and h != 2:
             # the good old fashioned two columns
             if dic['Verbose'] > 0:
@@ -274,6 +218,63 @@ def structure(data):
         else:
             print "I don't know what to do with this block. It's", w, "by",
             print h
+
+        if Form:  # If a form was specified, then use it
+            mults = 0
+            if Form[0] == 'r':
+                block = block.T
+            needx = True
+            for j, c in enumerate(Form[1:]):
+                if c == "x":
+                    x = block[:, j + 1].tolist()
+                    needx = False
+                    break
+            if needx:
+                print "No x specified in format"
+                x = range(h)
+            count = 0
+            for j in range(len(Form) - 1):
+                if check_type(Form[j + 1 + mults]) == 'num':
+                    for k in range(1, int(Form[j + 1 + mults])):
+                        if Form[j + 2 + mults] == "y":
+                            new.append([d[1], d[2]])
+                            if d[3]['labels']:
+                                new[-1].append(d[3]['labels'])
+                            else:
+                                new[-1].append('_'.join(map(str, [d[1],
+                                               'block', d[0][1], 'col',
+                                               j + mults])))
+                            new[-1] = new[-1] + [x, block[:, count].tolist()]
+                            new[-1].append([0]*len(x))
+                            new[-1].append([0]*len(x))
+                        elif Form[j + 2 + mults] == "e":
+                            if Form[j + 1 + mults] == "y":
+                                new[-1][-1] = block[:, count].tolist()
+                            if Form[j + 1 + mults] == "x":
+                                new[-1][-2] = block[:, count].tolist()
+                        count = count + 1
+                    mults = mults + 1
+                elif Form[j + 2 + mults] == "y":
+                    new.append([d[1], d[2]])
+                    if d[3]['labels']:
+                        new[-1].append(d[3]['labels'])
+                    else:
+                        new[-1].append('_'.join(map(str, [d[1],
+                                       'block', d[0][1], 'col',
+                                       j + mults])))
+                    new[-1] = new[-1] + [x, block[:, count].tolist()]
+                    new[-1].append([0]*len(x))
+                    new[-1].append([0]*len(x))
+                elif Form[j + 2 + mults] == "x":
+                    x = block[:, count].tolist()
+                elif Form[j + 2 + mults] == "e":
+                    if Form[j + 1 + mults] == "y":
+                        new[-1][-1] = block[:, count].tolist()
+                    if Form[j + 1 + mults] == "x":
+                        new[-1][-2] = block[:, count].tolist()
+                count = count + 1
+                if j + mults + 2 == len(Form):
+                    break
 
         if z:
             new_err = []
