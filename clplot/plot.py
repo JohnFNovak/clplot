@@ -98,14 +98,13 @@ def plot(z, errs, Force=False):
         if marker[-1] == '!':
             fcolor = 'white'
             marker = marker[:-1]
-        z[k] = map(lambda x: float(x) * dic['xscaled'], z[k])
-        z[k + 1] = map(lambda x: float(x) * dic['yscaled'], z[k + 1])
-        #z[k + 1] = map(float, z[k + 1])
+        z[k] = [float(x) * dic['xscaled'] for x in z[k]]
+        z[k + 1] = [float(x) * dic['yscaled']for x in z[k + 1]]
         if plottingerrors and not dic['errorbands']:
             if errs[k][0] == 0:
                 errs[k][0] = [0] * len(z[k])
             else:
-                errs[k][0] = map(lambda x: float(x) * dic['xscaled'], errs[k][0])
+                errs[k][0] = [float(x) * dic['xscaled'] for x in errs[k][0]]
             if errs[k + 1][0] == 0:
                 plt.errorbar(z[k], z[k + 1],
                              xerr=errs[k][0],
@@ -113,8 +112,8 @@ def plot(z, errs, Force=False):
                              fmt=marker, label=dic['labels'][(k + 1) / 2],
                              mec=ecolor, mfc=fcolor, ms=msize)
             if errs[k + 1][0] != 0:
-                errs[k + 1][0] = map(lambda x: float(x) * dic['yscaled'], errs[k + 1][0])
-                plt.errorbar(z[k], z[k + 1], xerr=errs[k][0], yerr=errs[k + 1][0], fmt=marker, label=dic['labels'][(k + 1)/2], mec=ecolor, mfc=fcolor, ms=msize)
+                errs[k + 1][0] = [float(x) * dic['yscaled']
+                                  for x in errs[k + 1][0]]
                 plt.errorbar(z[k], z[k + 1],
                              xerr=errs[k][0],
                              yerr=errs[k + 1][0],
@@ -124,7 +123,7 @@ def plot(z, errs, Force=False):
             if errs[k][0] == 0:
                 errs[k][0] = [0] * len(z[k])
             else:
-                errs[k][0] = map(lambda x: float(x) * dic['xscaled'], errs[k][0])
+                errs[k][0] = [float(x) * dic['xscaled'] for x in errs[k][0]]
             if errs[k + 1][0] == 0:
                 plt.errorbar(z[k], z[k + 1],
                              xerr=[0] * len(errs[k][0]),
@@ -132,7 +131,8 @@ def plot(z, errs, Force=False):
                              fmt=marker, label=dic['labels'][(k + 1) / 2],
                              mec=ecolor, mfc=fcolor, ms=msize)
             if errs[k + 1][0] != 0:
-                errs[k + 1][0] = map(lambda x: float(x) * dic['yscaled'], errs[k + 1][0])
+                errs[k + 1][0] = [float(x) * dic['yscaled']
+                                  for x in errs[k + 1][0]]
                 plt.errorbar(z[k], z[k + 1],
                              xerr=[0] * len(errs[k][0]),
                              yerr=[0] * len(errs[k + 1][0]),
