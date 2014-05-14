@@ -49,7 +49,8 @@ dic = {'formats': [],
        'norm': False,
        'EmbedData': True,
        'Verbose': 0,
-       'delimiter': ','}
+       'delimiter': ',',
+       'AssumeForm': 'c'}
 
 
 if __name__ == '__main__':

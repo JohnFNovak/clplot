@@ -14,121 +14,67 @@ import globe
 from helpers import check_type
 
 
-def detect_blocks(dataarray):
-    """This function runs over an array of data pulled from a file and detects
-    the structure so that the proper plotting method can be deduced the
-    structure is returned as a list. Each entry is one block of the data in the
-    form of (width of block,  height of block) This will detect contiguous
-    rectangular blocks of data with the same formats of text vs numbers"""
+def make_blocks(dataarray):
     dic = globe.dic
 
-    width = []
-    height = []
-    block = 0
-    structure = []
-    previous = []
+    def block(d, d2):
+        blank = {'dims': [len(d), 1], 'data': [], 'labels': None,
+                 'Format': dic['AssumeForm']}
+        current = [check_type(x) for x in d]
+        if 'str' in current:
+            if dic['Verbose'] > -1:
+                print "you seem to have text interspersed with your data"
+                print "Does this look familiar?:", ' '.join(d)
+        # if all([x == 'str' for x in current]):
+        if current.count('str') > (len(current) / 2.):
+            # more than half the enrties are strings, so we will assume it's
+            # column titles
+            if len(d) == len(d2):
+                print "we are going to use", string.join(d),
+                print "as labels"
+                blank['labels'] = d
+                blank['Format'] = 'c'
+                blank['dims'][1] = 0
+        elif current[0] == 'str' and not any([x == 'str' for x in d[1:]]):
+            # The first column in a string, and nothing else is
+            blank['labels'] = [d[0]]
+            blank['Format'] = 'r'
+            blank['dims'][0] = len(d) - 1
+            blank['data'].append(d)
+        elif not any([x == 'str' for x in d]):
+            blank['data'].append(d)
 
-    width.append(len(dataarray[0]))
-    height.append(1)
-    mixed = False
-    for i in range(len(dataarray[0])):
-        if check_type(dataarray[0][i]) == 'str':
-            previous.append(check_type(dataarray[0][i]))
-            if i != 0:
-                mixed = True
-                dic['Messy'] = True
-        else:
-            previous.append(check_type(dataarray[0][i]))
-    if mixed:
-        if dic['Verbose'] > -1:
-            print "you seem to have text interspersed with your data"
-            print "Does this look familiar?:", ' '.join(dataarray[0])
-    if mixed and len(dataarray[0]) == len(dataarray[1]):
-        print "we are going to use", string.join(dataarray[0]), "as labels"
-        dic['columnlabel'].append(dataarray[0])
-    else:
-        dic['columnlabel'].append(range(len(dataarray[0])))
+        return blank
 
-    for i in range(1, len(dataarray)):
-        mixed = False
-        if(len(dataarray[i]) == width[block]):
-            good = True
-            for x in range(len(dataarray[i])):
-                if check_type(dataarray[i][x]) != previous[x]:
-                    good = False
-            if good:
-                height[block] = height[block]+1
+    for i, d in enumerate(dataarray):
+        if i == 0:  # first pass
+            blocks = [block(d, dataarray[i + 1])]
+            previous = [check_type(x) for x in d]
+
+        current = [check_type(x) for x in d]
+        check = (((current == previous)  # same as the previous pass
+                  or (blocks[-1]['Format'] == 'c'
+                      and blocks[-1]['dims'][1] == 0
+                      and len(d) == blocks[-1]['dims'][0]))
+                 and ((blocks[-1]['Format'] == 'r'
+                       and not any([x == 'str' for x in d[1:]]))
+                      or (blocks[-1]['Format'] != 'r'
+                          and not any([x == 'str' for x in d]))))
+        if check:
+            blocks[-1]['dims'][1] += 1
+            if blocks[-1]['Format'] == 'r':
+                blocks[-1]['labels'].append(d[0])
+                blocks[-1]['data'].append(d[1:])
             else:
-                block = block+1
-                height.append(1)
-                width.append(len(dataarray[i]))
-                previous = []
-                for x in range(len(dataarray[i])):
-                    if check_type(dataarray[i][x]) == 'str':
-                        previous.append(check_type(dataarray[i][x]))
-                        if x != 0:
-                            mixed = True
-                            dic['Messy'] = True
-                    else:
-                        previous.append(check_type(dataarray[i][x]))
-            if mixed:
-                if dic['Verbose'] > -1:
-                    print "you seem to have text interspersed with your data"
-                    print "Does this look familiar?:", ' '.join(dataarray[i])
-            if mixed and len(dataarray) != i+1:
-                if len(dataarray[i]) == len(dataarray[i+1]):
-                    print "we are going to use", string.join(dataarray[i]),
-                    print "as labels"
-                    dic['columnlabel'].append(dataarray[i])
-            else:
-                dic['columnlabel'].append(range(len(dataarray[i])))
+                blocks[-1]['data'].append(d)
         else:
-            block = block+1
-            height.append(1)
-            width.append(len(dataarray[i]))
-            previous = []
-            for x in range(len(dataarray[i])):
-                if check_type(dataarray[i][x]) == 'str':
-                    previous.append(check_type(dataarray[i][x]))
-                    if x != 0:
-                        mixed = True
-                        dic['Messy'] = True
-                else:
-                    previous.append(check_type(dataarray[i][x]))
-            if mixed:
-                if dic['Verbose'] > -1:
-                    print "you seem to have text interspersed with your data"
-                    print "Does this look familiar?:", ' '.join(dataarray[i])
-            if mixed and len(dataarray) != i+1:
-                if len(dataarray[i]) == len(dataarray[i+1]):
-                    print "we are going to use", string.join(dataarray[i]),
-                    print "as labels"
-                    dic['columnlabel'].append(dataarray[i])
-            else:
-                dic['columnlabel'].append(range(len(dataarray[i])))
+            if blocks[-1]['dims'][1] <= 1:
+                # The previous block was only one line long
+                del(blocks[-1])
+            blocks.append(block(d, dataarray[i + 1]))
+        previous = current
 
-    for i in range(block+1):
-        #print "block", i, "is", width[i], "by", height[i]
-        structure.append((width[i], height[i]))
-
-    return structure
-
-
-def readdat(struct, block, data):
-    x = []
-    linenum = 0
-
-    for i in range(len(struct)):
-        if i == block:
-            # this is the block you want
-            for j in range(struct[i][1]):
-                k = j+linenum
-                x.append(data[k])
-            break
-        else:
-            # count how many lines down you have to look
-            linenum = linenum+struct[i][1]
-    return x
+    return blocks
 
 
 def read_data(filename):
