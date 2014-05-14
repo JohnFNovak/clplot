@@ -20,12 +20,12 @@ def is_it_ordered(vals):
     """This function takes a list of numbers are returns whether or not they
     are in order"""
 
-    ordered = False
+    ordered = 0
 
     if vals == sorted(vals):
-        ordered = True
+        ordered = 1
     if vals == sorted(vals, reverse=True):
-        ordered = True
+        ordered = -1
 
     return ordered
 
