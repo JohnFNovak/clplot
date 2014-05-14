@@ -14,16 +14,17 @@
 import numpy as np
 import globe
 from structure import unstruct_plot
-from helpers import read_flags, remove_empties
+from helpers import read_flags
 from plot import plot
-from data_handler import read_data, detect_blocks, readdat
+from data_handler import make_blocks, readdat, read_data
 
 
 def main():
     dic = globe.dic
     read_flags()
 
-    for filename in dic['files']:
+    data = []
+    for i, filename in enumerate(dic['files']):
         if dic['Verbose'] > 0:
             print "plotting", filename
         sys_err = dic['sys_err_default']
@@ -32,20 +33,26 @@ def main():
             filename = filename.split('#')[0].strip()
         output = None
         if dic['outputs']:
-            output = dic['outputs'].pop(0)
+            output = dic['outputs'].pop()
         dic['numbered'] = 0
 
         # Now read data file
-        data = read_data(filename)
+        blocks = make_blocks(read_data(filename))
+
+        for j, b in enumerate(blocks):
+            data.append([[i, j], filename, output, b, sys_err])
+
+    if dic['GroupBy'] == 'file':
+        data.sort(key=lambda x: x[0])
+    elif dic['GroupBy'] == 'block':
+        data.sort(key=lambda x: [x[0][1], x[0][0]])
+
+    data = structure(data)
+
 
         # Make decisions about what is in the file
         if len(data) > 0:
             struct = detect_blocks(data)
-
-            # KN: This can be done far more efficiently using a filter()
-            # function. Either specify a one liner using a lambda function or
-            # write a function that returns True or False
-            struct, data = remove_empties(struct, data)
 
             # Plot the stuff
             for i in range(len(struct)):

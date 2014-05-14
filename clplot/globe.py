@@ -50,7 +50,8 @@ dic = {'formats': [],
        'EmbedData': True,
        'Verbose': 0,
        'delimiter': ',',
-       'AssumeForm': 'c'}
+       'AssumeForm': 'c',
+       'GroupBy': 'files'}
 
 
 if __name__ == '__main__':
