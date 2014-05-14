@@ -26,13 +26,13 @@ def main():
     for filename in dic['files']:
         if dic['Verbose'] > 0:
             print "plotting", filename
-        dic['currentfile'] = filename
-        dic['sys_err'] = dic['sys_err_default']
-        if len(filename.split('# ')) == 2:
-            dic['sys_err'] = float(filename.split('# ')[1])
-            filename = filename.split('# ')[0]
+        sys_err = dic['sys_err_default']
+        if len(filename.split('#')) == 2:
+            sys_err = float(filename.split('#')[1].strip())
+            filename = filename.split('#')[0].strip()
+        output = None
         if dic['outputs']:
-            dic['currentoutput'] = dic['outputs'].pop(0)
+            output = dic['outputs'].pop(0)
         dic['numbered'] = 0
 
         # Now read data file
