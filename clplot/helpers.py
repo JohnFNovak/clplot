@@ -13,6 +13,7 @@ import collections
 import itertools
 import globe
 import sys
+from structure import plot_arragnement
 
 
 def is_it_ordered(vals):
@@ -239,6 +240,22 @@ def read_flags():
                 dic['Verbose'] = int(flag)
             if case == -1:
                 print "ignoring", flag
+
+    if dic['MULTIT'] and dic['layout']:
+        if (dic['layout'][0]*dic['layout'][1] < int(dic['MULTIT'])):
+            print "The layout that you specified was too small"
+            dic['layout'] = plot_arragnement()
+        else:
+            print "We are using the layout you specified:", dic['layout'][0],
+            print "by", dic['layout'][1]
+    if dic['MULTIT'] and not dic['layout']:
+        dic['layout'] = plot_arragnement()
+
+    if dic['outputs'] and (len(dic['outputs']) !=
+                           len(dic['files'])) and not (dic['MULTIT'] or
+                                                       dic['MULTIP']):
+        print "If you are going to specify output names",
+        print "you must specify one output file per input file."
 
 
 if __name__ == '__main__':

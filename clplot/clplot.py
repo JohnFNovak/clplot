@@ -13,7 +13,7 @@
 
 import numpy as np
 import globe
-from structure import unstruct_plot, plot_arragnement
+from structure import unstruct_plot
 from helpers import read_flags, remove_empties
 from plot import plot
 from data_handler import read_data, detect_blocks, readdat
@@ -22,22 +22,6 @@ from data_handler import read_data, detect_blocks, readdat
 def main():
     dic = globe.dic
     read_flags()
-
-    if dic['MULTIT'] and dic['layout']:
-        if (dic['layout'][0]*dic['layout'][1] < int(dic['MULTIT'])):
-            print "The layout that you specified was too small"
-            dic['layout'] = plot_arragnement()
-        else:
-            print "We are using the layout you specified:", dic['layout'][0],
-            print "by", dic['layout'][1]
-    if dic['MULTIT'] and not dic['layout']:
-        dic['layout'] = plot_arragnement()
-
-    if dic['outputs'] and (len(dic['outputs']) !=
-                           len(dic['files'])) and not (dic['MULTIT'] or
-                                                       dic['MULTIP']):
-        print "If you are going to specify output names",
-        print "you must specify one output file per input file."
 
     for filename in dic['files']:
         if dic['Verbose'] > 0:
