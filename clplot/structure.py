@@ -249,37 +249,6 @@ def structure(data):
                 if j + mults + 2 == len(Form):
                     break
 
-        if z:
-            new_err = []
-            for k in range(len(z) / 2):
-                new_err.append([[], []])
-                new_err.append([[], []])
-                for l in range(len(z[2*k + 1])):
-                    new_err[2*k][0].append(errs[2*k][l])
-                    new_err[2*k][1].append(errs[2*k][l])
-                    new_err[2*k + 1][0].append(float(errs[2*k + 1][l]))
-                    new_err[2*k + 1][1].append(dic['sys_err']*float(z[2*k + 1][l]))
-            errs = new_err
-            if dic['MULTIP']:
-                z = dic['remnants'] + z
-                errs = dic['remnanterrors'] + errs
-                dic['multicountpile'] = 0
-                if (len(z)-len(z) % int(dic['MULTIP'])) / int(dic['MULTIP']) / 2 > 1:
-                    dic['multicountpile'] = 1
-                if (len(z)-len(z) % int(dic['MULTIP'])) / int(dic['MULTIP']) > 0:
-                    for i in range(0, (len(z)-len(z) % int(dic['MULTIP'])) / int(dic['MULTIP']) / 2):
-                        plot(z[:(int(dic['MULTIP']) * 2)], errs[:(int(dic['MULTIP']) * 2)])
-                        z = z[(int(dic['MULTIP']) * 2):]
-                        errs = errs[(int(dic['MULTIP']) * 2):]
-                        dic['multicountpile'] = dic['multicountpile'] + 1
-                dic['remnants'] = z
-                dic['remnanterrors'] = errs
-            else:
-                # just plot it
-                plot(z, errs)
-            if dic['Numbering']:
-                dic['numbered'] = dic['numbered'] + 1
-
 
 def plot_arragnement():
     """This function looks at dic['MULTIT'] and decides how to structure the
