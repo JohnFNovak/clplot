@@ -20,7 +20,7 @@ import globe
 
 
 def plot(z, errs, Force=False):
-    """This function takes a list z of lists and trys to plot them. the first \
+    """This function takes a list z of lists and trys to plot them. the first
     list is always x, and the folowing are always y's"""
 
     #print z

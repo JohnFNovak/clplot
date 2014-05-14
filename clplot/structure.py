@@ -16,7 +16,9 @@ from plot import plot
 
 
 def unstruct_plot(X):
-    """This function takes a rectangular array of data and plots it. First looks at the dimensions of the data, the it 'decides' the best way to plot it.'"""
+    """This function takes a rectangular array of data and plots it. First
+    looks at the dimensions of the data, the it 'decides' the best way to plot
+    it.'"""
     dic = globe.dic
 
     Form = None
@@ -340,8 +342,8 @@ def unstruct_plot(X):
 
 
 def plot_arragnement():
-    """This function looks at dic['MULTIT'] and decides how to structure the \
-    multiplot it returns a 2 tuple which is the root for the first 2 argument \
+    """This function looks at dic['MULTIT'] and decides how to structure the
+    multiplot it returns a 2 tuple which is the root for the first 2 argument
     of the subplot command"""
 
     dic = globe.dic
