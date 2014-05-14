@@ -66,6 +66,18 @@ def structure(data):
             if dic['Verbose'] > 0:
                 print "the good old fashioned two rows"
             Form = 'rxy'
+        elif h > (w * 3):
+            Form = 'c' + ('y' * w)
+        elif w > (h * 3):
+            Form = 'r' + ('y' * h)
+        else:
+            rows = [is_it_ordered(block[:, x].list()) for x in range(w)]
+            cols = [is_it_ordered(block[x, :].list()) for x in range(h)]
+            if cols.count(1) > rows.count(1):
+                Form = 'r' + ('y' * h)
+            if rows.count(1) > cols.count(1):
+                Form = 'c' + ('y' * w)
+
         elif w < 5 and h < 5:
             # we are going to have to look around for ordered things
             needx = True
