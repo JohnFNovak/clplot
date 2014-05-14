@@ -13,7 +13,7 @@
 
 import numpy as np
 import globe
-from structure import unstruct_plot
+from structure import structure
 from helpers import read_flags
 from plot import plot
 from data_handler import make_blocks, readdat, read_data
