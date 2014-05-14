@@ -128,12 +128,11 @@ def readdat(struct, block, data):
 
 
 def read_data(filename):
-    data = []
-    datafile = open(filename, "r")
-
-    test = datafile.readline()
-    while test[0] == "#" and len(test) > 1:  # Not a comment or empty
+    with open(filename, "r") as datafile:
         test = datafile.readline()
+        while test[0] == "#" and len(test) > 1:  # Not a comment or empty
+            test = datafile.readline()
+
     delimiters = [' ', ',', ';', '.', '']
     while delimiters:
         d = delimiters.pop()
@@ -143,10 +142,9 @@ def read_data(filename):
         print "Um,  we can't figure out what you are using for data seperation"
         return False
 
-    datafile.seek(0)
-    for line in datafile:
-        data.append(tuple(line.split(d)))
-    datafile.close()
+    with open(filename, "r") as datafile:
+        data = datafile.read().split('\n')
+    data = [tuple(line.split(d)) for line in data if line.strip()]
 
     data = remove_formating(data)
     return data
