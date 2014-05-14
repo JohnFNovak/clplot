@@ -75,124 +75,13 @@ def structure(data):
             cols = [is_it_ordered(block[x, :].list()) for x in range(h)]
             if cols.count(1) > rows.count(1):
                 Form = 'r' + ('y' * h)
-            if rows.count(1) > cols.count(1):
+            elif rows.count(1) > cols.count(1):
+                Form = 'c' + ('y' * w)
+            else:
+                print "I have no idea what's going on"
                 Form = 'c' + ('y' * w)
 
-        elif w < 5 and h < 5:
-            # we are going to have to look around for ordered things
-            needx = True
-            for i in range(w):
-                if is_it_ordered(list(X[:, i])):
-                    needx = False
-                    xcol = i
-                    break
-            if not needx:
-                for i in range(w):
-                    if i != xcol:
-                        errs.append([0]*len(list(X[:, xcol])))
-                        errs.append([0]*len(list(X[:, i])))
-                        z.append(list(X[:, xcol]))
-                        z.append(list(X[:, i]))
-                        dic['labels'].append(dic['currentfile'] + " / " +
-                                             str(dic['columnlabel']
-                                                 [dic['currentstruct']]
-                                                 [int(len(z) / 2)]))
-            if needx:
-                for i in range(h):
-                    if is_it_ordered(list(X[i, :])):
-                        needx = False
-                        xrow = i
-                        break
-                if not needx:
-                    for i in range(h):
-                        if i != xcol:
-                            errs.append([0]*len(list(X[xcol, :])))
-                            errs.append([0]*len(list(X[i, :])))
-                            z.append(list(X[xrow, :]))
-                            z.append(list(X[i, :]))
-                            dic['labels'].append(dic['currentfile'] + " / " +
-                                                 str(dic['columnlabel']
-                                                     [dic['currentstruct']]
-                                                     [int(len(z) / 2)]))
-            if needx:
-                print "I don't know what to do with this block. It's", w, "by",
-                print h, "and neither axis seems to be ordered"
-        elif w < 5 and h > 7:
-            # we will assume that it is in columns
-            needx = True
-            for i in range(w):
-                if is_it_ordered(list(X[:, i])):
-                    needx = False
-                    xcol = i
-                    break
-            if not needx:
-                for i in range(w):
-                    if i != xcol:
-                        errs.append([0]*len(list(X[:, xcol])))
-                        errs.append([0]*len(list(X[:, i])))
-                        z.append(list(X[:, xcol]))
-                        z.append(list(X[:, i]))
-                        dic['labels'].append(dic['currentfile'] + " / " +
-                                             str(dic['columnlabel']
-                                                 [dic['currentstruct']]
-                                                 [int(len(z) / 2)]))
-        elif w > 7 and h < 5:
-            # we will assume that it is in rows
-            needx = True
-            for i in range(h):
-                if is_it_ordered(list(X[i, :])):
-                    needx = False
-                    xrow = i
-                    break
-            if not needx:
-                for i in range(h):
-                    if i != xrow:
-                        errs.append([0]*len(list(X[xcol, :])))
-                        errs.append([0]*len(list(X[i, :])))
-                        z.append(list(X[xrow, :]))
-                        z.append(list(X[i, :]))
-                        dic['labels'].append(dic['currentfile'] + " / " +
-                                             str(dic['columnlabel']
-                                                 [dic['currentstruct']]
-                                                 [int(len(z) / 2)]))
-        elif w > 5 and h > 5:
-            # will will have to look around for oredered things
-            needx = True
-            for i in range(w):
-                if is_it_ordered(list(X[:, i])):
-                    needx = False
-                    xcol = i
-                    break
-            if not needx:
-                for i in range(w):
-                    if i != xcol:
-                        errs.append([0]*len(list(X[:, xcol])))
-                        errs.append([0]*len(list(X[:, i])))
-                        z.append(list(X[:, xcol]))
-                        z.append(list(X[:, i]))
-                        dic['labels'].append(dic['currentfile'] + " / " + str(dic['columnlabel'][dic['currentstruct']][int(len(z) / 2)]))
-            if needx:
-                for i in range(h):
-                    if is_it_ordered(list(X[i, :])):
-                        needx = False
-                        xrow = i
-                        break
-                if not needx:
-                    for i in range(h):
-                        if i != xrow:
-                            errs.append([0]*len(list(X[xcol, :])))
-                            errs.append([0]*len(list(X[i, :])))
-                            z.append(list(X[xrow, :]))
-                            z.append(list(X[i, :]))
-                            dic['labels'].append(dic['currentfile'] + " / " + str(dic['columnlabel'][dic['currentstruct']][int(len(z) / 2)]))
-            if needx:
-                print "I don't know what to do with this block. It's", w, "by",
-                print h, "and neither axis seems to be ordered"
-        else:
-            print "I don't know what to do with this block. It's", w, "by",
-            print h
-
-        if Form:  # If a form was specified, then use it
+        if Form:
             mults = 0
             if Form[0] == 'r':
                 block = block.T
