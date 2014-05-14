@@ -249,6 +249,8 @@ def structure(data):
                 if j + mults + 2 == len(Form):
                     break
 
+    return new
+
 
 def plot_arragnement():
     """This function looks at dic['MULTIT'] and decides how to structure the
