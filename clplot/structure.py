@@ -56,55 +56,16 @@ def structure(data):
                         print "Using specified format:", f
                     Form = f
 
-        elif w == 2 and h != 2:
+        elif w == 2 and h > 2:
             # the good old fashioned two columns
             if dic['Verbose'] > 0:
                 print "the good old fashioned two columns"
-            if is_it_ordered(list(X[:, 0])):
-                # ordered by the first column
-                z = [list(X[:, 0]), list(X[:, 1])]
-                dic['labels'].append(dic['currentfile'] + " / " +
-                                     str(dic['columnlabel']
-                                         [dic['currentstruct']][int(len(z) / 2)]))
-                errs = [[0] * len(z[0])] * 2
-            elif is_it_ordered(list(X[:, 1])):
-                # ordered by the second column
-                z[list(X[:, 1]), list(X[:, 0])]
-                dic['labels'].append(dic['currentfile'] + " / " +
-                                     str(dic['columnlabel']
-                                         [dic['currentstruct']][int(len(z) / 2)]))
-                errs = [[0] * len(z[0])] * 2
-            else:
-                # not ordered
-                print "No deducable ordering, I'll just pick which column is x"
-                z = [list(X[:, 0]), list(X[:, 1])]
-                dic['labels'].append(dic['currentfile'] + " / " +
-                                     str(dic['columnlabel']
-                                         [dic['currentstruct']][int(len(z) / 2)]))
-                errs = [[0] * len(z[0])] * 2
-        elif w != 2 and h == 2:
+            Form = 'cxy'
+        elif w > 2 and h == 2:
             # the good old fashioned two rows
             if dic['Verbose'] > 0:
                 print "the good old fashioned two rows"
-            if is_it_ordered(list(X[0, :])):
-                # ordered by the first row
-                z = [list(X[0, :]), list(X[1, :])]
-                dic['labels'].append(dic['currentfile'] + " / " +
-                                     str(dic['columnlabel']
-                                         [dic['currentstruct']][int(len(z) / 2)]))
-                errs = [[0] * len(z[0])] * 2
-            elif is_it_ordered(list(X[1, :])):
-                # ordered by the second row
-                z = [list(X[1, :]), list(X[0, :])]
-                dic['labels'].append(dic['currentfile'] + " / " +
-                                     str(dic['columnlabel']
-                                         [dic['currentstruct']][int(len(z) / 2)]))
-                errs = [[0] * len(z[0])] * 2
-            else:
-                # not ordered
-                print "No deducable ordering, I'll just pick which row is x"
-                z = [list(X[0, :]), list(X[1, :])]
-                errs = [[0] * len(z[0])] * 2
+            Form = 'rxy'
         elif w < 5 and h < 5:
             # we are going to have to look around for ordered things
             needx = True
