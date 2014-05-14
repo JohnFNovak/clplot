@@ -134,21 +134,18 @@ def read_data(filename):
     test = datafile.readline()
     while test[0] == "#" and len(test) > 1:  # Not a comment or empty
         test = datafile.readline()
-    delimiter = " "
-    if len(test.split(" ")) > 1:
-        delimiter = " "
-    elif len(test.split(", ")) > 1:
-        delimiter = ", "
-    elif len(test.split(";")) > 1:
-        delimiter = ";"
-    elif len(test.split(".")) > 1:
-        delimiter = "."
-    else:
+    delimiters = [' ', ',', ';', '.', '']
+    while delimiters:
+        d = delimiters.pop()
+        if len([x.strip() for x in test.split(d) if x.strip()]) > 1:
+            break
+    if not d:
         print "Um,  we can't figure out what you are using for data seperation"
+        return False
 
     datafile.seek(0)
     for line in datafile:
-        data.append(tuple(line.split(delimiter)))
+        data.append(tuple(line.split(d)))
     datafile.close()
 
     data = remove_formating(data)
