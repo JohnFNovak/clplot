@@ -11,7 +11,6 @@
 
 import collections
 import itertools
-import string
 import globe
 import sys
 
@@ -67,23 +66,6 @@ def check_type(x):
 def skip(iterator, n):
     '''Advance the iterator n-steps ahead. If n is none, consume entirely.'''
     collections.deque(itertools.islice(iterator, n), maxlen=0)
-
-
-def remove_formating(data):
-    """This function removes thigns that will cause problems like endlines"""
-    cleaned = []
-    for i in data:
-        temp = []
-        for j in i:
-            temp2 = []
-            for k in j:
-                if (k != '\n') and (k != '') and (k != '\r'):
-                    temp2.append(k)
-            if(len(temp2) > 0):
-                temp.append(string.join(temp2, ''))
-        cleaned.append(temp)
-
-    return cleaned
 
 
 def givehelp(a):

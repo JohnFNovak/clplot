@@ -11,7 +11,7 @@
 
 import string
 import globe
-from helpers import remove_formating, check_type
+from helpers import check_type
 
 
 def detect_blocks(dataarray):
@@ -146,7 +146,6 @@ def read_data(filename):
         data = datafile.read().split('\n')
     data = [tuple(line.split(d)) for line in data if line.strip()]
 
-    data = remove_formating(data)
     return data
 
 if __name__ == '__main__':
