@@ -30,30 +30,6 @@ def is_it_ordered(vals):
     return ordered
 
 
-def remove_empties(struct, x):
-    """This function runs through the data and the structure array and removes
-    entries that are either empty or are singular"""
-
-    linenum = len(x)-1
-    structBK = struct
-    count = 0
-    blocks = len(structBK)
-
-    for i in range(blocks):
-        j = -i - 1 + count  # do this backward
-        if structBK[j][0] > 1 and structBK[j][1] > 1:
-            # the entry is good: it's more than a single column or single line
-            linenum = linenum - struct[j][1]
-        else:
-            # the entry is worthless: it's a single line
-            del struct[len(structBK) + j]
-            del x[linenum]
-            linenum = linenum - 1
-            count = count + 1
-
-    return struct, x
-
-
 def check_type(x):
     """This function returns a string. It returns "str" if x is a string, and
     "num" if x is a number"""
