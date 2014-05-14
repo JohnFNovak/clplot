@@ -26,274 +26,241 @@ def structure(data):
     new = []
 
     for d in data:
-    
-    w = d[3]['dims'][0]
-    h = d[3]['dims'][1]
+        
+        w = d[3]['dims'][0]
+        h = d[3]['dims'][1]
 
-    # Check if a prespecified format will work
-    if dic['formats']:
-        if d[3]['Format']:
-            formats = [x for x in dic['formats'] if x[0] == d[3]['Format']]
-        else:
-            formats = dic['formats']
-        for f in formats:
-            l = len(f) - 1
-            wild = '*' in f
-            if f[0] == "c" and (l == w or (l < w and wild)):
-                if dic['Verbose'] > 0:
-                    print "Using specified format:", f
-                Form = f
-                break
-            elif f[0] == "r" and (l == h or (l < h and wild)):
-                if dic['Verbose'] > 0:
-                    print "Using specified format:", f
-                Form = f
+        # Check if a prespecified format will work
+        if dic['formats']:
+            if d[3]['Format']:
+                formats = [x for x in dic['formats'] if x[0] == d[3]['Format']]
+            else:
+                formats = dic['formats']
+            for f in formats:
+                l = len(f) - 1
+                wild = '*' in f
+                if f[0] == "c" and (l == w or (l < w and wild)):
+                    if dic['Verbose'] > 0:
+                        print "Using specified format:", f
+                    Form = f
+                    break
+                elif f[0] == "r" and (l == h or (l < h and wild)):
+                    if dic['Verbose'] > 0:
+                        print "Using specified format:", f
+                    Form = f
 
-    if Form:  # If a form was specified, then use it
-        mults = 0
-        if Form[0] == "c":
+        if Form:  # If a form was specified, then use it
+            mults = 0
+            if Form[0] == "c":
+                needx = True
+                for j in range(1, len(Form)):
+                    if Form[j] == "x":
+                        x = list(X[:, j-1])
+                        needx = False
+                        break
+                if needx:
+                    print "No x specified in format"
+                    x = range(h)
+                count = 0
+                for j in range(len(Form)-1):
+                    if check_type(Form[j + 1 + mults]) == 'num':
+                        if int(Form[j + 1 + mults]) == 1:
+                            print "You are a moron, there should be no 1's in",
+                            print "your format flag, stupid"
+                        for k in range(1, int(Form[j + 1 + mults])):
+                            if Form[j + 2 + mults] == "y":
+                                z.append(x)
+                                z.append(list(X[:, count]))
+                                dic['labels'].append(dic['currentfile'] + " / " +
+                                                     str(dic['columnlabel']
+                                                         [dic['currentstruct']]
+                                                         [j + mults]))
+                                errs.append([0]*len(x))
+                                errs.append([0]*len(list(X[count, :])))
+                            elif Form[j + 2 + mults] == "e":
+                                if Form[j + 1 + mults] == "y":
+                                    errs[-1] = list(X[count, :])
+                                if Form[j + 1 + mults] == "x":
+                                    errs[-2] = list(X[count, :])
+                            count = count + 1
+                        mults = mults + 1
+                    elif Form[j + 1 + mults] == "y":
+                        z.append(x)
+                        z.append(list(X[:, count]))
+                        dic['labels'].append(dic['currentfile'] + " / " +
+                                             str(dic['columnlabel']
+                                                 [dic['currentstruct']]
+                                                 [j + mults]))
+                        errs.append([0]*len(x))
+                        errs.append([0]*len(list(X[:, count])))
+                    elif Form[j + 1 + mults] == "e":
+                        if Form[j + mults] == "y":
+                            errs[-1] = list(X[:, count])
+                        if Form[j + mults] == "x":
+                            errs[-2] = list(X[:, count])
+                    count = count + 1
+                    if j + mults + 2 == len(Form):
+                        break
+            if Form[0] == "r":
+                needx = True
+                for j in range(1, len(Form)):
+                    if Form[j] == "x":
+                        x = list(X[j-1, :])
+                        needx = False
+                        break
+                if needx:
+                    print "No x specified in format"
+                    x = range(w)
+                count = 0
+                for j in range(len(Form)-1):
+                    if check_type(Form[j + 1 + mults]) == 'num':
+                        if int(Form[j + 1 + mults]) == 1:
+                            print "You are a moron, there should be no 1's in",
+                            print "your format flag, stupid"
+                        for k in range(1, int(Form[j + 1 + mults])):
+                            if Form[j + 2 + mults] == "y":
+                                z.append(x)
+                                z.append(list(X[count, :]))
+                                dic['labels'].append(dic['currentfile'] + " / " +
+                                                     str(dic['columnlabel']
+                                                         [dic['currentstruct']]
+                                                         [j + mults]))
+                                errs.append([0]*len(x))
+                                errs.append([0]*len(list(X[count, :])))
+                            elif Form[j + 2 + mults] == "e":
+                                if Form[j + 1 + mults] == "y":
+                                    errs[-1] = list(X[count, :])
+                                if Form[j + 1 + mults] == "x":
+                                    errs[-2] = list(X[count, :])
+                            count = count + 1
+                        mults = mults + 1
+                    elif Form[j + 1 + mults] == "y":
+                        z.append(x)
+                        z.append(list(X[count, :]))
+                        dic['labels'].append(dic['currentfile'] + " / " +
+                                             str(dic['columnlabel']
+                                                 [dic['currentstruct']]
+                                                 [j + mults]))
+                        errs.append([0]*len(x))
+                        errs.append([0]*len(list(X[count, :])))
+                    elif Form[j + 1 + mults] == "e":
+                        if Form[j + mults] == "y":
+                            errs[-1] = list(X[count, :])
+                        if Form[j + mults] == "x":
+                            errs[-2] = list(X[count, :])
+                    count = count + 1
+                    if j + mults + 2 == len(Form):
+                        break
+        elif w == 2 and h != 2:
+            # the good old fashioned two columns
+            if dic['Verbose'] > 0:
+                print "the good old fashioned two columns"
+            if is_it_ordered(list(X[:, 0])):
+                # ordered by the first column
+                z = [list(X[:, 0]), list(X[:, 1])]
+                dic['labels'].append(dic['currentfile'] + " / " +
+                                     str(dic['columnlabel']
+                                         [dic['currentstruct']][int(len(z) / 2)]))
+                errs = [[0] * len(z[0])] * 2
+            elif is_it_ordered(list(X[:, 1])):
+                # ordered by the second column
+                z[list(X[:, 1]), list(X[:, 0])]
+                dic['labels'].append(dic['currentfile'] + " / " +
+                                     str(dic['columnlabel']
+                                         [dic['currentstruct']][int(len(z) / 2)]))
+                errs = [[0] * len(z[0])] * 2
+            else:
+                # not ordered
+                print "No deducable ordering, I'll just pick which column is x"
+                z = [list(X[:, 0]), list(X[:, 1])]
+                dic['labels'].append(dic['currentfile'] + " / " +
+                                     str(dic['columnlabel']
+                                         [dic['currentstruct']][int(len(z) / 2)]))
+                errs = [[0] * len(z[0])] * 2
+        elif w != 2 and h == 2:
+            # the good old fashioned two rows
+            if dic['Verbose'] > 0:
+                print "the good old fashioned two rows"
+            if is_it_ordered(list(X[0, :])):
+                # ordered by the first row
+                z = [list(X[0, :]), list(X[1, :])]
+                dic['labels'].append(dic['currentfile'] + " / " +
+                                     str(dic['columnlabel']
+                                         [dic['currentstruct']][int(len(z) / 2)]))
+                errs = [[0] * len(z[0])] * 2
+            elif is_it_ordered(list(X[1, :])):
+                # ordered by the second row
+                z = [list(X[1, :]), list(X[0, :])]
+                dic['labels'].append(dic['currentfile'] + " / " +
+                                     str(dic['columnlabel']
+                                         [dic['currentstruct']][int(len(z) / 2)]))
+                errs = [[0] * len(z[0])] * 2
+            else:
+                # not ordered
+                print "No deducable ordering, I'll just pick which row is x"
+                z = [list(X[0, :]), list(X[1, :])]
+                errs = [[0] * len(z[0])] * 2
+        elif w < 5 and h < 5:
+            # we are going to have to look around for ordered things
             needx = True
-            for j in range(1, len(Form)):
-                if Form[j] == "x":
-                    x = list(X[:, j-1])
-                    needx = False
-                    break
-            if needx:
-                print "No x specified in format"
-                x = range(h)
-            count = 0
-            for j in range(len(Form)-1):
-                if check_type(Form[j + 1 + mults]) == 'num':
-                    if int(Form[j + 1 + mults]) == 1:
-                        print "You are a moron, there should be no 1's in",
-                        print "your format flag, stupid"
-                    for k in range(1, int(Form[j + 1 + mults])):
-                        if Form[j + 2 + mults] == "y":
-                            z.append(x)
-                            z.append(list(X[:, count]))
-                            dic['labels'].append(dic['currentfile'] + " / " +
-                                                 str(dic['columnlabel']
-                                                     [dic['currentstruct']]
-                                                     [j + mults]))
-                            errs.append([0]*len(x))
-                            errs.append([0]*len(list(X[count, :])))
-                        elif Form[j + 2 + mults] == "e":
-                            if Form[j + 1 + mults] == "y":
-                                errs[-1] = list(X[count, :])
-                            if Form[j + 1 + mults] == "x":
-                                errs[-2] = list(X[count, :])
-                        count = count + 1
-                    mults = mults + 1
-                elif Form[j + 1 + mults] == "y":
-                    z.append(x)
-                    z.append(list(X[:, count]))
-                    dic['labels'].append(dic['currentfile'] + " / " +
-                                         str(dic['columnlabel']
-                                             [dic['currentstruct']]
-                                             [j + mults]))
-                    errs.append([0]*len(x))
-                    errs.append([0]*len(list(X[:, count])))
-                elif Form[j + 1 + mults] == "e":
-                    if Form[j + mults] == "y":
-                        errs[-1] = list(X[:, count])
-                    if Form[j + mults] == "x":
-                        errs[-2] = list(X[:, count])
-                count = count + 1
-                if j + mults + 2 == len(Form):
-                    break
-        if Form[0] == "r":
-            needx = True
-            for j in range(1, len(Form)):
-                if Form[j] == "x":
-                    x = list(X[j-1, :])
-                    needx = False
-                    break
-            if needx:
-                print "No x specified in format"
-                x = range(w)
-            count = 0
-            for j in range(len(Form)-1):
-                if check_type(Form[j + 1 + mults]) == 'num':
-                    if int(Form[j + 1 + mults]) == 1:
-                        print "You are a moron, there should be no 1's in",
-                        print "your format flag, stupid"
-                    for k in range(1, int(Form[j + 1 + mults])):
-                        if Form[j + 2 + mults] == "y":
-                            z.append(x)
-                            z.append(list(X[count, :]))
-                            dic['labels'].append(dic['currentfile'] + " / " +
-                                                 str(dic['columnlabel']
-                                                     [dic['currentstruct']]
-                                                     [j + mults]))
-                            errs.append([0]*len(x))
-                            errs.append([0]*len(list(X[count, :])))
-                        elif Form[j + 2 + mults] == "e":
-                            if Form[j + 1 + mults] == "y":
-                                errs[-1] = list(X[count, :])
-                            if Form[j + 1 + mults] == "x":
-                                errs[-2] = list(X[count, :])
-                        count = count + 1
-                    mults = mults + 1
-                elif Form[j + 1 + mults] == "y":
-                    z.append(x)
-                    z.append(list(X[count, :]))
-                    dic['labels'].append(dic['currentfile'] + " / " +
-                                         str(dic['columnlabel']
-                                             [dic['currentstruct']]
-                                             [j + mults]))
-                    errs.append([0]*len(x))
-                    errs.append([0]*len(list(X[count, :])))
-                elif Form[j + 1 + mults] == "e":
-                    if Form[j + mults] == "y":
-                        errs[-1] = list(X[count, :])
-                    if Form[j + mults] == "x":
-                        errs[-2] = list(X[count, :])
-                count = count + 1
-                if j + mults + 2 == len(Form):
-                    break
-    elif w == 2 and h != 2:
-        # the good old fashioned two columns
-        if dic['Verbose'] > 0:
-            print "the good old fashioned two columns"
-        if is_it_ordered(list(X[:, 0])):
-            # ordered by the first column
-            z = [list(X[:, 0]), list(X[:, 1])]
-            dic['labels'].append(dic['currentfile'] + " / " +
-                                 str(dic['columnlabel']
-                                     [dic['currentstruct']][int(len(z) / 2)]))
-            errs = [[0] * len(z[0])] * 2
-        elif is_it_ordered(list(X[:, 1])):
-            # ordered by the second column
-            z[list(X[:, 1]), list(X[:, 0])]
-            dic['labels'].append(dic['currentfile'] + " / " +
-                                 str(dic['columnlabel']
-                                     [dic['currentstruct']][int(len(z) / 2)]))
-            errs = [[0] * len(z[0])] * 2
-        else:
-            # not ordered
-            print "No deducable ordering, I'll just pick which column is x"
-            z = [list(X[:, 0]), list(X[:, 1])]
-            dic['labels'].append(dic['currentfile'] + " / " +
-                                 str(dic['columnlabel']
-                                     [dic['currentstruct']][int(len(z) / 2)]))
-            errs = [[0] * len(z[0])] * 2
-    elif w != 2 and h == 2:
-        # the good old fashioned two rows
-        if dic['Verbose'] > 0:
-            print "the good old fashioned two rows"
-        if is_it_ordered(list(X[0, :])):
-            # ordered by the first row
-            z = [list(X[0, :]), list(X[1, :])]
-            dic['labels'].append(dic['currentfile'] + " / " +
-                                 str(dic['columnlabel']
-                                     [dic['currentstruct']][int(len(z) / 2)]))
-            errs = [[0] * len(z[0])] * 2
-        elif is_it_ordered(list(X[1, :])):
-            # ordered by the second row
-            z = [list(X[1, :]), list(X[0, :])]
-            dic['labels'].append(dic['currentfile'] + " / " +
-                                 str(dic['columnlabel']
-                                     [dic['currentstruct']][int(len(z) / 2)]))
-            errs = [[0] * len(z[0])] * 2
-        else:
-            # not ordered
-            print "No deducable ordering, I'll just pick which row is x"
-            z = [list(X[0, :]), list(X[1, :])]
-            errs = [[0] * len(z[0])] * 2
-    elif w < 5 and h < 5:
-        # we are going to have to look around for ordered things
-        needx = True
-        for i in range(w):
-            if is_it_ordered(list(X[:, i])):
-                needx = False
-                xcol = i
-                break
-        if not needx:
             for i in range(w):
-                if i != xcol:
-                    errs.append([0]*len(list(X[:, xcol])))
-                    errs.append([0]*len(list(X[:, i])))
-                    z.append(list(X[:, xcol]))
-                    z.append(list(X[:, i]))
-                    dic['labels'].append(dic['currentfile'] + " / " +
-                                         str(dic['columnlabel']
-                                             [dic['currentstruct']]
-                                             [int(len(z) / 2)]))
-        if needx:
-            for i in range(h):
-                if is_it_ordered(list(X[i, :])):
+                if is_it_ordered(list(X[:, i])):
                     needx = False
-                    xrow = i
+                    xcol = i
                     break
             if not needx:
-                for i in range(h):
+                for i in range(w):
                     if i != xcol:
-                        errs.append([0]*len(list(X[xcol, :])))
-                        errs.append([0]*len(list(X[i, :])))
-                        z.append(list(X[xrow, :]))
-                        z.append(list(X[i, :]))
+                        errs.append([0]*len(list(X[:, xcol])))
+                        errs.append([0]*len(list(X[:, i])))
+                        z.append(list(X[:, xcol]))
+                        z.append(list(X[:, i]))
                         dic['labels'].append(dic['currentfile'] + " / " +
                                              str(dic['columnlabel']
                                                  [dic['currentstruct']]
                                                  [int(len(z) / 2)]))
-        if needx:
-            print "I don't know what to do with this block. It's", w, "by",
-            print h, "and neither axis seems to be ordered"
-    elif w < 5 and h > 7:
-        # we will assume that it is in columns
-        needx = True
-        for i in range(w):
-            if is_it_ordered(list(X[:, i])):
-                needx = False
-                xcol = i
-                break
-        if not needx:
+            if needx:
+                for i in range(h):
+                    if is_it_ordered(list(X[i, :])):
+                        needx = False
+                        xrow = i
+                        break
+                if not needx:
+                    for i in range(h):
+                        if i != xcol:
+                            errs.append([0]*len(list(X[xcol, :])))
+                            errs.append([0]*len(list(X[i, :])))
+                            z.append(list(X[xrow, :]))
+                            z.append(list(X[i, :]))
+                            dic['labels'].append(dic['currentfile'] + " / " +
+                                                 str(dic['columnlabel']
+                                                     [dic['currentstruct']]
+                                                     [int(len(z) / 2)]))
+            if needx:
+                print "I don't know what to do with this block. It's", w, "by",
+                print h, "and neither axis seems to be ordered"
+        elif w < 5 and h > 7:
+            # we will assume that it is in columns
+            needx = True
             for i in range(w):
-                if i != xcol:
-                    errs.append([0]*len(list(X[:, xcol])))
-                    errs.append([0]*len(list(X[:, i])))
-                    z.append(list(X[:, xcol]))
-                    z.append(list(X[:, i]))
-                    dic['labels'].append(dic['currentfile'] + " / " +
-                                         str(dic['columnlabel']
-                                             [dic['currentstruct']]
-                                             [int(len(z) / 2)]))
-    elif w > 7 and h < 5:
-        # we will assume that it is in rows
-        needx = True
-        for i in range(h):
-            if is_it_ordered(list(X[i, :])):
-                needx = False
-                xrow = i
-                break
-        if not needx:
-            for i in range(h):
-                if i != xrow:
-                    errs.append([0]*len(list(X[xcol, :])))
-                    errs.append([0]*len(list(X[i, :])))
-                    z.append(list(X[xrow, :]))
-                    z.append(list(X[i, :]))
-                    dic['labels'].append(dic['currentfile'] + " / " +
-                                         str(dic['columnlabel']
-                                             [dic['currentstruct']]
-                                             [int(len(z) / 2)]))
-    elif w > 5 and h > 5:
-        # will will have to look around for oredered things
-        needx = True
-        for i in range(w):
-            if is_it_ordered(list(X[:, i])):
-                needx = False
-                xcol = i
-                break
-        if not needx:
-            for i in range(w):
-                if i != xcol:
-                    errs.append([0]*len(list(X[:, xcol])))
-                    errs.append([0]*len(list(X[:, i])))
-                    z.append(list(X[:, xcol]))
-                    z.append(list(X[:, i]))
-                    dic['labels'].append(dic['currentfile'] + " / " + str(dic['columnlabel'][dic['currentstruct']][int(len(z) / 2)]))
-        if needx:
+                if is_it_ordered(list(X[:, i])):
+                    needx = False
+                    xcol = i
+                    break
+            if not needx:
+                for i in range(w):
+                    if i != xcol:
+                        errs.append([0]*len(list(X[:, xcol])))
+                        errs.append([0]*len(list(X[:, i])))
+                        z.append(list(X[:, xcol]))
+                        z.append(list(X[:, i]))
+                        dic['labels'].append(dic['currentfile'] + " / " +
+                                             str(dic['columnlabel']
+                                                 [dic['currentstruct']]
+                                                 [int(len(z) / 2)]))
+        elif w > 7 and h < 5:
+            # we will assume that it is in rows
+            needx = True
             for i in range(h):
                 if is_it_ordered(list(X[i, :])):
                     needx = False
@@ -306,44 +273,77 @@ def structure(data):
                         errs.append([0]*len(list(X[i, :])))
                         z.append(list(X[xrow, :]))
                         z.append(list(X[i, :]))
+                        dic['labels'].append(dic['currentfile'] + " / " +
+                                             str(dic['columnlabel']
+                                                 [dic['currentstruct']]
+                                                 [int(len(z) / 2)]))
+        elif w > 5 and h > 5:
+            # will will have to look around for oredered things
+            needx = True
+            for i in range(w):
+                if is_it_ordered(list(X[:, i])):
+                    needx = False
+                    xcol = i
+                    break
+            if not needx:
+                for i in range(w):
+                    if i != xcol:
+                        errs.append([0]*len(list(X[:, xcol])))
+                        errs.append([0]*len(list(X[:, i])))
+                        z.append(list(X[:, xcol]))
+                        z.append(list(X[:, i]))
                         dic['labels'].append(dic['currentfile'] + " / " + str(dic['columnlabel'][dic['currentstruct']][int(len(z) / 2)]))
-        if needx:
-            print "I don't know what to do with this block. It's", w, "by",
-            print h, "and neither axis seems to be ordered"
-    else:
-        print "I don't know what to do with this block. It's", w, "by",
-        print h
-
-    if z:
-        new_err = []
-        for k in range(len(z) / 2):
-            new_err.append([[], []])
-            new_err.append([[], []])
-            for l in range(len(z[2*k + 1])):
-                new_err[2*k][0].append(errs[2*k][l])
-                new_err[2*k][1].append(errs[2*k][l])
-                new_err[2*k + 1][0].append(float(errs[2*k + 1][l]))
-                new_err[2*k + 1][1].append(dic['sys_err']*float(z[2*k + 1][l]))
-        errs = new_err
-        if dic['MULTIP']:
-            z = dic['remnants'] + z
-            errs = dic['remnanterrors'] + errs
-            dic['multicountpile'] = 0
-            if (len(z)-len(z) % int(dic['MULTIP'])) / int(dic['MULTIP']) / 2 > 1:
-                dic['multicountpile'] = 1
-            if (len(z)-len(z) % int(dic['MULTIP'])) / int(dic['MULTIP']) > 0:
-                for i in range(0, (len(z)-len(z) % int(dic['MULTIP'])) / int(dic['MULTIP']) / 2):
-                    plot(z[:(int(dic['MULTIP']) * 2)], errs[:(int(dic['MULTIP']) * 2)])
-                    z = z[(int(dic['MULTIP']) * 2):]
-                    errs = errs[(int(dic['MULTIP']) * 2):]
-                    dic['multicountpile'] = dic['multicountpile'] + 1
-            dic['remnants'] = z
-            dic['remnanterrors'] = errs
+            if needx:
+                for i in range(h):
+                    if is_it_ordered(list(X[i, :])):
+                        needx = False
+                        xrow = i
+                        break
+                if not needx:
+                    for i in range(h):
+                        if i != xrow:
+                            errs.append([0]*len(list(X[xcol, :])))
+                            errs.append([0]*len(list(X[i, :])))
+                            z.append(list(X[xrow, :]))
+                            z.append(list(X[i, :]))
+                            dic['labels'].append(dic['currentfile'] + " / " + str(dic['columnlabel'][dic['currentstruct']][int(len(z) / 2)]))
+            if needx:
+                print "I don't know what to do with this block. It's", w, "by",
+                print h, "and neither axis seems to be ordered"
         else:
-            # just plot it
-            plot(z, errs)
-        if dic['Numbering']:
-            dic['numbered'] = dic['numbered'] + 1
+            print "I don't know what to do with this block. It's", w, "by",
+            print h
+
+        if z:
+            new_err = []
+            for k in range(len(z) / 2):
+                new_err.append([[], []])
+                new_err.append([[], []])
+                for l in range(len(z[2*k + 1])):
+                    new_err[2*k][0].append(errs[2*k][l])
+                    new_err[2*k][1].append(errs[2*k][l])
+                    new_err[2*k + 1][0].append(float(errs[2*k + 1][l]))
+                    new_err[2*k + 1][1].append(dic['sys_err']*float(z[2*k + 1][l]))
+            errs = new_err
+            if dic['MULTIP']:
+                z = dic['remnants'] + z
+                errs = dic['remnanterrors'] + errs
+                dic['multicountpile'] = 0
+                if (len(z)-len(z) % int(dic['MULTIP'])) / int(dic['MULTIP']) / 2 > 1:
+                    dic['multicountpile'] = 1
+                if (len(z)-len(z) % int(dic['MULTIP'])) / int(dic['MULTIP']) > 0:
+                    for i in range(0, (len(z)-len(z) % int(dic['MULTIP'])) / int(dic['MULTIP']) / 2):
+                        plot(z[:(int(dic['MULTIP']) * 2)], errs[:(int(dic['MULTIP']) * 2)])
+                        z = z[(int(dic['MULTIP']) * 2):]
+                        errs = errs[(int(dic['MULTIP']) * 2):]
+                        dic['multicountpile'] = dic['multicountpile'] + 1
+                dic['remnants'] = z
+                dic['remnanterrors'] = errs
+            else:
+                # just plot it
+                plot(z, errs)
+            if dic['Numbering']:
+                dic['numbered'] = dic['numbered'] + 1
 
 
 def plot_arragnement():
