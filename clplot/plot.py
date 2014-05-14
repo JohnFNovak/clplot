@@ -23,9 +23,6 @@ def plot(z, errs, Force=False):
     """This function takes a list z of lists and trys to plot them. the first
     list is always x, and the folowing are always y's"""
 
-    #print z
-    #print errs
-
     dic = globe.dic
     points = dic['colorstyle']
 
@@ -50,17 +47,19 @@ def plot(z, errs, Force=False):
             size[i] = float(points[i].split(';')[1])
 
     if dic['MULTIT']:
-        dic['multicounttile'] = dic['multicounttile'] + 1
+        dic['mct'] = dic['mct'] + 1
         if not dic['columnsfirst']:
-            plt.subplot2grid((dic['layout'][0], dic['layout'][1]), (((dic['multicounttile']-1)-(dic['multicounttile']-1) % dic['layout'][1])/dic['layout'][1], ((dic['multicounttile']-1) % dic['layout'][1])))
+            plt.subplot2grid((dic['layout'][0], dic['layout'][1]),
+                             (((dic['mct'] - 1) - (dic['mct'] - 1) %
+                               dic['layout'][1]) / dic['layout'][1],
+                              ((dic['mct'] - 1) % dic['layout'][1])))
         if dic['columnsfirst']:
-            plt.subplot2grid((dic['layout'][0], dic['layout'][1]), ((dic['multicounttile']-1) % dic['layout'][1])), (((dic['multicounttile']-1)-(dic['multicounttile']-1) % dic['layout'][1])/dic['layout'][1])
-        #plt.title(str(dic['multicounttile']), fontsize = dic['fontsize'])
+            plt.subplot2grid((dic['layout'][0], dic['layout'][1]),
+                             ((dic['mct'] - 1) % dic['layout'][1]),
+                             (((dic['mct'] - 1) - (dic['mct'] - 1) %
+                              dic['layout'][1]) / dic['layout'][1]))
 
     plottingerrors = True
-    #for k in errs:
-    #    if k != 0:
-    #        plottingerrors = True
 
     arg = []
 
@@ -104,27 +103,52 @@ def plot(z, errs, Force=False):
         #z[k + 1] = map(float, z[k + 1])
         if plottingerrors and not dic['errorbands']:
             if errs[k][0] == 0:
-                errs[k][0] = [0]*len(z[k])
+                errs[k][0] = [0] * len(z[k])
             else:
                 errs[k][0] = map(lambda x: float(x) * dic['xscaled'], errs[k][0])
             if errs[k + 1][0] == 0:
-                plt.errorbar(z[k], z[k + 1], xerr=errs[k][0], yerr=[0]*len(z[k + 1]), fmt=marker, label=dic['labels'][(k + 1)/2], mec=ecolor, mfc=fcolor, ms=msize)
+                plt.errorbar(z[k], z[k + 1],
+                             xerr=errs[k][0],
+                             yerr=[0] * len(z[k + 1]),
+                             fmt=marker, label=dic['labels'][(k + 1) / 2],
+                             mec=ecolor, mfc=fcolor, ms=msize)
             if errs[k + 1][0] != 0:
                 errs[k + 1][0] = map(lambda x: float(x) * dic['yscaled'], errs[k + 1][0])
                 plt.errorbar(z[k], z[k + 1], xerr=errs[k][0], yerr=errs[k + 1][0], fmt=marker, label=dic['labels'][(k + 1)/2], mec=ecolor, mfc=fcolor, ms=msize)
+                plt.errorbar(z[k], z[k + 1],
+                             xerr=errs[k][0],
+                             yerr=errs[k + 1][0],
+                             fmt=marker, label=dic['labels'][(k + 1) / 2],
+                             mec=ecolor, mfc=fcolor, ms=msize)
         if plottingerrors and dic['errorbands']:
             if errs[k][0] == 0:
-                errs[k][0] = [0]*len(z[k])
+                errs[k][0] = [0] * len(z[k])
             else:
                 errs[k][0] = map(lambda x: float(x) * dic['xscaled'], errs[k][0])
             if errs[k + 1][0] == 0:
-                plt.errorbar(z[k], z[k + 1], xerr=[0]*len(errs[k][0]), yerr=[0]*len(z[k + 1]), fmt=marker, label=dic['labels'][(k + 1)/2], mec=ecolor, mfc=fcolor, ms=msize)
+                plt.errorbar(z[k], z[k + 1],
+                             xerr=[0] * len(errs[k][0]),
+                             yerr=[0] * len(z[k + 1]),
+                             fmt=marker, label=dic['labels'][(k + 1) / 2],
+                             mec=ecolor, mfc=fcolor, ms=msize)
             if errs[k + 1][0] != 0:
                 errs[k + 1][0] = map(lambda x: float(x) * dic['yscaled'], errs[k + 1][0])
-                plt.errorbar(z[k], z[k + 1], xerr=[0]*len(errs[k][0]), yerr=[0]*len(errs[k + 1][0]), fmt=marker, label=dic['labels'][(k + 1)/2], mec=ecolor, mfc=fcolor, ms=msize)
-                plt.fill_between(np.array(z[k]), np.array(z[k + 1]) + np.array(errs[k + 1][0]), np.array(z[k + 1])-np.array(errs[k + 1][0]), facecolor=ecolor, alpha=dic['alpha'], interpolate=True, linewidth=0)
+                plt.errorbar(z[k], z[k + 1],
+                             xerr=[0] * len(errs[k][0]),
+                             yerr=[0] * len(errs[k + 1][0]),
+                             fmt=marker, label=dic['labels'][(k + 1) / 2],
+                             mec=ecolor, mfc=fcolor, ms=msize)
+                plt.fill_between(np.array(z[k]),
+                                 np.array(z[k + 1]) + np.array(errs[k + 1][0]),
+                                 np.array(z[k + 1]) - np.array(errs[k + 1][0]),
+                                 facecolor=ecolor, alpha=dic['alpha'],
+                                 interpolate=True, linewidth=0)
         if dic['plot_sys_err']:
-            plt.fill_between(np.array(z[k]), np.array(z[k + 1]) + np.array(errs[k + 1][1]), np.array(z[k + 1])-np.array(errs[k + 1][1]), facecolor=ecolor, alpha=dic['alpha'], interpolate=True, linewidth=0)
+            plt.fill_between(np.array(z[k]),
+                             np.array(z[k + 1]) + np.array(errs[k + 1][1]),
+                             np.array(z[k + 1]) - np.array(errs[k + 1][1]),
+                             facecolor=ecolor, alpha=dic['alpha'],
+                             interpolate=True, linewidth=0)
         if not plottingerrors:
             arg.append(z[k])  # x vector
             arg.append(z[k + 1])
@@ -160,7 +184,7 @@ def plot(z, errs, Force=False):
     else:
         outputname = outputname + "." + dic['TYPE']
 
-    if not dic['MULTIT'] or (dic['MULTIT'] and dic['multicounttile'] ==
+    if not dic['MULTIT'] or (dic['MULTIT'] and dic['mct'] ==
                              int(dic['MULTIT'])) or Force:
         plt.tight_layout()  # Experimental, and may cause problems
         plt.savefig(outputname)
@@ -171,8 +195,8 @@ def plot(z, errs, Force=False):
         #check = subprocess.call(['open', outputname])
         plt.clf()
 
-    if dic['MULTIT'] and dic['multicounttile'] == int(dic['MULTIT']):
-            dic['multicounttile'] = 0
+    if dic['MULTIT'] and dic['mct'] == int(dic['MULTIT']):
+            dic['mct'] = 0
 
 
 def parse_legend():
