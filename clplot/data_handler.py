@@ -94,7 +94,12 @@ def read_data(filename):
 
     with open(filename, "r") as datafile:
         data = datafile.read().split('\n')
-    data = [tuple(line.split(d)) for line in data if line.strip()]
+    data = [line.split(d) for line in data if line.strip()]
+
+    if len(data < 2):
+        print filename, 'does not contain sufficient data'
+        print 'length of printable data is too short'
+        return []
 
     return data
 
