@@ -86,9 +86,9 @@ def structure(data):
                             new[-1].append([0]*len(x))
                         elif Form[j + 2 + mults] == "e":
                             if Form[j + 1 + mults] == "y":
-                                new[-1][-1] = block[count, :].tolist()
+                                new[-1][-1] = block[:, count].tolist()
                             if Form[j + 1 + mults] == "x":
-                                new[-1][-2] = block[count, :].tolist()
+                                new[-1][-2] = block[:, count].tolist()
                         count = count + 1
                     mults = mults + 1
                 elif Form[j + 2 + mults] == "y":
@@ -106,9 +106,9 @@ def structure(data):
                     x = block[:, count].tolist()
                 elif Form[j + 2 + mults] == "e":
                     if Form[j + 1 + mults] == "y":
-                        new[-1][-1] = block[count, :].tolist()
+                        new[-1][-1] = block[:, count].tolist()
                     if Form[j + 1 + mults] == "x":
-                        new[-1][-2] = block[count, :].tolist()
+                        new[-1][-2] = block[:, count].tolist()
                 count = count + 1
                 if j + mults + 2 == len(Form):
                     break
