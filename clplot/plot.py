@@ -179,7 +179,7 @@ def plot(data, Force=False):
         if dic['Verbose'] > 0:
             print"printed to", outputname
         if dic['EmbedData']:
-            EmbedData(outputname, z, errs)
+            EmbedData(outputname, data)
         #check = subprocess.call(['open', outputname])
         plt.clf()
 
@@ -246,17 +246,21 @@ def parse_legend():
                     dic['labels'][j] = string.join(temp, divider)
 
 
-def EmbedData(outputname, z, errs):
+def EmbedData(outputname, data):
     dic = globe.dic
     StringToEmbed = "Creation time: " + time.ctime() + '\n'
     StringToEmbed += "Current directory: " + os.path.abspath('.') + '\n'
     StringToEmbed += "Creation command: " + ' '.join(sys.argv) + '\n'
     StringToEmbed += "Plotted values:" + '\n'
-    for k in range(0, len(z), 2):
-        StringToEmbed += 'x ' + ' '.join(map(str, z[k])) + '\n'
-        StringToEmbed += 'x err ' + ' '.join(map(str, errs[k])) + '\n'
-        StringToEmbed += 'y ' + ' '.join(map(str, z[k + 1])) + '\n'
-        StringToEmbed += 'y err ' + ' '.join(map(str, errs[k + 1])) + '\n'
+    for i, d in enumerate(data):
+        X, Y, X_err, Y_err, X_sys_err, Y_sys_err = d[3:9]
+        StringToEmbed += 'Plot %d\n' % i
+        StringToEmbed += 'x ' + ' '.join(map(str, X)) + '\n'
+        StringToEmbed += 'x_err ' + ' '.join(map(str, X_err)) + '\n'
+        StringToEmbed += 'x_sys_err ' + ' '.join(map(str, X_err)) + '\n'
+        StringToEmbed += 'y ' + ' '.join(map(str, Y)) + '\n'
+        StringToEmbed += 'y_err ' + ' '.join(map(str, Y_err)) + '\n'
+        StringToEmbed += 'y_sys_err ' + ' '.join(map(str, Y_sys_err)) + '\n'
     if dic['TYPE'] == 'jpg':
         with open(outputname, 'a') as f:
             f.write(StringToEmbed)
