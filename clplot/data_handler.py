@@ -36,7 +36,8 @@ def make_blocks(dataarray):
                 blank['labels'] = d
                 blank['Format'] = 'c'
                 blank['dims'][1] = 0
-        elif current[0] == 'str' and not any([x == 'str' for x in d[1:]]):
+        elif (current[0] == 'str'
+              and not any([x == 'str' for x in current[1:]])):
             # The first column in a string, and nothing else is
             blank['labels'] = [d[0]]
             blank['Format'] = 'r'
