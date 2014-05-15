@@ -14,7 +14,7 @@
 import globe
 from structure import structure
 from helpers import read_flags
-from plot import plot
+from plot import plot, plot_tiles
 from data_handler import make_blocks, read_data
 
 
@@ -67,11 +67,21 @@ def main():
         outputfile = '-'.join(sorted(set([d[2] for d in g])))
         plots.append([g, outputfile])
 
+    tiles = []
     for p in plots:
         e_args = {}
         if [x[1] for x in plots].count(p[1]) > 1:
             e_args['numbered'] = [x for x in plots if x[1] == p[1]].index(p)
-        plot(*p, **e_args)
+        if dic['MULTIT']:
+            tiles.append(p)
+            if len(tiles) == dic['MULTIT']:
+                plot_tiles(tiles)
+                tiles = []
+        else:
+            plot(*p, **e_args)
+
+    if tiles:
+        plot_tiles(tiles)
 
 
 if __name__ == '__main__':
