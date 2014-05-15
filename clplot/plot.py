@@ -94,9 +94,8 @@ def plot(data, Force=False):
             Y = Y / np.sum(Y * width)
             d[5] = Y.tolist()
 
-    # for k in range(0, len(z), 2):
     for k, d in enumerate(data):
-        X, Y, X_err, Y_err, X_sys_err, y_sys_err = d[3:9]
+        X, Y, X_err, Y_err, X_sys_err, Y_sys_err = d[3:9]
         marker = points[k % len(points)]
         msize = size[k % len(points)]
         ecolor = points[k % len(points)][0]
@@ -134,8 +133,8 @@ def plot(data, Force=False):
                                  interpolate=True, linewidth=0)
         if dic['plot_sys_err']:
             plt.fill_between(np.array(X),
-                             np.array(Y) + np.array(y_sys_err),
-                             np.array(Y) - np.array(y_sys_err),
+                             np.array(Y) + np.array(Y_sys_err),
+                             np.array(Y) - np.array(Y_sys_err),
                              facecolor=ecolor, alpha=dic['alpha'],
                              interpolate=True, linewidth=0)
         if not plottingerrors:
