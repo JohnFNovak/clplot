@@ -182,7 +182,7 @@ def parse_legend(data):
     # dic = globe.dic
     # delimiters = ['/', '-', '.', '/', '-', '.']
     delimiters = ['/', '-']
-    labels = [x[0][4] for x in data]
+    labels = [x[4] for x in data]
 
     for divider in delimiters:
         tester = labels[0].split(divider)
