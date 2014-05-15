@@ -20,11 +20,10 @@ def structure(data):
     it.'"""
     dic = globe.dic
 
-    Form = None
-
     new = []
 
     for d in data:
+        Form = None
         w = d[3]['dims'][0]
         h = d[3]['dims'][1]
         block = np.array(d[3]['data'])
