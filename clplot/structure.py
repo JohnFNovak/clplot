@@ -69,8 +69,8 @@ def structure(data):
         elif w > (h * 3):
             Form = 'r' + ('y' * h)
         else:
-            rows = [is_it_ordered(block[:, x].list()) for x in range(w)]
-            cols = [is_it_ordered(block[x, :].list()) for x in range(h)]
+            rows = [is_it_ordered(block[:, x].tolist()) for x in range(w)]
+            cols = [is_it_ordered(block[x, :].tolist()) for x in range(h)]
             if cols.count(1) > rows.count(1):
                 Form = 'r' + ('y' * h)
             elif rows.count(1) > cols.count(1):
