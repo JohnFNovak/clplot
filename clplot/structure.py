@@ -81,13 +81,17 @@ def structure(data):
                 Form = 'c' + ('y' * w)
 
         if Form:
-            mults = 0
             if Form[0] == 'r':
                 block = block.T
             needx = True
+            mults = 0
             for j, c in enumerate(Form[1:]):
+                if check_type(c) == 'num':
+                    mults += (int(c) - 1)
                 if c == "x":
-                    x = block[:, j + 1].tolist()
+                    if d[3]['labels']:
+                        d[3]['x_label'] = d[3]['labels'][j + mults]
+                    x = block[:, j + mults].tolist()
                     needx = False
                     break
             if needx:
@@ -100,7 +104,7 @@ def structure(data):
                         if Form[j + 2 + mults] == "y":
                             new.append([d[1], d[2]])
                             if d[3]['labels']:
-                                new[-1].append(d[3]['labels'])
+                                new[-1].append(d[3]['labels'][j + mults])
                             else:
                                 new[-1].append('_'.join(map(str, [d[1],
                                                'block', d[0][1], 'col',
@@ -134,7 +138,7 @@ def structure(data):
                 elif Form[j + 2 + mults] == "y":
                     new.append([d[1], d[2]])
                     if d[3]['labels']:
-                        new[-1].append(d[3]['labels'])
+                        new[-1].append(d[3]['labels'][j + mults])
                     else:
                         new[-1].append('_'.join(map(str, [d[1],
                                        'block', d[0][1], 'col',
