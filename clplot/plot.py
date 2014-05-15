@@ -19,9 +19,13 @@ import string
 import globe
 
 
-def plot(z, errs, Force=False):
+def plot(data, Force=False):
     """This function takes a list z of lists and trys to plot them. the first
     list is always x, and the folowing are always y's"""
+
+    # data format:
+    # [filename, output, x_label, y_label,
+    #  x, y, x_err, y_err, x_sys_err, y_sys_err]
 
     dic = globe.dic
     points = dic['colorstyle']
@@ -67,8 +71,8 @@ def plot(z, errs, Force=False):
         plt.xlim(dic['x_range'])
     if dic['y_range']:
         plt.ylim(dic['y_range'])
-    if dic['x_label']:
-        plt.xlabel(dic['x_label'], fontsize=dic['fontsize'])
+    x_label = '/'.join(sorted(set([d[2] for d in data])))
+    plt.xlabel(x_label, fontsize=dic['fontsize'])
     if dic['y_label']:
         plt.ylabel(dic['y_label'], fontsize=dic['fontsize'])
     if dic['x_log']:
