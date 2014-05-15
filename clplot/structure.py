@@ -32,11 +32,16 @@ def structure(data):
         # Check if a prespecified format will work
         if dic['formats']:
             if d[3]['Format']:
+                if dic['Verbose'] > 1:
+                    print 'data handler decided appropriat format was',
+                    print d[3]['Format']
                 formats = [x for x in dic['formats'] if x[0] == d[3]['Format']]
             else:
                 formats = dic['formats']
             for f in formats:
                 l = len(f) - 1
+                if dic['Verbose'] > 2:
+                    print 'checking', f, l, w, h
                 wild = '*' in f
                 if f[0] == "c" and (l == w or (l < w and wild)):
                     if dic['Verbose'] > 0:
@@ -99,7 +104,7 @@ def structure(data):
                             if d[3]['labels']:
                                 new[-1].append(d[3]['labels'][j + mults])
                             else:
-                                new[-1].append('_'.join(map(str, [d[1],
+                                new[-1].append('_'.join(map(str, [d[2],
                                                'block', d[0][1], 'col',
                                                j + mults])))
                             new[-1] = new[-1] + [x, block[:, count].tolist()]
@@ -133,7 +138,7 @@ def structure(data):
                     if d[3]['labels']:
                         new[-1].append(d[3]['labels'][j + mults])
                     else:
-                        new[-1].append('_'.join(map(str, [d[1],
+                        new[-1].append('_'.join(map(str, [d[2],
                                        'block', d[0][1], 'col',
                                        j + mults])))
                     new[-1] = new[-1] + [x, block[:, count].tolist()]
