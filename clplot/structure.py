@@ -10,7 +10,6 @@
 # written for Python 2.6. Requires Scipy, Numpy, and Matplotlib
 
 import numpy as np
-import math as m
 import globe
 from helpers import check_type, is_it_ordered
 
@@ -158,81 +157,6 @@ def structure(data):
                     break
 
     return new
-
-
-def plot_arragnement():
-    """This function looks at dic['MULTIT'] and decides how to structure the
-    multiplot it returns a 2 tuple which is the root for the first 2 argument
-    of the subplot command"""
-
-    dic = globe.dic
-    found = False
-
-    if m.sqrt(float(dic['MULTIT'])) % 1 == 0:
-        # Or multiplot can be square
-        form = (int(m.sqrt(float(dic['MULTIT']))),
-                int(m.sqrt(float(dic['MULTIT']))))
-        found = True
-    elif int(dic['MULTIT']) == 3:
-        form = (1, 3)
-        found = True
-    if not found:
-        looking = True
-        a = 1
-        while looking and a * (a + 1) <= int(dic['MULTIT']):
-            if float(dic['MULTIT']) == float(a * (a + 1)):
-                looking = False
-                found = True
-            else:
-                a = a + 1
-        if found:
-            form = (a, a + 1)
-    if not found and m.sqrt(float(dic['MULTIT']) + 1) % 1 == 0:
-        form = (int(m.sqrt(float(dic['MULTIT']) + 1)),
-                int(m.sqrt(float(dic['MULTIT']) + 1)))
-        found = True
-    if not found:
-        looking = True
-        a = 1
-        while looking and a * (a + 1) <= int(dic['MULTIT']) + 1:
-            if float(dic['MULTIT']) + 1 == float(a * (a + 1)):
-                looking = False
-                found = True
-            else:
-                a = a + 1
-        if found:
-            form = (a, a + 1)
-    if not found and m.sqrt(float(dic['MULTIT']) + 2) % 1 == 0:
-        form = (int(m.sqrt(float(dic['MULTIT']) + 2)),
-                int(m.sqrt(float(dic['MULTIT']) + 2)))
-        found = True
-    if not found:
-        looking = True
-        a = 1
-        while looking and a * (a + 1) <= int(dic['MULTIT']) + 2:
-            if float(dic['MULTIT']) + 2 == float(a * (a + 1)):
-                looking = False
-                found = True
-            else:
-                a = a + 1
-        if found:
-            form = (a, a + 1)
-    if not found:
-        looking = True
-        a = 1
-        while looking and a * (a + 1) <= int(dic['MULTIT']):
-            if float(dic['MULTIT']) <= float(a * (a + 1)):
-                looking = False
-                found = True
-            else:
-                a = a + 1
-        if found:
-            form = (a, a + 1)
-
-    if dic['Verbose'] > 0:
-        print " I have decided that the multiplots will be", form[0], "by", form[1]
-
-    return form
 
 
 if __name__ == '__main__':
