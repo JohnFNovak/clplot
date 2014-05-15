@@ -264,7 +264,7 @@ def EmbedData(outputname, data):
     elif dic['TYPE'] == 'pdf':
         if dic['Verbose'] > 0:
             print "Warning!!! Embedding data in pdfs is not reliable storage!"
-            print "Many PDF viewers will strip data which is not viewed!"
+            print "Many PDF viewers will strip data which is not rendered!"
         with open(outputname, 'r') as f:
             filetext = f.read().split('\n')
         obj_count = 0
