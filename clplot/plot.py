@@ -19,7 +19,7 @@ import string
 import globe
 
 
-def plot(data, Force=False):
+def plot(data, outputfile, Force=False):
     """This function takes a list z of lists and trys to plot them. the first
     list is always x, and the folowing are always y's"""
 
@@ -150,10 +150,7 @@ def plot(data, Force=False):
     if dic['legend']:
         plt.legend()
 
-    if dic['currentoutput']:
-        outputname = dic['currentoutput']
-    else:
-        outputname = string.split(dic['currentfile'], ".")[0]
+    outputname = outputfile
 
     if dic['numbered'] != 0:
         outputname = outputname + "_" + str(dic['numbered'])
