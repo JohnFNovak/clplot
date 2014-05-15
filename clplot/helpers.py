@@ -178,7 +178,10 @@ def read_flags():
             if case == 0:
                 dic['files'].append(flag)
             if case == 1:
-                dic['outputs'].append(flag)
+                if flag[0] == '.':
+                    dic['outputs'].append(flag[1:])
+                else:
+                    dic['outputs'].append(flag)
             if case == 2:
                 dic['formats'].append(flag)
             if case == 3:
