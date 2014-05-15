@@ -64,8 +64,9 @@ def main():
 
     plots = []
     for g in groups:
-        outputfile = '-'.join(sorted(set([d[2] for d in g])))
-        plots.append([g, outputfile])
+        if g:
+            outputfile = '-'.join(sorted(set([d[2] for d in g])))
+            plots.append([g, outputfile])
 
     tiles = []
     for p in plots:
