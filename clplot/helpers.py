@@ -178,14 +178,14 @@ def read_flags():
             if case == 0:
                 dic['files'].append(flag)
             if case == 1:
-                if flag[0] == '.':
-                    dic['outputs'].append(flag[1:])
-                else:
-                    dic['outputs'].append(flag)
+                dic['outputs'].append(flag)
             if case == 2:
                 dic['formats'].append(flag)
             if case == 3:
-                dic['TYPE'] = flag
+                if flag[0] == '.':
+                    dic['TYPE'].append(flag[1:])
+                else:
+                    dic['TYPE'].append(flag)
             if case == 4:
                 dic['MULTIP'] = flag  # number of plots per plot
             if case == 5:
