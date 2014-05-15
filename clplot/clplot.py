@@ -16,6 +16,7 @@ from structure import structure
 from helpers import read_flags, interact
 from plot import plot, plot_tiles
 from data_handler import make_blocks, read_data
+import sys
 
 
 def init(data=[], files=globe.dic['files']):
@@ -112,6 +113,8 @@ def interactive_plot(data):
             interact({'dic': dic, 'data': data})
         if command == 'g':
             clplot(data)
+        if command == 'q':
+            sys.exit(1)
 
 
 if __name__ == '__main__':
