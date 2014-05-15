@@ -112,7 +112,7 @@ def structure(data):
                             new[-1].append([0]*len(x))  # x err
                             new[-1].append([0]*len(x))  # y err
                             new[-1].append([0]*len(x))  # x sys err
-                            new[-1].append(d[-1]*len(x))  # y sys err
+                            new[-1].append([d[-1]]*len(x))  # y sys err
                         elif Form[j + 2 + mults] == "e":
                             if Form[j + 1 + mults] == "y":
                                 new[-1][-3] = block[:, count].tolist()
@@ -135,7 +135,7 @@ def structure(data):
                         count = count + 1
                     mults = mults + 1
                 elif Form[j + 1 + mults] == "y":
-                    new.append([d[0], d[1], d[2]])
+                    new.append([d[0], d[1], d[2], d[3]['x_label']])
                     if d[3]['labels']:
                         new[-1].append(d[3]['labels'][j + mults])
                     else:
@@ -143,11 +143,27 @@ def structure(data):
                                        'block', d[0][1], 'col',
                                        j + mults])))
                     new[-1] = new[-1] + [x, block[:, count].tolist()]
-                    new[-1].append([0]*len(x))
-                    new[-1].append([0]*len(x))
+                    new[-1].append([0]*len(x))  # x err
+                    new[-1].append([0]*len(x))  # y err
+                    new[-1].append([0]*len(x))  # x sys err
+                    new[-1].append([d[-1]]*len(x))  # y sys err
                 elif Form[j + 1 + mults] == "x":
                     x = block[:, count].tolist()
                 elif Form[j + 1 + mults] == "e":
+                    if Form[j + 1 + mults] == "y":
+                        new[-1][-3] = block[:, count].tolist()
+                    if Form[j + 1 + mults] == "x":
+                        new[-1][-4] = block[:, count].tolist()
+                elif Form[j + 1 + mults] == "s":
+                    # % systematic error
+                    if Form[j + 1 + mults] == "y":
+                        new[-1][-1] = (new[-1][-5] *
+                                       block[:, count]).tolist()
+                    if Form[j + 1 + mults] == "x":
+                        new[-1][-2] = (new[-1][-6] *
+                                       block[:, count]).tolist()
+                elif Form[j + 1 + mults] == "S":
+                    # abs systematic error
                     if Form[j + 1 + mults] == "y":
                         new[-1][-1] = block[:, count].tolist()
                     if Form[j + 1 + mults] == "x":
