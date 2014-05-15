@@ -115,6 +115,8 @@ def interactive_plot(data):
             clplot(data)
         if command == 'q':
             sys.exit(1)
+        if command == 'f':
+            data = init(data=data, files=[raw_input('file to load: ').strip()])
 
 
 if __name__ == '__main__':
