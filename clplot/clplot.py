@@ -109,7 +109,7 @@ def interactive_plot(data):
         command = raw_input('?: ')  # or '.'
         history.append(command)
         if command == '!':
-            interact()
+            interact({'dic': dic, 'data': data})
         if command == 'g':
             clplot(data)
 
