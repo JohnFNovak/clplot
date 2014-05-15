@@ -31,8 +31,9 @@ def make_blocks(dataarray):
             # more than half the enrties are strings, so we will assume it's
             # column titles
             if len(d) == len(d2):
-                print "we are going to use", string.join(d),
-                print "as labels"
+                if dic['Verbose'] > -1:
+                    print "we are going to use", string.join(d),
+                    print "as labels"
                 blank['labels'] = d
                 blank['Format'] = 'c'
                 blank['dims'][1] = 0
