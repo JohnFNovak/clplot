@@ -70,6 +70,7 @@ def main():
 
     tiles = []
     tiled_count = 0
+    tile_name = ''
     for p in plots:
         e_args = {}
         if [x[1] for x in plots].count(p[1]) > 1:
@@ -77,9 +78,12 @@ def main():
         if dic['MULTIT']:
             tiles.append(p)
             if len(tiles) == dic['MULTIT']:
+                if tile_name != p[1]:
+                    tiled_count = 0
                 plot_tiles(tiles, numbered=tiled_count)
                 tiles = []
                 tiled_count += 1
+                tile_name = p[1]
         else:
             plot(*p, **e_args)
 
