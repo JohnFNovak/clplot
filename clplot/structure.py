@@ -134,7 +134,7 @@ def structure(data):
                                 new[-1][-2] = block[:, count].tolist()
                         count = count + 1
                     mults = mults + 1
-                elif Form[j + 2 + mults] == "y":
+                elif Form[j + 1 + mults] == "y":
                     new.append([d[1], d[2]])
                     if d[3]['labels']:
                         new[-1].append(d[3]['labels'][j + mults])
@@ -145,9 +145,9 @@ def structure(data):
                     new[-1] = new[-1] + [x, block[:, count].tolist()]
                     new[-1].append([0]*len(x))
                     new[-1].append([0]*len(x))
-                elif Form[j + 2 + mults] == "x":
+                elif Form[j + 1 + mults] == "x":
                     x = block[:, count].tolist()
-                elif Form[j + 2 + mults] == "e":
+                elif Form[j + 1 + mults] == "e":
                     if Form[j + 1 + mults] == "y":
                         new[-1][-1] = block[:, count].tolist()
                     if Form[j + 1 + mults] == "x":
