@@ -11,12 +11,11 @@
 
 # written for Python 2.6. Requires Scipy, Numpy, and Matplotlib
 
-import numpy as np
 import globe
 from structure import structure
 from helpers import read_flags
 from plot import plot
-from data_handler import make_blocks, readdat, read_data
+from data_handler import make_blocks, read_data
 
 
 def main():
@@ -31,38 +30,48 @@ def main():
         if len(filename.split('#')) == 2:
             sys_err = float(filename.split('#')[1].strip())
             filename = filename.split('#')[0].strip()
-        output = None
         if dic['outputs']:
             output = dic['outputs'].pop()
+        else:
+            output = '.'.join(filename.split('.')[:-1])
         dic['numbered'] = 0
 
         # Now read data file
         blocks = make_blocks(read_data(filename))
 
         for j, b in enumerate(blocks):
-            data.append([[i, j], filename, output, b, sys_err])
+            if dic['GroupBy'] == 'files':
+                data.append([[i, j], filename, output, b, sys_err])
+            elif dic['GroupBy'] == 'blocks':
+                data.append([[j, i], filename, output, b, sys_err])
 
-    if dic['GroupBy'] == 'file':
-        data.sort(key=lambda x: x[0])
-    elif dic['GroupBy'] == 'block':
-        data.sort(key=lambda x: [x[0][1], x[0][0]])
+    data.sort(key=lambda x: x[0])
 
     data = structure(data)
 
+    # data format:
+    # [[f_id, b_id], filename, output, x_label, y_label,
+    #  x, y, x_err, y_err, x_sys_err, y_sys_err]
 
-        # Make decisions about what is in the file
-        if len(data) > 0:
-            struct = detect_blocks(data)
+    if not dic['MULTIP']:
+        # multiplot flag not give, group plots by file, then block
+        l = lambda x: '-'.join(map(str, x))
+        groups = [[d for d in data if l(d[0]) == f]
+                  for f in set([l(x[0]) for x in data])]
+    else:
+        groups = [data[(i * dic['MULTIP']):((i + 1) * dic['MULTIP'])]
+                  for i in range((len(data) / dic['MULTIP']) + 1)]
 
-            # Plot the stuff
-            for i in range(len(struct)):
-                dic['currentstruct'] = i
-                dic['Numbering'] = len(struct) > 1
-                x = readdat(struct, i, data)
-                unstruct_plot(np.array(x))
+    plots = []
+    for g in groups:
+        outputfile = '-'.join(sorted(set([d[2] for d in g])))
+        plots.append([g, outputfile])
 
-    if dic['remnants']:
-        plot(dic['remnants'], dic['remnanterrors'], Force=True)
+    for p in plots:
+        e_args = {}
+        if [x[1] for x in plots].count(p[1]) > 1:
+            e_args['numbered'] = [x for x in plots if x[1] == p[1]].index(p)
+        plot(*p, **e_args)
 
 
 if __name__ == '__main__':
