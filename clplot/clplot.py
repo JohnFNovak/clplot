@@ -69,6 +69,7 @@ def main():
             plots.append([g, outputfile])
 
     tiles = []
+    tiled_count = 0
     for p in plots:
         e_args = {}
         if [x[1] for x in plots].count(p[1]) > 1:
@@ -76,13 +77,14 @@ def main():
         if dic['MULTIT']:
             tiles.append(p)
             if len(tiles) == dic['MULTIT']:
-                plot_tiles(tiles, **e_args)
+                plot_tiles(tiles, numbered=tiled_count)
                 tiles = []
+                tiled_count += 1
         else:
             plot(*p, **e_args)
 
     if tiles:
-        plot_tiles(tiles, **e_args)
+        plot_tiles(tiles, numbered=tiled_count)
 
 
 if __name__ == '__main__':
