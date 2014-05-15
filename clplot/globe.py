@@ -29,8 +29,8 @@ dic = {'formats': [],
        'y_log': False,
        'numbered': None,
        'Numbering': None,
-       'multicounttile': 0,
-       'multicountpile': 0,
+       'mct': 0,  # multicounttile
+       'mcp': 0,  # multicountpile
        'files': [],
        'legend': False,
        'labels': [],

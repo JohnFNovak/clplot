@@ -172,11 +172,11 @@ def plot(z, errs, Force=False):
         outputname = outputname + "_" + str(dic['numbered'])
     if dic['MULTIT']:
         outputname = outputname + "_tiled"
-    if dic['multicountpile'] != 0:
+    if dic['mcp'] != 0:
         if Force:
-            outputname = outputname + "_" + str(dic['multicountpile'] + 1)
+            outputname = outputname + "_" + str(dic['mcp'] + 1)
         else:
-            outputname = outputname + "_" + str(dic['multicountpile'])
+            outputname = outputname + "_" + str(dic['mcp'])
     if dic['MULTIP']:
         outputname = outputname + "_multip"
     if dic['TYPE'][0] == ".":
