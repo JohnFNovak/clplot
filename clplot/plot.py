@@ -19,7 +19,32 @@ import string
 import globe
 
 
-def plot(data, outputfile, Force=False):
+def plot_tiles(tiles):
+    dic = globe.dic
+    for i, t in enumerate(tiles):
+        if not dic['columnsfirst']:
+            plt.subplot2grid((dic['layout'][0], dic['layout'][1]),
+                             (((i - 1) - (i - 1) %
+                               dic['layout'][1]) / dic['layout'][1],
+                              ((i - 1) % dic['layout'][1])))
+        if dic['columnsfirst']:
+            plt.subplot2grid((dic['layout'][0], dic['layout'][1]),
+                             ((i - 1) % dic['layout'][1]),
+                             (((i - 1) - (i - 1) %
+                              dic['layout'][1]) / dic['layout'][1]))
+        plot(t[0], '', Print=False)
+    outputname = tiles[-1][1] + '_tiled' + "." + dic['TYPE']
+    plt.tight_layout()  # Experimental, and may cause problems
+    plt.savefig(outputname)
+    if dic['Verbose'] > 0:
+        print"printed to", outputname
+    # if dic['EmbedData']:
+    #     EmbedData(outputname, data)
+    #check = subprocess.call(['open', outputname])
+    plt.clf()
+
+
+def plot(data, outputfile, numbered=0, Print=True):
     """This function takes a list z of lists and trys to plot them. the first
     list is always x, and the folowing are always y's"""
 
@@ -44,28 +69,13 @@ def plot(data, outputfile, Force=False):
         for c in colors:
             points.append(str(c + s))
 
-    size = [dic['default_marker_size']]*len(points)
+    size = [dic['default_marker_size']] * len(points)
     for i in range(len(points)):
         if len(points[i].split(';')) == 2:
             points[i] = points[i].split(';')[0]
             size[i] = float(points[i].split(';')[1])
 
-    if dic['MULTIT']:
-        dic['mct'] = dic['mct'] + 1
-        if not dic['columnsfirst']:
-            plt.subplot2grid((dic['layout'][0], dic['layout'][1]),
-                             (((dic['mct'] - 1) - (dic['mct'] - 1) %
-                               dic['layout'][1]) / dic['layout'][1],
-                              ((dic['mct'] - 1) % dic['layout'][1])))
-        if dic['columnsfirst']:
-            plt.subplot2grid((dic['layout'][0], dic['layout'][1]),
-                             ((dic['mct'] - 1) % dic['layout'][1]),
-                             (((dic['mct'] - 1) - (dic['mct'] - 1) %
-                              dic['layout'][1]) / dic['layout'][1]))
-
     plottingerrors = True
-
-    arg = []
 
     if dic['x_range']:
         plt.xlim(dic['x_range'])
@@ -138,12 +148,7 @@ def plot(data, outputfile, Force=False):
                              facecolor=ecolor, alpha=dic['alpha'],
                              interpolate=True, linewidth=0)
         if not plottingerrors:
-            arg.append(X)
-            arg.append(Y)
-            arg.append(points[k % len(points)])
-
-    if not plottingerrors:
-        plt.plot(*arg)
+            plt.plot(X, Y, points[k % len(points)])
 
     plt.grid(dic['grid'])
 
@@ -152,25 +157,14 @@ def plot(data, outputfile, Force=False):
 
     outputname = outputfile
 
-    if dic['numbered'] != 0:
-        outputname = outputname + "_" + str(dic['numbered'])
-    if dic['MULTIT']:
-        outputname = outputname + "_tiled"
-    if dic['mcp'] != 0:
-        if Force:
-            outputname = outputname + "_" + str(dic['mcp'] + 1)
-        else:
-            outputname = outputname + "_" + str(dic['mcp'])
+    if numbered != 0:
+        outputname = outputname + "_" + str(numbered)
     if dic['MULTIP']:
-        outputname = outputname + "_multip"
+        outputname = outputname + "_mp"
 
-    if dic['TYPE'][0] == ".":
-        outputname = outputname + dic['TYPE']
-    else:
-        outputname = outputname + "." + dic['TYPE']
+    outputname = outputname + "." + dic['TYPE']
 
-    if not dic['MULTIT'] or (dic['MULTIT'] and dic['mct'] ==
-                             int(dic['MULTIT'])) or Force:
+    if Print:
         plt.tight_layout()  # Experimental, and may cause problems
         plt.savefig(outputname)
         if dic['Verbose'] > 0:
@@ -179,9 +173,6 @@ def plot(data, outputfile, Force=False):
             EmbedData(outputname, data)
         #check = subprocess.call(['open', outputname])
         plt.clf()
-
-    if dic['MULTIT'] and dic['mct'] == int(dic['MULTIT']):
-            dic['mct'] = 0
 
 
 def parse_legend():
