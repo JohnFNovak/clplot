@@ -14,6 +14,7 @@ import itertools
 import globe
 import sys
 import math as m
+import code
 
 
 def is_it_ordered(vals):
@@ -314,6 +315,13 @@ def plot_arragnement():
         print "by", form[1]
 
     return form
+
+
+def interact(**kwargs):
+    global Opts
+    code.InteractiveConsole(locals=dict(globals().items() +
+                                        kwargs.items())).interact()
+    return True
 
 
 if __name__ == '__main__':
