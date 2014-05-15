@@ -158,6 +158,10 @@ def plot(data, outputfile, numbered=0, Print=True, **kwargs):
     if dic['legend']:
         plt.legend()
 
+    if dic['interactive']:
+        plt.show()
+        return
+
     outputname = outputfile
 
     if numbered != 0:
