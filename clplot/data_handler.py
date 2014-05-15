@@ -19,7 +19,8 @@ def make_blocks(dataarray):
 
     def block(d, d2):
         blank = {'dims': [len(d), 1], 'data': [], 'labels': None,
-                 'Format': dic['AssumeForm']}
+                 'Format': dic['AssumeForm'], 'x_label': dic['x_label'],
+                 'y_label': dic['y_label']}
         current = [check_type(x) for x in d]
         if 'str' in current:
             if dic['Verbose'] > -1:
@@ -35,7 +36,8 @@ def make_blocks(dataarray):
                 blank['labels'] = d
                 blank['Format'] = 'c'
                 blank['dims'][1] = 0
-        elif current[0] == 'str' and not any([x == 'str' for x in d[1:]]):
+        elif (current[0] == 'str'
+              and not any([x == 'str' for x in current[1:]])):
             # The first column in a string, and nothing else is
             blank['labels'] = [d[0]]
             blank['Format'] = 'r'
@@ -57,9 +59,9 @@ def make_blocks(dataarray):
                       and blocks[-1]['dims'][1] == 0
                       and len(d) == blocks[-1]['dims'][0]))
                  and ((blocks[-1]['Format'] == 'r'
-                       and not any([x == 'str' for x in d[1:]]))
+                       and not any([x == 'str' for x in current[1:]]))
                       or (blocks[-1]['Format'] != 'r'
-                          and not any([x == 'str' for x in d]))))
+                          and not any([x == 'str' for x in current]))))
         if check:
             blocks[-1]['dims'][1] += 1
             if blocks[-1]['Format'] == 'r':

@@ -13,7 +13,6 @@ import numpy as np
 import math as m
 import globe
 from helpers import check_type, is_it_ordered
-from plot import plot
 
 
 def structure(data):
@@ -82,13 +81,17 @@ def structure(data):
                 Form = 'c' + ('y' * w)
 
         if Form:
-            mults = 0
             if Form[0] == 'r':
                 block = block.T
             needx = True
+            mults = 0
             for j, c in enumerate(Form[1:]):
+                if check_type(c) == 'num':
+                    mults += (int(c) - 1)
                 if c == "x":
-                    x = block[:, j + 1].tolist()
+                    if d[3]['labels']:
+                        d[3]['x_label'] = d[3]['labels'][j + mults]
+                    x = block[:, j + mults].tolist()
                     needx = False
                     break
             if needx:
@@ -101,25 +104,41 @@ def structure(data):
                         if Form[j + 2 + mults] == "y":
                             new.append([d[1], d[2]])
                             if d[3]['labels']:
-                                new[-1].append(d[3]['labels'])
+                                new[-1].append(d[3]['labels'][j + mults])
                             else:
                                 new[-1].append('_'.join(map(str, [d[1],
                                                'block', d[0][1], 'col',
                                                j + mults])))
                             new[-1] = new[-1] + [x, block[:, count].tolist()]
-                            new[-1].append([0]*len(x))
-                            new[-1].append([0]*len(x))
+                            new[-1].append([0]*len(x))  # x err
+                            new[-1].append([0]*len(x))  # x sys err
+                            new[-1].append([0]*len(x))  # y err
+                            new[-1].append(d[-1]*len(x))  # y sys err
                         elif Form[j + 2 + mults] == "e":
+                            if Form[j + 1 + mults] == "y":
+                                new[-1][-2] = block[:, count].tolist()
+                            if Form[j + 1 + mults] == "x":
+                                new[-1][-4] = block[:, count].tolist()
+                        elif Form[j + 2 + mults] == "s":
+                            # % systematic error
+                            if Form[j + 1 + mults] == "y":
+                                new[-1][-1] = (new[-1][-5] *
+                                               block[:, count]).tolist()
+                            if Form[j + 1 + mults] == "x":
+                                new[-1][-3] = (new[-1][-6] *
+                                               block[:, count]).tolist()
+                        elif Form[j + 2 + mults] == "S":
+                            # abs systematic error
                             if Form[j + 1 + mults] == "y":
                                 new[-1][-1] = block[:, count].tolist()
                             if Form[j + 1 + mults] == "x":
-                                new[-1][-2] = block[:, count].tolist()
+                                new[-1][-3] = block[:, count].tolist()
                         count = count + 1
                     mults = mults + 1
                 elif Form[j + 2 + mults] == "y":
                     new.append([d[1], d[2]])
                     if d[3]['labels']:
-                        new[-1].append(d[3]['labels'])
+                        new[-1].append(d[3]['labels'][j + mults])
                     else:
                         new[-1].append('_'.join(map(str, [d[1],
                                        'block', d[0][1], 'col',
