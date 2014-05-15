@@ -12,6 +12,7 @@
 import string
 import globe
 from helpers import check_type
+import os
 
 
 def make_blocks(dataarray):
@@ -83,6 +84,9 @@ def make_blocks(dataarray):
 
 
 def read_data(filename):
+    if not os.path.isfile(filename):
+        print filename, 'does not exist'
+        return []
     with open(filename, "r") as datafile:
         test = datafile.readline()
         test = datafile.readline()
