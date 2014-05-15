@@ -87,76 +87,61 @@ def plot(data, Force=False):
         parse_legend()
 
     if dic['norm']:
-        for k in range(0, len(z), 2):
-            X = np.array(z[k]).astype(float)
-            Y = np.array(z[k + 1]).astype(float)
+        for d in data:
+            X = np.array(d[4]).astype(float)
+            Y = np.array(d[5]).astype(float)
             width = np.mean(X[1:] - X[:-1])
             Y = Y / np.sum(Y * width)
-            z[k + 1] = Y.tolist()
+            d[5] = Y.tolist()
 
-    for k in range(0, len(z), 2):
-        marker = points[((k + 1) / 2) % len(points)]
-        msize = size[((k + 1) / 2) % len(points)]
-        ecolor = points[((k + 1) / 2) % len(points)][0]
-        fcolor = points[((k + 1) / 2) % len(points)][0]
+    # for k in range(0, len(z), 2):
+    for k, d in enumerate(data):
+        X, Y, X_err, Y_err, X_sys_err, y_sys_err = d[3:9]
+        marker = points[k % len(points)]
+        msize = size[k % len(points)]
+        ecolor = points[k % len(points)][0]
+        fcolor = points[k % len(points)][0]
         if marker[-1] == '!':
             fcolor = 'white'
             marker = marker[:-1]
-        z[k] = [float(x) * dic['xscaled'] for x in z[k]]
-        z[k + 1] = [float(x) * dic['yscaled']for x in z[k + 1]]
+        X = [float(x) * dic['xscaled'] for x in X]
+        Y = [float(x) * dic['yscaled'] for x in Y]
+        X_err = [float(x) * dic['xscaled'] for x in X_err]
+        Y_err = [float(x) * dic['yscaled'] for x in Y_err]
         if plottingerrors and not dic['errorbands']:
-            if errs[k][0] == 0:
-                errs[k][0] = [0] * len(z[k])
-            else:
-                errs[k][0] = [float(x) * dic['xscaled'] for x in errs[k][0]]
-            if errs[k + 1][0] == 0:
-                plt.errorbar(z[k], z[k + 1],
-                             xerr=errs[k][0],
-                             yerr=[0] * len(z[k + 1]),
-                             fmt=marker, label=dic['labels'][(k + 1) / 2],
-                             mec=ecolor, mfc=fcolor, ms=msize)
-            if errs[k + 1][0] != 0:
-                errs[k + 1][0] = [float(x) * dic['yscaled']
-                                  for x in errs[k + 1][0]]
-                plt.errorbar(z[k], z[k + 1],
-                             xerr=errs[k][0],
-                             yerr=errs[k + 1][0],
-                             fmt=marker, label=dic['labels'][(k + 1) / 2],
-                             mec=ecolor, mfc=fcolor, ms=msize)
+            plt.errorbar(X, Y,
+                         xerr=X_err,
+                         yerr=Y_err,
+                         fmt=marker, label=dic['labels'][k],
+                         mec=ecolor, mfc=fcolor, ms=msize)
         if plottingerrors and dic['errorbands']:
-            if errs[k][0] == 0:
-                errs[k][0] = [0] * len(z[k])
+            if all(Y_err == 0):
+                plt.errorbar(X, Y,
+                             xerr=[0] * len(X),
+                             yerr=[0] * len(Y),
+                             fmt=marker, label=dic['labels'][k],
+                             mec=ecolor, mfc=fcolor, ms=msize)
             else:
-                errs[k][0] = [float(x) * dic['xscaled'] for x in errs[k][0]]
-            if errs[k + 1][0] == 0:
-                plt.errorbar(z[k], z[k + 1],
-                             xerr=[0] * len(errs[k][0]),
-                             yerr=[0] * len(z[k + 1]),
-                             fmt=marker, label=dic['labels'][(k + 1) / 2],
+                plt.errorbar(X, Y,
+                             xerr=[0] * len(X),
+                             yerr=[0] * len(Y),
+                             fmt=marker, label=dic['labels'][k],
                              mec=ecolor, mfc=fcolor, ms=msize)
-            if errs[k + 1][0] != 0:
-                errs[k + 1][0] = [float(x) * dic['yscaled']
-                                  for x in errs[k + 1][0]]
-                plt.errorbar(z[k], z[k + 1],
-                             xerr=[0] * len(errs[k][0]),
-                             yerr=[0] * len(errs[k + 1][0]),
-                             fmt=marker, label=dic['labels'][(k + 1) / 2],
-                             mec=ecolor, mfc=fcolor, ms=msize)
-                plt.fill_between(np.array(z[k]),
-                                 np.array(z[k + 1]) + np.array(errs[k + 1][0]),
-                                 np.array(z[k + 1]) - np.array(errs[k + 1][0]),
+                plt.fill_between(np.array(X),
+                                 np.array(Y) + np.array(Y_err),
+                                 np.array(Y) - np.array(Y_err),
                                  facecolor=ecolor, alpha=dic['alpha'],
                                  interpolate=True, linewidth=0)
         if dic['plot_sys_err']:
-            plt.fill_between(np.array(z[k]),
-                             np.array(z[k + 1]) + np.array(errs[k + 1][1]),
-                             np.array(z[k + 1]) - np.array(errs[k + 1][1]),
+            plt.fill_between(np.array(X),
+                             np.array(Y) + np.array(y_sys_err),
+                             np.array(Y) - np.array(y_sys_err),
                              facecolor=ecolor, alpha=dic['alpha'],
                              interpolate=True, linewidth=0)
         if not plottingerrors:
-            arg.append(z[k])  # x vector
-            arg.append(z[k + 1])
-            arg.append(points[(k / 2) % len(points)])
+            arg.append(X)
+            arg.append(Y)
+            arg.append(points[k % len(points)])
 
     if not plottingerrors:
         plt.plot(*arg)
