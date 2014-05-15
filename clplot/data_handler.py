@@ -82,10 +82,11 @@ def make_blocks(dataarray):
 def read_data(filename):
     with open(filename, "r") as datafile:
         test = datafile.readline()
+        test = datafile.readline()
         while test[0] == "#" and len(test) > 1:  # Not a comment or empty
             test = datafile.readline()
 
-    delimiters = [' ', ',', ';', '.', '']
+    delimiters = [' ', ',', ';']
     while delimiters:
         d = delimiters.pop()
         if len([x.strip() for x in test.split(d) if x.strip()]) > 1:
