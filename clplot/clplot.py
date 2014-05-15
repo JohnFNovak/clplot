@@ -18,9 +18,9 @@ from plot import plot, plot_tiles
 from data_handler import make_blocks, read_data
 
 
-def init():
-    data = []
-    for i, filename in enumerate(dic['files']):
+def init(data=[], files=globe.dic['files']):
+    dic = globe.dic
+    for i, filename in enumerate(files):
         if dic['Verbose'] > 0:
             print "plotting", filename
         sys_err = dic['sys_err_default']
