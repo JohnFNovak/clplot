@@ -118,13 +118,13 @@ def plot(data, Force=False):
                 plt.errorbar(X, Y,
                              xerr=[0] * len(X),
                              yerr=[0] * len(Y),
-                             fmt=marker, label=dic['labels'][k],
+                             fmt=marker, label=d[3],
                              mec=ecolor, mfc=fcolor, ms=msize)
             else:
                 plt.errorbar(X, Y,
                              xerr=[0] * len(X),
                              yerr=[0] * len(Y),
-                             fmt=marker, label=dic['labels'][k],
+                             fmt=marker, label=d[3],
                              mec=ecolor, mfc=fcolor, ms=msize)
                 plt.fill_between(np.array(X),
                                  np.array(Y) + np.array(Y_err),
@@ -149,7 +149,6 @@ def plot(data, Force=False):
 
     if dic['legend']:
         plt.legend()
-        dic['labels'] = []
 
     if dic['currentoutput']:
         outputname = dic['currentoutput']
