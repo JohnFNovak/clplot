@@ -86,7 +86,7 @@ def read_data(filename):
         while test[0] == "#" and len(test) > 1:  # Not a comment or empty
             test = datafile.readline()
 
-    delimiters = [' ', ',', ';']
+    delimiters = [' ', ',', ';', '\t']
     while delimiters:
         d = delimiters.pop()
         if len([x.strip() for x in test.split(d) if x.strip()]) > 1:
@@ -99,7 +99,7 @@ def read_data(filename):
         data = datafile.read().split('\n')
     data = [line.split(d) for line in data if line.strip()]
 
-    if len(data < 2):
+    if len(data) < 2:
         print filename, 'does not contain sufficient data'
         print 'length of printable data is too short'
         return []
