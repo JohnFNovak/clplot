@@ -52,30 +52,30 @@ def make_blocks(dataarray):
         if i == 0:  # first pass
             blocks = [block(d, dataarray[i + 1])]
             previous = [check_type(x) for x in d]
-
-        current = [check_type(x) for x in d]
-        check = (((current == previous)  # same as the previous pass
-                  or (blocks[-1]['Format'] == 'c'
-                      and blocks[-1]['dims'][1] == 0
-                      and len(d) == blocks[-1]['dims'][0]))
-                 and ((blocks[-1]['Format'] == 'r'
-                       and not any([x == 'str' for x in current[1:]]))
-                      or (blocks[-1]['Format'] != 'r'
-                          and not any([x == 'str' for x in current]))))
-        if check:
-            blocks[-1]['dims'][1] += 1
-            if blocks[-1]['Format'] == 'r':
-                blocks[-1]['labels'].append(d[0])
-                blocks[-1]['data'].append(d[1:])
-            else:
-                blocks[-1]['data'].append(d)
         else:
-            if blocks[-1]['dims'][1] <= 1:
-                # The previous block was only one line long
-                del(blocks[-1])
-            if (i + 1) < len(dataarray):
-                blocks.append(block(d, dataarray[i + 1]))
-        previous = current
+            current = [check_type(x) for x in d]
+            check = (((current == previous)  # same as the previous pass
+                      or (blocks[-1]['Format'] == 'c'
+                          and blocks[-1]['dims'][1] == 0
+                          and len(d) == blocks[-1]['dims'][0]))
+                     and ((blocks[-1]['Format'] == 'r'
+                           and not any([x == 'str' for x in current[1:]]))
+                          or (blocks[-1]['Format'] != 'r'
+                              and not any([x == 'str' for x in current]))))
+            if check:
+                blocks[-1]['dims'][1] += 1
+                if blocks[-1]['Format'] == 'r':
+                    blocks[-1]['labels'].append(d[0])
+                    blocks[-1]['data'].append(d[1:])
+                else:
+                    blocks[-1]['data'].append(d)
+            else:
+                if blocks[-1]['dims'][1] <= 1:
+                    # The previous block was only one line long
+                    del(blocks[-1])
+                if (i + 1) < len(dataarray):
+                    blocks.append(block(d, dataarray[i + 1]))
+            previous = current
 
     return blocks
 
