@@ -96,8 +96,8 @@ def plot(data, outputfile, numbered=0, Print=True, **kwargs):
     plt.tick_params(axis='both', which='major', labelsize=dic['fontsize']*0.75)
     plt.tick_params(axis='both', which='minor', labelsize=dic['fontsize']*0.75)
 
-    if dic['legend'] and len(dic['labels']) > 1:
-        parse_legend()
+    if dic['legend']:
+        parse_legend(data)
 
     if dic['norm']:
         for d in data:
@@ -178,49 +178,50 @@ def plot(data, outputfile, numbered=0, Print=True, **kwargs):
         plt.clf()
 
 
-def parse_legend():
-    dic = globe.dic
+def parse_legend(data):
+    # dic = globe.dic
     # delimiters = ['/', '-', '.', '/', '-', '.']
     delimiters = ['/', '-']
+    labels = [x[0][4] for x in data]
 
     for divider in delimiters:
-        tester = dic['labels'][0].split(divider)
+        tester = labels[0].split(divider)
 
         # From the front
-        for i in dic['labels']:
+        for i in labels:
             if len(i.split(divider)) > len(tester):
                 tester = i.split(divider)
         hold = [0]*len(tester)
 
-        for i in range(1, len(dic['labels'])):
-            for j in range(len(dic['labels'][i].split(divider))):
-                if tester[j] == dic['labels'][i].split(divider)[j] and hold[j]\
+        for i in range(1, len(labels)):
+            for j in range(len(labels[i].split(divider))):
+                if tester[j] == labels[i].split(divider)[j] and hold[j]\
                    == 0:
                     hold[j] = 1
-                if tester[j] != dic['labels'][i].split(divider)[j] and hold[j]\
+                if tester[j] != labels[i].split(divider)[j] and hold[j]\
                    == 1:
                     hold[j] = 0
 
         for i in range(len(hold)):
             if hold[len(hold)-1-i] == 1:
-                for j in range(len(dic['labels'])):
+                for j in range(len(labels)):
                     temp = []
-                    for k in range(len(dic['labels'][j].split(divider))):
+                    for k in range(len(labels[j].split(divider))):
                         if k != len(hold) - 1 - i:
-                            temp.append(dic['labels'][j].split(divider)[k])
-                    dic['labels'][j] = string.join(temp, divider)
+                            temp.append(labels[j].split(divider)[k])
+                    labels[j] = string.join(temp, divider)
 
-        tester = dic['labels'][0].split(divider)
+        tester = labels[0].split(divider)
 
         # From the back
-        for i in dic['labels']:
+        for i in labels:
             if len(i.split(divider)) > len(tester):
                 tester = i.split(divider)
         hold = [0]*len(tester)
 
-        for i in range(1, len(dic['labels'])):
-            temp = len(dic['labels'][i].split(divider)) - 1 - j
-            temp_labels = dic['labels'][i].split(divider)
+        for i in range(1, len(labels)):
+            temp = len(labels[i].split(divider)) - 1 - j
+            temp_labels = labels[i].split(divider)
             for j in range(temp):
                 if tester[temp] == temp_labels[temp] and hold[temp] == 0:
                     hold[temp] = 1
@@ -229,12 +230,12 @@ def parse_legend():
 
         for i in range(len(hold)):
             if hold[len(hold)-1-i] == 1:
-                for j in range(len(dic['labels'])):
+                for j in range(len(labels)):
                     temp = []
-                    for k in range(len(dic['labels'][j].split(divider))):
+                    for k in range(len(labels[j].split(divider))):
                         if k != len(hold)-1-i:
-                            temp.append(dic['labels'][j].split(divider)[k])
-                    dic['labels'][j] = string.join(temp, divider)
+                            temp.append(labels[j].split(divider)[k])
+                    labels[j] = string.join(temp, divider)
 
 
 def EmbedData(outputname, data):
