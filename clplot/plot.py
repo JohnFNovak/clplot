@@ -24,7 +24,7 @@ def plot(data, Force=False):
     list is always x, and the folowing are always y's"""
 
     # data format:
-    # [filename, output, x_label, y_label,
+    # [[f_id, b_id], filename, output, x_label, y_label,
     #  x, y, x_err, y_err, x_sys_err, y_sys_err]
 
     dic = globe.dic
@@ -71,7 +71,7 @@ def plot(data, Force=False):
         plt.xlim(dic['x_range'])
     if dic['y_range']:
         plt.ylim(dic['y_range'])
-    x_label = '/'.join(sorted(set([d[2] for d in data])))
+    x_label = '/'.join(sorted(set([d[3] for d in data])))
     plt.xlabel(x_label, fontsize=dic['fontsize'])
     if dic['y_label']:
         plt.ylabel(dic['y_label'], fontsize=dic['fontsize'])
@@ -88,14 +88,14 @@ def plot(data, Force=False):
 
     if dic['norm']:
         for d in data:
-            X = np.array(d[4]).astype(float)
-            Y = np.array(d[5]).astype(float)
+            X = np.array(d[5]).astype(float)
+            Y = np.array(d[6]).astype(float)
             width = np.mean(X[1:] - X[:-1])
             Y = Y / np.sum(Y * width)
-            d[5] = Y.tolist()
+            d[6] = Y.tolist()
 
     for k, d in enumerate(data):
-        X, Y, X_err, Y_err, X_sys_err, Y_sys_err = d[4:10]
+        X, Y, X_err, Y_err, X_sys_err, Y_sys_err = d[5:11]
         marker = points[k % len(points)]
         msize = size[k % len(points)]
         ecolor = points[k % len(points)][0]
@@ -118,13 +118,13 @@ def plot(data, Force=False):
                 plt.errorbar(X, Y,
                              xerr=[0] * len(X),
                              yerr=[0] * len(Y),
-                             fmt=marker, label=d[3],
+                             fmt=marker, label=d[4],
                              mec=ecolor, mfc=fcolor, ms=msize)
             else:
                 plt.errorbar(X, Y,
                              xerr=[0] * len(X),
                              yerr=[0] * len(Y),
-                             fmt=marker, label=d[3],
+                             fmt=marker, label=d[4],
                              mec=ecolor, mfc=fcolor, ms=msize)
                 plt.fill_between(np.array(X),
                                  np.array(Y) + np.array(Y_err),
@@ -253,7 +253,7 @@ def EmbedData(outputname, data):
     StringToEmbed += "Creation command: " + ' '.join(sys.argv) + '\n'
     StringToEmbed += "Plotted values:" + '\n'
     for i, d in enumerate(data):
-        X, Y, X_err, Y_err, X_sys_err, Y_sys_err = d[4:10]
+        X, Y, X_err, Y_err, X_sys_err, Y_sys_err = d[5:11]
         StringToEmbed += 'Plot %d\n' % i
         StringToEmbed += 'x ' + ' '.join(map(str, X)) + '\n'
         StringToEmbed += 'x_err ' + ' '.join(map(str, X_err)) + '\n'
