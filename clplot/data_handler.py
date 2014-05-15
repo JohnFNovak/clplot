@@ -19,7 +19,8 @@ def make_blocks(dataarray):
 
     def block(d, d2):
         blank = {'dims': [len(d), 1], 'data': [], 'labels': None,
-                 'Format': dic['AssumeForm']}
+                 'Format': dic['AssumeForm'], 'x_label': dic['x_label'],
+                 'y_label': dic['y_label']}
         current = [check_type(x) for x in d]
         if 'str' in current:
             if dic['Verbose'] > -1:
