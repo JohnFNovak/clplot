@@ -65,19 +65,19 @@ def structure(data):
                 print "the good old fashioned two rows"
             Form = 'rxy'
         elif h > (w * 3):
-            Form = 'c' + ('y' * w)
+            Form = 'cx' + ('y' * (w - 1))
         elif w > (h * 3):
-            Form = 'r' + ('y' * h)
+            Form = 'rx' + ('y' * (h - 1))
         else:
             rows = [is_it_ordered(block[:, x].tolist()) for x in range(w)]
             cols = [is_it_ordered(block[x, :].tolist()) for x in range(h)]
             if cols.count(1) > rows.count(1):
-                Form = 'r' + ('y' * h)
+                Form = 'rx' + ('y' * (h - 1))
             elif rows.count(1) > cols.count(1):
-                Form = 'c' + ('y' * w)
+                Form = 'cx' + ('y' * (w - 1))
             else:
                 print "I have no idea what's going on"
-                Form = 'c' + ('y' * w)
+                Form = 'cx' + ('y' * (w - 1))
 
         if Form:
             if Form[0] == 'r':
