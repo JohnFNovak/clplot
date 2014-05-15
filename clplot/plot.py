@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
 
+# Part of CLP
 # A universal command line plotting script
 #
 # John Novak
@@ -16,16 +17,43 @@ import os
 import time
 import string
 import globe
-from structure import *
-from helpers import *
 
 
-def plot(z, errs, Force=False):
-    """This function takes a list z of lists and trys to plot them. the first \
+def plot_tiles(tiles, numbered=0, **kwargs):
+    dic = globe.dic
+    for i, t in enumerate(tiles):
+        if not dic['columnsfirst']:
+            plt.subplot2grid((dic['layout'][0], dic['layout'][1]),
+                             (((i - 1) - (i - 1) %
+                               dic['layout'][1]) / dic['layout'][1],
+                              ((i - 1) % dic['layout'][1])))
+        if dic['columnsfirst']:
+            plt.subplot2grid((dic['layout'][0], dic['layout'][1]),
+                             ((i - 1) % dic['layout'][1]),
+                             (((i - 1) - (i - 1) %
+                              dic['layout'][1]) / dic['layout'][1]))
+        plot(t[0], '', Print=False)
+    outputname = tiles[-1][1] + "_tiled"
+    if numbered != 0:
+        outputname = outputname + '_' + str(numbered)
+    outputname = outputname + "." + dic['TYPE']
+    plt.tight_layout()  # Experimental, and may cause problems
+    plt.savefig(outputname)
+    if dic['Verbose'] > 0:
+        print"printed to", outputname
+    # if dic['EmbedData']:
+    #     EmbedData(outputname, data)
+    #check = subprocess.call(['open', outputname])
+    plt.clf()
+
+
+def plot(data, outputfile, numbered=0, Print=True, **kwargs):
+    """This function takes a list z of lists and trys to plot them. the first
     list is always x, and the folowing are always y's"""
 
-    #print z
-    #print errs
+    # data format:
+    # [[f_id, b_id], filename, output, x_label, y_label,
+    #  x, y, x_err, y_err, x_sys_err, y_sys_err]
 
     dic = globe.dic
     points = dic['colorstyle']
@@ -44,33 +72,20 @@ def plot(z, errs, Force=False):
         for c in colors:
             points.append(str(c + s))
 
-    size = [dic['default_marker_size']]*len(points)
+    size = [dic['default_marker_size']] * len(points)
     for i in range(len(points)):
         if len(points[i].split(';')) == 2:
             points[i] = points[i].split(';')[0]
             size[i] = float(points[i].split(';')[1])
 
-    if dic['MULTIT']:
-        dic['multicounttile'] = dic['multicounttile'] + 1
-        if not dic['columnsfirst']:
-            plt.subplot2grid((dic['layout'][0], dic['layout'][1]), (((dic['multicounttile']-1)-(dic['multicounttile']-1) % dic['layout'][1])/dic['layout'][1], ((dic['multicounttile']-1) % dic['layout'][1])))
-        if dic['columnsfirst']:
-            plt.subplot2grid((dic['layout'][0], dic['layout'][1]), ((dic['multicounttile']-1) % dic['layout'][1])), (((dic['multicounttile']-1)-(dic['multicounttile']-1) % dic['layout'][1])/dic['layout'][1])
-        #plt.title(str(dic['multicounttile']), fontsize = dic['fontsize'])
-
     plottingerrors = True
-    #for k in errs:
-    #    if k != 0:
-    #        plottingerrors = True
-
-    arg = []
 
     if dic['x_range']:
         plt.xlim(dic['x_range'])
     if dic['y_range']:
         plt.ylim(dic['y_range'])
-    if dic['x_label']:
-        plt.xlabel(dic['x_label'], fontsize=dic['fontsize'])
+    x_label = '/'.join(sorted(set([d[3] for d in data])))
+    plt.xlabel(x_label, fontsize=dic['fontsize'])
     if dic['y_label']:
         plt.ylabel(dic['y_label'], fontsize=dic['fontsize'])
     if dic['x_log']:
@@ -85,227 +100,86 @@ def plot(z, errs, Force=False):
         parse_legend()
 
     if dic['norm']:
-        for k in range(0, len(z), 2):
-            X = np.array(z[k]).astype(float)
-            Y = np.array(z[k + 1]).astype(float)
+        for d in data:
+            X = np.array(d[5]).astype(float)
+            Y = np.array(d[6]).astype(float)
             width = np.mean(X[1:] - X[:-1])
             Y = Y / np.sum(Y * width)
-            z[k + 1] = Y.tolist()
+            d[6] = Y.tolist()
 
-    for k in range(0, len(z), 2):
-        marker = points[((k + 1) / 2) % len(points)]
-        msize = size[((k + 1) / 2) % len(points)]
-        ecolor = points[((k + 1) / 2) % len(points)][0]
-        fcolor = points[((k + 1) / 2) % len(points)][0]
+    for k, d in enumerate(data):
+        X, Y, X_err, Y_err, X_sys_err, Y_sys_err = d[5:11]
+        marker = points[k % len(points)]
+        msize = size[k % len(points)]
+        ecolor = points[k % len(points)][0]
+        fcolor = points[k % len(points)][0]
         if marker[-1] == '!':
             fcolor = 'white'
             marker = marker[:-1]
-        z[k] = map(lambda x: float(x) * dic['xscaled'], z[k])
-        z[k + 1] = map(lambda x: float(x) * dic['yscaled'], z[k + 1])
-        #z[k + 1] = map(float, z[k + 1])
+        X = [float(x) * dic['xscaled'] for x in X]
+        Y = [float(x) * dic['yscaled'] for x in Y]
+        X_err = [float(x) * dic['xscaled'] for x in X_err]
+        Y_err = [float(x) * dic['yscaled'] for x in Y_err]
         if plottingerrors and not dic['errorbands']:
-            if errs[k][0] == 0:
-                errs[k][0] = [0]*len(z[k])
-            else:
-                errs[k][0] = map(lambda x: float(x) * dic['xscaled'], errs[k][0])
-            if errs[k + 1][0] == 0:
-                plt.errorbar(z[k], z[k + 1], xerr=errs[k][0], yerr=[0]*len(z[k + 1]), fmt=marker, label=dic['labels'][(k + 1)/2], mec=ecolor, mfc=fcolor, ms=msize)
-            if errs[k + 1][0] != 0:
-                errs[k + 1][0] = map(lambda x: float(x) * dic['yscaled'], errs[k + 1][0])
-                plt.errorbar(z[k], z[k + 1], xerr=errs[k][0], yerr=errs[k + 1][0], fmt=marker, label=dic['labels'][(k + 1)/2], mec=ecolor, mfc=fcolor, ms=msize)
+            plt.errorbar(X, Y,
+                         xerr=X_err,
+                         yerr=Y_err,
+                         fmt=marker, label=d[4],
+                         mec=ecolor, mfc=fcolor, ms=msize)
         if plottingerrors and dic['errorbands']:
-            if errs[k][0] == 0:
-                errs[k][0] = [0]*len(z[k])
+            if all(Y_err == 0):
+                plt.errorbar(X, Y,
+                             xerr=[0] * len(X),
+                             yerr=[0] * len(Y),
+                             fmt=marker, label=d[4],
+                             mec=ecolor, mfc=fcolor, ms=msize)
             else:
-                errs[k][0] = map(lambda x: float(x) * dic['xscaled'], errs[k][0])
-            if errs[k + 1][0] == 0:
-                plt.errorbar(z[k], z[k + 1], xerr=[0]*len(errs[k][0]), yerr=[0]*len(z[k + 1]), fmt=marker, label=dic['labels'][(k + 1)/2], mec=ecolor, mfc=fcolor, ms=msize)
-            if errs[k + 1][0] != 0:
-                errs[k + 1][0] = map(lambda x: float(x) * dic['yscaled'], errs[k + 1][0])
-                plt.errorbar(z[k], z[k + 1], xerr=[0]*len(errs[k][0]), yerr=[0]*len(errs[k + 1][0]), fmt=marker, label=dic['labels'][(k + 1)/2], mec=ecolor, mfc=fcolor, ms=msize)
-                plt.fill_between(np.array(z[k]), np.array(z[k + 1]) + np.array(errs[k + 1][0]), np.array(z[k + 1])-np.array(errs[k + 1][0]), facecolor=ecolor, alpha=dic['alpha'], interpolate=True, linewidth=0)
+                plt.errorbar(X, Y,
+                             xerr=[0] * len(X),
+                             yerr=[0] * len(Y),
+                             fmt=marker, label=d[4],
+                             mec=ecolor, mfc=fcolor, ms=msize)
+                plt.fill_between(np.array(X),
+                                 np.array(Y) + np.array(Y_err),
+                                 np.array(Y) - np.array(Y_err),
+                                 facecolor=ecolor, alpha=dic['alpha'],
+                                 interpolate=True, linewidth=0)
         if dic['plot_sys_err']:
-            plt.fill_between(np.array(z[k]), np.array(z[k + 1]) + np.array(errs[k + 1][1]), np.array(z[k + 1])-np.array(errs[k + 1][1]), facecolor=ecolor, alpha=dic['alpha'], interpolate=True, linewidth=0)
+            plt.fill_between(np.array(X),
+                             np.array(Y) + np.array(Y_sys_err),
+                             np.array(Y) - np.array(Y_sys_err),
+                             facecolor=ecolor, alpha=dic['alpha'],
+                             interpolate=True, linewidth=0)
         if not plottingerrors:
-            arg.append(z[k])  # x vector
-            arg.append(z[k + 1])
-            arg.append(points[(k / 2) % len(points)])
-
-    if not plottingerrors:
-        plt.plot(*arg)
+            plt.plot(X, Y, points[k % len(points)])
 
     plt.grid(dic['grid'])
 
     if dic['legend']:
         plt.legend()
-        dic['labels'] = []
 
-    if dic['currentoutput']:
-        outputname = dic['currentoutput']
-    else:
-        outputname = string.split(dic['currentfile'], ".")[0]
+    outputname = outputfile
 
-    if dic['numbered'] != 0:
-        outputname = outputname + "_" + str(dic['numbered'])
-    if dic['MULTIT']:
-        outputname = outputname + "_tiled"
-    if dic['multicountpile'] != 0:
-        if Force:
-            outputname = outputname + "_" + str(dic['multicountpile'] + 1)
-        else:
-            outputname = outputname + "_" + str(dic['multicountpile'])
+    if numbered != 0:
+        outputname = outputname + "_" + str(numbered)
     if dic['MULTIP']:
-        outputname = outputname + "_multip"
-    if dic['TYPE'][0] == ".":
-        outputname = outputname + dic['TYPE']
-    else:
-        outputname = outputname + "." + dic['TYPE']
+        outputname = outputname + "_mp"
 
-    if not dic['MULTIT'] or (dic['MULTIT'] and dic['multicounttile'] ==
-                             int(dic['MULTIT'])) or Force:
+    outputname = outputname + "." + dic['TYPE']
+
+    if Print:
         plt.tight_layout()  # Experimental, and may cause problems
         plt.savefig(outputname)
-        print"printed to", outputname
+        if dic['Verbose'] > 0:
+            print"printed to", outputname
         if dic['EmbedData']:
-            EmbedData(outputname, z, errs)
+            EmbedData(outputname, data)
         #check = subprocess.call(['open', outputname])
         plt.clf()
 
-    if dic['MULTIT'] and dic['multicounttile'] == int(dic['MULTIT']):
-            dic['multicounttile'] = 0
-
-
-def read_flags():
-    dic = globe.dic
-    case = 0  # 0 is reading files, 1 is outputs, 2 is formats, etc
-
-    if len(sys.argv) == 1:
-        givehelp(0)
-
-    for flag in sys.argv[1:]:
-        # performance tweak: Check if the flag has a dash in it first,
-        # otherwise its a filename, i.e. "if '-' in flag: "
-        if "-f" == flag:
-            # format flag
-            case = 2
-        elif "-i" == flag:
-            # input file flag
-            case = 0
-        elif "-o" == flag:
-            # output file flag
-            case = 1
-        elif "-t" == flag:
-            # output type flag
-            case = 3
-        elif "-mp" == flag:
-            # multiplot pile flag
-            case = 4
-        elif "-mt" == flag:
-            # multiplot tile flag
-            case = 5
-        elif "-h" == flag[:2]:
-            givehelp(1)
-        elif "-c" == flag:
-            case = 6
-        elif "-s" == flag:
-            case = 7
-        elif "-xr" == flag:
-            case = 8
-        elif "-yr" == flag:
-            case = 9
-        elif "-xl" == flag:
-            case = 10
-        elif "-yl" == flag:
-            case = 11
-        elif "-logx" == flag:
-            dic['x_log'] = True
-            if dic['x_range']:
-                if dic['x_range'][0] <= 0:
-                    dic['x_range'] = None
-        elif "-logy" == flag:
-            dic['y_log'] = True
-            if dic['y_range']:
-                if dic['y_range'][0] <= 0:
-                    dic['y_range'] = None
-        elif '-layout' == flag:
-            case = 12
-        elif '-cs' == flag:
-            case = 13
-        elif '-fontsize' == flag:
-            case = 14
-        elif '-systematic' == flag:
-            case = 15
-        elif '-xscaled' == flag:
-            case = 16
-        elif '-yscaled' == flag:
-            case = 17
-        elif '-markersize' == flag:
-            case = 18
-        elif '-alpha' == flag:
-            case = 19
-        elif '-columnsfirst' == flag:
-            dic['columnsfirst'] = True
-        elif "-legend" == flag:
-            dic['legend'] = True
-        elif '-bands' == flag:
-            dic['errorbands'] = True
-        elif '-grid' == flag:
-            dic['grid'] = True
-        elif '-sys_err' == flag:
-            dic['plot_sys_err'] = True
-        elif '-norm' == flag:
-            dic['norm'] = True
-        elif "-" == flag[0] and case != 7 and case != 8 and case != 9:
-            case = -1
-            print "flag", flag, "not recognized"
-        else:
-            # if there is not a flag, and we are reading filenames or formats
-            if case == 0:
-                dic['files'].append(flag)
-            if case == 1:
-                dic['outputs'].append(flag)
-            if case == 2:
-                dic['formats'].append(flag)
-            if case == 3:
-                dic['TYPE'] = flag
-            if case == 4:
-                dic['MULTIP'] = flag  # number of plots per plot
-            if case == 5:
-                dic['MULTIT'] = flag  # number of plots per plot
-            if case == 6:
-                dic['Ucolor'].append(flag)
-            if case == 7:
-                dic['Ustyle'].append(flag)
-            if case == 8:
-                dic['x_range'] = map(float, flag.split(":"))
-            if case == 9:
-                dic['y_range'] = map(float, flag.split(":"))
-            if case == 10:
-                dic['x_label'] = flag
-            if case == 11:
-                dic['y_label'] = flag
-            if case == 12:
-                dic['layout'] = tuple(map(int, flag.split(":")))
-            if case == 13:
-                dic['colorstyle'].append(flag)
-            if case == 14:
-                dic['fontsize'] = float(flag)
-            if case == 15:
-                dic['sys_err_default'] = float(flag)
-            if case == 16:
-                dic['xscaled'] = float(flag)
-            if case == 17:
-                dic['yscaled'] = float(flag)
-            if case == 18:
-                dic['default_marker_size'] = float(flag)
-            if case == 19:
-                dic['alpha'] = float(flag)
-            if case == -1:
-                print "ignoring", flag
-
 
 def parse_legend():
-    global dic
+    dic = globe.dic
     # delimiters = ['/', '-', '.', '/', '-', '.']
     delimiters = ['/', '-']
 
@@ -363,23 +237,28 @@ def parse_legend():
                     dic['labels'][j] = string.join(temp, divider)
 
 
-def EmbedData(outputname, z, errs):
+def EmbedData(outputname, data):
     dic = globe.dic
     StringToEmbed = "Creation time: " + time.ctime() + '\n'
     StringToEmbed += "Current directory: " + os.path.abspath('.') + '\n'
     StringToEmbed += "Creation command: " + ' '.join(sys.argv) + '\n'
     StringToEmbed += "Plotted values:" + '\n'
-    for k in range(0, len(z), 2):
-        StringToEmbed += 'x ' + ' '.join(map(str, z[k])) + '\n'
-        StringToEmbed += 'x err ' + ' '.join(map(str, errs[k])) + '\n'
-        StringToEmbed += 'y ' + ' '.join(map(str, z[k + 1])) + '\n'
-        StringToEmbed += 'y err ' + ' '.join(map(str, errs[k + 1])) + '\n'
+    for i, d in enumerate(data):
+        X, Y, X_err, Y_err, X_sys_err, Y_sys_err = d[5:11]
+        StringToEmbed += 'Plot %d\n' % i
+        StringToEmbed += 'x ' + ' '.join(map(str, X)) + '\n'
+        StringToEmbed += 'x_err ' + ' '.join(map(str, X_err)) + '\n'
+        StringToEmbed += 'x_sys_err ' + ' '.join(map(str, X_err)) + '\n'
+        StringToEmbed += 'y ' + ' '.join(map(str, Y)) + '\n'
+        StringToEmbed += 'y_err ' + ' '.join(map(str, Y_err)) + '\n'
+        StringToEmbed += 'y_sys_err ' + ' '.join(map(str, Y_sys_err)) + '\n'
     if dic['TYPE'] == 'jpg':
         with open(outputname, 'a') as f:
             f.write(StringToEmbed)
     elif dic['TYPE'] == 'pdf':
-        print "Warning!!! Embedding data in pdfs is not reliable storage!"
-        print "Many PDF viewers will strip data which is not viewed!"
+        if dic['Verbose'] > 0:
+            print "Warning!!! Embedding data in pdfs is not reliable storage!"
+            print "Many PDF viewers will strip data which is not rendered!"
         with open(outputname, 'r') as f:
             filetext = f.read().split('\n')
         obj_count = 0

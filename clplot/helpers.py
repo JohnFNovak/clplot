@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
 
+# Part of CLP
 # A universal command line plotting script
 #
 # John Novak
@@ -10,47 +11,28 @@
 
 import collections
 import itertools
-import string
+import globe
+import sys
+import math as m
 
 
 def is_it_ordered(vals):
-    """This function takes a list of numbers are returns whether or not they are in order"""
+    """This function takes a list of numbers are returns whether or not they
+    are in order"""
 
-    ordered = False
+    ordered = 0
 
     if vals == sorted(vals):
-        ordered = True
+        ordered = 1
     if vals == sorted(vals, reverse=True):
-        ordered = True
+        ordered = -1
 
     return ordered
 
 
-def remove_empties(struct, x):
-    """This function runs through the data and the structure array and removes entries that are either empty or are singular"""
-
-    linenum = len(x)-1
-    structBK = struct
-    count = 0
-    blocks = len(structBK)
-
-    for i in range(blocks):
-        j = -i - 1 + count  # do this backward
-        if structBK[j][0] > 1 and structBK[j][1] > 1:
-            # the entry is good: it's more than a single column or single line
-            linenum = linenum - struct[j][1]
-        else:
-            # the entry is worthless: it's a single line
-            del struct[len(structBK) + j]
-            del x[linenum]
-            linenum = linenum - 1
-            count = count + 1
-
-    return struct, x
-
-
 def check_type(x):
-    """This function returns a string. It returns "str" if x is a string, and "num" if x is a number"""
+    """This function returns a string. It returns "str" if x is a string, and
+    "num" if x is a number"""
     try:
         float(x)
     except ValueError:
@@ -62,25 +44,8 @@ def check_type(x):
 
 
 def skip(iterator, n):
-    '''Advance the iterator n-steps ahead. If n is none, consume entirely.'''
+    """Advance the iterator n-steps ahead. If n is none, consume entirely."""
     collections.deque(itertools.islice(iterator, n), maxlen=0)
-
-
-def remove_formating(data):
-    """This function removes thigns that will cause problems like endlines"""
-    cleaned = []
-    for i in data:
-        temp = []
-        for j in i:
-            temp2 = []
-            for k in j:
-                if (k != '\n') and (k != '') and (k != '\r'):
-                    temp2.append(k)
-            if(len(temp2) > 0):
-                temp.append(string.join(temp2, ''))
-        cleaned.append(temp)
-
-    return cleaned
 
 
 def givehelp(a):
@@ -121,6 +86,234 @@ def givehelp(a):
             # python plot.py * -t eps -mt 9 -c b -s o -f x3_y*"""
 
     exit(1)
+
+
+def read_flags():
+    dic = globe.dic
+    case = 0  # 0 is reading files, 1 is outputs, 2 is formats, etc
+
+    if len(sys.argv) == 1:
+        givehelp(0)
+
+    for flag in sys.argv[1:]:
+        # performance tweak: Check if the flag has a dash in it first,
+        # otherwise its a filename, i.e. "if '-' in flag: "
+        if "-f" == flag:
+            # format flag
+            case = 2
+        elif "-i" == flag:
+            # input file flag
+            case = 0
+        elif "-o" == flag:
+            # output file flag
+            case = 1
+        elif "-t" == flag:
+            # output type flag
+            case = 3
+        elif "-mp" == flag:
+            # multiplot pile flag
+            case = 4
+        elif "-mt" == flag:
+            # multiplot tile flag
+            case = 5
+        elif "-h" == flag[:2]:
+            givehelp(1)
+        elif "-c" == flag:
+            case = 6
+        elif "-s" == flag:
+            case = 7
+        elif "-xr" == flag:
+            case = 8
+        elif "-yr" == flag:
+            case = 9
+        elif "-xl" == flag:
+            case = 10
+        elif "-yl" == flag:
+            case = 11
+        elif "-logx" == flag:
+            dic['x_log'] = True
+            if dic['x_range']:
+                if dic['x_range'][0] <= 0:
+                    dic['x_range'] = None
+        elif "-logy" == flag:
+            dic['y_log'] = True
+            if dic['y_range']:
+                if dic['y_range'][0] <= 0:
+                    dic['y_range'] = None
+        elif '-layout' == flag:
+            case = 12
+        elif '-cs' == flag:
+            case = 13
+        elif '-fontsize' == flag:
+            case = 14
+        elif '-systematic' == flag:
+            case = 15
+        elif '-xscaled' == flag:
+            case = 16
+        elif '-yscaled' == flag:
+            case = 17
+        elif '-markersize' == flag:
+            case = 18
+        elif '-alpha' == flag:
+            case = 19
+        elif len(flag) >= 2 and '-v' == flag[:2]:
+            case = 20
+        elif '-columnsfirst' == flag:
+            dic['columnsfirst'] = True
+        elif "-legend" == flag:
+            dic['legend'] = True
+        elif '-bands' == flag:
+            dic['errorbands'] = True
+        elif '-grid' == flag:
+            dic['grid'] = True
+        elif '-sys_err' == flag:
+            dic['plot_sys_err'] = True
+        elif '-norm' == flag:
+            dic['norm'] = True
+        elif "-" == flag[0] and not case in [7, 8, 9, 20]:
+            case = -1
+            print "flag", flag, "not recognized"
+        else:
+            # if there is not a flag, and we are reading filenames or formats
+            if case == 0:
+                dic['files'].append(flag)
+            if case == 1:
+                dic['outputs'].append(flag)
+            if case == 2:
+                dic['formats'].append(flag)
+            if case == 3:
+                if flag[0] == '.':
+                    dic['TYPE'].append(flag[1:])
+                else:
+                    dic['TYPE'].append(flag)
+            if case == 4:
+                dic['MULTIP'] = int(flag)  # number of plots per plot
+            if case == 5:
+                dic['MULTIT'] = int(flag)  # number of plots per plot
+            if case == 6:
+                dic['Ucolor'].append(flag)
+            if case == 7:
+                dic['Ustyle'].append(flag)
+            if case == 8:
+                dic['x_range'] = map(float, flag.split(":"))
+            if case == 9:
+                dic['y_range'] = map(float, flag.split(":"))
+            if case == 10:
+                dic['x_label'] = flag
+            if case == 11:
+                dic['y_label'] = flag
+            if case == 12:
+                dic['layout'] = tuple(map(int, flag.split(":")))
+            if case == 13:
+                dic['colorstyle'].append(flag)
+            if case == 14:
+                dic['fontsize'] = float(flag)
+            if case == 15:
+                dic['sys_err_default'] = float(flag)
+            if case == 16:
+                dic['xscaled'] = float(flag)
+            if case == 17:
+                dic['yscaled'] = float(flag)
+            if case == 18:
+                dic['default_marker_size'] = float(flag)
+            if case == 19:
+                dic['alpha'] = float(flag)
+            if case == 20:
+                dic['Verbose'] = int(flag)
+            if case == -1:
+                print "ignoring", flag
+
+    if dic['MULTIT'] and dic['layout']:
+        if (dic['layout'][0]*dic['layout'][1] < int(dic['MULTIT'])):
+            print "The layout that you specified was too small"
+            dic['layout'] = plot_arragnement()
+        else:
+            print "We are using the layout you specified:", dic['layout'][0],
+            print "by", dic['layout'][1]
+    if dic['MULTIT'] and not dic['layout']:
+        dic['layout'] = plot_arragnement()
+
+    if dic['outputs'] and (len(dic['outputs']) !=
+                           len(dic['files'])) and not (dic['MULTIT'] or
+                                                       dic['MULTIP']):
+        print "If you are going to specify output names",
+        print "you must specify one output file per input file."
+
+
+def plot_arragnement():
+    """This function looks at dic['MULTIT'] and decides how to structure the
+    multiplot it returns a 2 tuple which is the root for the first 2 argument
+    of the subplot command"""
+
+    dic = globe.dic
+    found = False
+
+    if m.sqrt(float(dic['MULTIT'])) % 1 == 0:
+        # Or multiplot can be square
+        form = (int(m.sqrt(float(dic['MULTIT']))),
+                int(m.sqrt(float(dic['MULTIT']))))
+        found = True
+    elif int(dic['MULTIT']) == 3:
+        form = (1, 3)
+        found = True
+    if not found:
+        looking = True
+        a = 1
+        while looking and a * (a + 1) <= int(dic['MULTIT']):
+            if float(dic['MULTIT']) == float(a * (a + 1)):
+                looking = False
+                found = True
+            else:
+                a = a + 1
+        if found:
+            form = (a, a + 1)
+    if not found and m.sqrt(float(dic['MULTIT']) + 1) % 1 == 0:
+        form = (int(m.sqrt(float(dic['MULTIT']) + 1)),
+                int(m.sqrt(float(dic['MULTIT']) + 1)))
+        found = True
+    if not found:
+        looking = True
+        a = 1
+        while looking and a * (a + 1) <= int(dic['MULTIT']) + 1:
+            if float(dic['MULTIT']) + 1 == float(a * (a + 1)):
+                looking = False
+                found = True
+            else:
+                a = a + 1
+        if found:
+            form = (a, a + 1)
+    if not found and m.sqrt(float(dic['MULTIT']) + 2) % 1 == 0:
+        form = (int(m.sqrt(float(dic['MULTIT']) + 2)),
+                int(m.sqrt(float(dic['MULTIT']) + 2)))
+        found = True
+    if not found:
+        looking = True
+        a = 1
+        while looking and a * (a + 1) <= int(dic['MULTIT']) + 2:
+            if float(dic['MULTIT']) + 2 == float(a * (a + 1)):
+                looking = False
+                found = True
+            else:
+                a = a + 1
+        if found:
+            form = (a, a + 1)
+    if not found:
+        looking = True
+        a = 1
+        while looking and a * (a + 1) <= int(dic['MULTIT']):
+            if float(dic['MULTIT']) <= float(a * (a + 1)):
+                looking = False
+                found = True
+            else:
+                a = a + 1
+        if found:
+            form = (a, a + 1)
+
+    if dic['Verbose'] > 0:
+        print " I have decided that the multiplots will be", form[0],
+        print "by", form[1]
+
+    return form
 
 
 if __name__ == '__main__':

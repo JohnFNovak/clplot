@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
 
 # Part of CLP
 # A universal command line plotting script
@@ -23,34 +23,32 @@ dic = {'formats': [],
        'remnanterrors': [],
        'x_range': None,
        'y_range': None,
-       'x_label': None,
+       'x_label': 'x',
        'y_label': None,
        'x_log': False,
        'y_log': False,
-       'currentfile': None,
        'numbered': None,
        'Numbering': None,
-       'multicounttile': 0,
-       'multicountpile': 0,
-       'currentoutput': None,
+       'mct': 0,  # multicounttile
+       'mcp': 0,  # multicountpile
        'files': [],
        'legend': False,
-       'labels': [],
-       'columnlabel': [],
-       'currentstruct': 0,
        'colorstyle': [],
        'errorbands': False,
        'fontsize': 20,
        'grid': False,
        'sys_err_default': 0,
        'default_marker_size': 5,
-       'sys_err': 0,
        'plot_sys_err': False,
        'yscaled': 1,
        'xscaled': 1,
        'alpha': 0.25,
        'norm': False,
-       'EmbedData': True}
+       'EmbedData': True,
+       'Verbose': 0,
+       'delimiter': ',',
+       'AssumeForm': 'c',
+       'GroupBy': 'files'}
 
 
 if __name__ == '__main__':
