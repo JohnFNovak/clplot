@@ -28,12 +28,6 @@ def structure(data):
         w = d[3]['dims'][0]
         h = d[3]['dims'][1]
         block = np.array(d[3]['data'])
-        if (h, w) != block.shape:
-            print "Internal error, the dimensions given from make_blocks don't",
-            print "match the dims on the data"
-            print h, w, block.shape
-            print 'using the dims on the data'
-            h, w = block.shape
 
         # Check if a prespecified format will work
         if dic['formats']:
