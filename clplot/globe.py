@@ -40,7 +40,8 @@ dic = {'formats': [],
        'norm': False,
        'EmbedData': True,
        'Verbose': 0,
-       'GroupBy': 'files'}
+       'GroupBy': 'files',
+       'interactive': False}
 
 
 if __name__ == '__main__':

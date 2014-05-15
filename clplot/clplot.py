@@ -13,7 +13,7 @@
 
 import globe
 from structure import structure
-from helpers import read_flags
+from helpers import read_flags, interact
 from plot import plot, plot_tiles
 from data_handler import make_blocks, read_data
 
@@ -98,10 +98,29 @@ def clplot(data):
         plot_tiles(tiles, numbered=tiled_count)
 
 
+def interactive_plot(data):
+    """Interactive Mode!"""
+    dic = globe.dic
+
+    command = True
+    history = []
+    while command:
+        print '#=====================#'
+        command = raw_input('?: ')  # or '.'
+        history.append(command)
+        if command == '!':
+            interact()
+        if command == 'g':
+            clplot(data)
+
+
 if __name__ == '__main__':
     """A Python program that takes a file or list of filesand creates plots of
     the data."""
     dic = globe.dic
     read_flags()
     data = init()
-    clplot(data)
+    if dic['interactive']:
+        interactive_plot(data)
+    else:
+        clplot(data)

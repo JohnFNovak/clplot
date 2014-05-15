@@ -174,6 +174,8 @@ def read_flags():
         elif "-" == flag[0] and not case in [7, 8, 9, 20]:
             case = -1
             print "flag", flag, "not recognized"
+        elif flag in ['!', 'I', 'interact']:
+            dic['interactive'] = True
         else:
             # if there is not a flag, and we are reading filenames or formats
             if case == 0:
