@@ -127,7 +127,7 @@ def plot(data, outputfile, numbered=0, Print=True, **kwargs):
                          fmt=marker, label=d[4],
                          mec=ecolor, mfc=fcolor, ms=msize)
         if plottingerrors and dic['errorbands']:
-            if all(Y_err == 0):
+            if all([y == 0 for y in Y_err]):
                 plt.errorbar(X, Y,
                              xerr=[0] * len(X),
                              yerr=[0] * len(Y),
