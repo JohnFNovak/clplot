@@ -76,13 +76,13 @@ def main():
         if dic['MULTIT']:
             tiles.append(p)
             if len(tiles) == dic['MULTIT']:
-                plot_tiles(tiles)
+                plot_tiles(tiles, **e_args)
                 tiles = []
         else:
             plot(*p, **e_args)
 
     if tiles:
-        plot_tiles(tiles)
+        plot_tiles(tiles, **e_args)
 
 
 if __name__ == '__main__':

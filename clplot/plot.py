@@ -19,7 +19,7 @@ import string
 import globe
 
 
-def plot_tiles(tiles):
+def plot_tiles(tiles, numbered=0, **kwargs):
     dic = globe.dic
     for i, t in enumerate(tiles):
         if not dic['columnsfirst']:
@@ -33,7 +33,10 @@ def plot_tiles(tiles):
                              (((i - 1) - (i - 1) %
                               dic['layout'][1]) / dic['layout'][1]))
         plot(t[0], '', Print=False)
-    outputname = tiles[-1][1] + '_tiled' + "." + dic['TYPE']
+    outputname = tiles[-1][1] + "_tiled"
+    if numbered != 0:
+        outputname = outputname + '_' + str(numbered)
+    outputname = outputname + "." + dic['TYPE']
     plt.tight_layout()  # Experimental, and may cause problems
     plt.savefig(outputname)
     if dic['Verbose'] > 0:
@@ -44,7 +47,7 @@ def plot_tiles(tiles):
     plt.clf()
 
 
-def plot(data, outputfile, numbered=0, Print=True):
+def plot(data, outputfile, numbered=0, Print=True, **kwargs):
     """This function takes a list z of lists and trys to plot them. the first
     list is always x, and the folowing are always y's"""
 
