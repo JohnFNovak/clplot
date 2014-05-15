@@ -135,7 +135,7 @@ def structure(data):
                         count = count + 1
                     mults = mults + 1
                 elif Form[j + 1 + mults] == "y":
-                    new.append([d[1], d[2]])
+                    new.append([d[0], d[1], d[2]])
                     if d[3]['labels']:
                         new[-1].append(d[3]['labels'][j + mults])
                     else:
