@@ -187,9 +187,9 @@ def read_flags():
                 else:
                     dic['TYPE'].append(flag)
             if case == 4:
-                dic['MULTIP'] = flag  # number of plots per plot
+                dic['MULTIP'] = int(flag)  # number of plots per plot
             if case == 5:
-                dic['MULTIT'] = flag  # number of plots per plot
+                dic['MULTIT'] = int(flag)  # number of plots per plot
             if case == 6:
                 dic['Ucolor'].append(flag)
             if case == 7:
