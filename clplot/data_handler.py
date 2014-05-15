@@ -49,9 +49,10 @@ def make_blocks(dataarray):
 
         return blank
 
+    blocks = []
     for i, d in enumerate(dataarray):
         if i == 0:  # first pass
-            blocks = [block(d, dataarray[i + 1])]
+            blocks.append(block(d, dataarray[i + 1]))
             previous = [check_type(x) for x in d]
         else:
             current = [check_type(x) for x in d]

@@ -39,11 +39,15 @@ def main():
         # Now read data file
         blocks = make_blocks(read_data(filename))
 
-        for j, b in enumerate(blocks):
-            if dic['GroupBy'] == 'files':
-                data.append([[i, j], filename, output, b, sys_err])
-            elif dic['GroupBy'] == 'blocks':
-                data.append([[j, i], filename, output, b, sys_err])
+        if blocks:
+            for j, b in enumerate(blocks):
+                if dic['GroupBy'] == 'files':
+                    data.append([[i, j], filename, output, b, sys_err])
+                elif dic['GroupBy'] == 'blocks':
+                    data.append([[j, i], filename, output, b, sys_err])
+
+    if not data:
+        return
 
     data.sort(key=lambda x: x[0])
 
