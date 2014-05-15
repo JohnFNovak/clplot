@@ -58,9 +58,9 @@ def make_blocks(dataarray):
                       and blocks[-1]['dims'][1] == 0
                       and len(d) == blocks[-1]['dims'][0]))
                  and ((blocks[-1]['Format'] == 'r'
-                       and not any([x == 'str' for x in d[1:]]))
+                       and not any([x == 'str' for x in current[1:]]))
                       or (blocks[-1]['Format'] != 'r'
-                          and not any([x == 'str' for x in d]))))
+                          and not any([x == 'str' for x in current]))))
         if check:
             blocks[-1]['dims'][1] += 1
             if blocks[-1]['Format'] == 'r':
