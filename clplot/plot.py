@@ -95,7 +95,7 @@ def plot(data, Force=False):
             d[5] = Y.tolist()
 
     for k, d in enumerate(data):
-        X, Y, X_err, Y_err, X_sys_err, Y_sys_err = d[3:9]
+        X, Y, X_err, Y_err, X_sys_err, Y_sys_err = d[4:10]
         marker = points[k % len(points)]
         msize = size[k % len(points)]
         ecolor = points[k % len(points)][0]
@@ -167,6 +167,7 @@ def plot(data, Force=False):
             outputname = outputname + "_" + str(dic['mcp'])
     if dic['MULTIP']:
         outputname = outputname + "_multip"
+
     if dic['TYPE'][0] == ".":
         outputname = outputname + dic['TYPE']
     else:
@@ -253,7 +254,7 @@ def EmbedData(outputname, data):
     StringToEmbed += "Creation command: " + ' '.join(sys.argv) + '\n'
     StringToEmbed += "Plotted values:" + '\n'
     for i, d in enumerate(data):
-        X, Y, X_err, Y_err, X_sys_err, Y_sys_err = d[3:9]
+        X, Y, X_err, Y_err, X_sys_err, Y_sys_err = d[4:10]
         StringToEmbed += 'Plot %d\n' % i
         StringToEmbed += 'x ' + ' '.join(map(str, X)) + '\n'
         StringToEmbed += 'x_err ' + ' '.join(map(str, X_err)) + '\n'
