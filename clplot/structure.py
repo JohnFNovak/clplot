@@ -87,7 +87,9 @@ def structure(data):
                 if check_type(c) == 'num':
                     mults += (int(c) - 1)
                 if c == "x":
-                    if d[3]['labels']:
+                    if dic['x_label']:
+                        d[3]['x_label'] = dic['x_label']
+                    elif d[3]['labels']:
                         d[3]['x_label'] = d[3]['labels'][j + mults]
                     x = block[:, j + mults].tolist()
                     needx = False
