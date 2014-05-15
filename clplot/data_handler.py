@@ -73,7 +73,8 @@ def make_blocks(dataarray):
             if blocks[-1]['dims'][1] <= 1:
                 # The previous block was only one line long
                 del(blocks[-1])
-            blocks.append(block(d, dataarray[i + 1]))
+            if (i + 1) < len(dataarray):
+                blocks.append(block(d, dataarray[i + 1]))
         previous = current
 
     return blocks
