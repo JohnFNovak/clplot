@@ -18,10 +18,7 @@ from plot import plot, plot_tiles
 from data_handler import make_blocks, read_data
 
 
-def main():
-    dic = globe.dic
-    read_flags()
-
+def init():
     data = []
     for i, filename in enumerate(dic['files']):
         if dic['Verbose'] > 0:
@@ -46,10 +43,16 @@ def main():
                 elif dic['GroupBy'] == 'blocks':
                     data.append([[j, i], filename, output, b, sys_err])
 
+    data.sort(key=lambda x: x[0])
+
+    return data
+
+
+def clplot(data):
+    dic = globe.dic
+
     if not data:
         return
-
-    data.sort(key=lambda x: x[0])
 
     data = structure(data)
 
@@ -99,4 +102,6 @@ if __name__ == '__main__':
     """A Python program that takes a file or list of filesand creates plots of
     the data."""
     dic = globe.dic
-    main()
+    read_flags()
+    data = init()
+    clplot(data)
