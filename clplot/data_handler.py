@@ -19,7 +19,7 @@ def make_blocks(dataarray):
 
     def block(d, d2):
         blank = {'dims': [len(d), 1], 'data': [], 'labels': None,
-                 'Format': dic['AssumeForm'], 'x_label': dic['x_label'],
+                 'Format': None, 'x_label': dic['x_label'],
                  'y_label': dic['y_label']}
         current = [check_type(x) for x in d]
         if 'str' in current:
@@ -31,8 +31,9 @@ def make_blocks(dataarray):
             # more than half the enrties are strings, so we will assume it's
             # column titles
             if len(d) == len(d2):
-                print "we are going to use", string.join(d),
-                print "as labels"
+                if dic['Verbose'] > -1:
+                    print "we are going to use", string.join(d),
+                    print "as labels"
                 blank['labels'] = d
                 blank['Format'] = 'c'
                 blank['dims'][1] = 0
@@ -52,29 +53,30 @@ def make_blocks(dataarray):
         if i == 0:  # first pass
             blocks = [block(d, dataarray[i + 1])]
             previous = [check_type(x) for x in d]
-
-        current = [check_type(x) for x in d]
-        check = (((current == previous)  # same as the previous pass
-                  or (blocks[-1]['Format'] == 'c'
-                      and blocks[-1]['dims'][1] == 0
-                      and len(d) == blocks[-1]['dims'][0]))
-                 and ((blocks[-1]['Format'] == 'r'
-                       and not any([x == 'str' for x in current[1:]]))
-                      or (blocks[-1]['Format'] != 'r'
-                          and not any([x == 'str' for x in current]))))
-        if check:
-            blocks[-1]['dims'][1] += 1
-            if blocks[-1]['Format'] == 'r':
-                blocks[-1]['labels'].append(d[0])
-                blocks[-1]['data'].append(d[1:])
-            else:
-                blocks[-1]['data'].append(d)
         else:
-            if blocks[-1]['dims'][1] <= 1:
-                # The previous block was only one line long
-                del(blocks[-1])
-            blocks.append(block(d, dataarray[i + 1]))
-        previous = current
+            current = [check_type(x) for x in d]
+            check = (((current == previous)  # same as the previous pass
+                      or (blocks[-1]['Format'] == 'c'
+                          and blocks[-1]['dims'][1] == 0
+                          and len(d) == blocks[-1]['dims'][0]))
+                     and ((blocks[-1]['Format'] == 'r'
+                           and not any([x == 'str' for x in current[1:]]))
+                          or (blocks[-1]['Format'] != 'r'
+                              and not any([x == 'str' for x in current]))))
+            if check:
+                blocks[-1]['dims'][1] += 1
+                if blocks[-1]['Format'] == 'r':
+                    blocks[-1]['labels'].append(d[0])
+                    blocks[-1]['data'].append(d[1:])
+                else:
+                    blocks[-1]['data'].append(d)
+            else:
+                if blocks[-1]['dims'][1] <= 1:
+                    # The previous block was only one line long
+                    del(blocks[-1])
+                if (i + 1) < len(dataarray):
+                    blocks.append(block(d, dataarray[i + 1]))
+            previous = current
 
     return blocks
 
@@ -82,10 +84,11 @@ def make_blocks(dataarray):
 def read_data(filename):
     with open(filename, "r") as datafile:
         test = datafile.readline()
+        test = datafile.readline()
         while test[0] == "#" and len(test) > 1:  # Not a comment or empty
             test = datafile.readline()
 
-    delimiters = [' ', ',', ';', '.', '']
+    delimiters = [' ', ',', ';', '\t']
     while delimiters:
         d = delimiters.pop()
         if len([x.strip() for x in test.split(d) if x.strip()]) > 1:
@@ -98,7 +101,7 @@ def read_data(filename):
         data = datafile.read().split('\n')
     data = [line.split(d) for line in data if line.strip()]
 
-    if len(data < 2):
+    if len(data) < 2:
         print filename, 'does not contain sufficient data'
         print 'length of printable data is too short'
         return []
