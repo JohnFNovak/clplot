@@ -31,7 +31,7 @@ def is_it_ordered(vals):
     return ordered
 
 
-def check_type(x):
+def check_type(x, specific=False):
     """This function returns a string. It returns "str" if x is a string, and
     "num" if x is a number"""
     try:
@@ -39,7 +39,15 @@ def check_type(x):
     except ValueError:
         verdict = "str"
     else:
-        verdict = "num"
+        if not specific:
+            verdict = "num"
+        else:
+            try:
+                int(x)
+            except ValueError:
+                verdict = "float"
+            else:
+                verdict = "int"
 
     return verdict
 
