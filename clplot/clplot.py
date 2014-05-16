@@ -121,7 +121,7 @@ def interactive_plot(data):
                    for i, p in enumerate(plots) if p and p[0]]
             # print [['-'.join(map(str, [d[1]] + d[0])), len(d[6])]
             #        for plot in plots for d in plot]
-        command = raw_input('?: ')  # or '.'
+        command = choose_from('? :', ['!', 'g', 'G', 'f', 'a'])
         history.append(command)
         if command == '!':
             interact(**{'dic': dic, 'data': data})
@@ -131,8 +131,6 @@ def interactive_plot(data):
             dic['interactive'] = False
             clplot(data)
             exit(1)
-        if command == 'q':
-            sys.exit(1)
         if command == 'f':
             new_file = raw_input('file to load: ').strip()
             if os.path.isfile(new_file):
