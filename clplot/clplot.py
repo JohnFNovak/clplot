@@ -134,7 +134,7 @@ def interactive_plot(data):
             new_file = raw_input('file to load: ').strip()
             if os.path.isfile(new_file):
                 files.append(new_file)
-            data = init(data=data, files=[new_file])
+            data += structure(init(files=[new_file]))
             blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
         if command == 'x':
             t = raw_input('(f)iles, (b)locks, (d)ata? [d]: ').strip()[0] or 'd'
