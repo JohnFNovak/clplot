@@ -341,6 +341,8 @@ def choose_from(prompt, choices, default=' '):
     while not choice:
         choice = raw_input(prompt) or default
         choice = choice[0].lower()
+        if choice == 'q':
+            sys.exit(1)
         if not choice in choices:
             choice = False
     return choice
