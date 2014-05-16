@@ -121,7 +121,13 @@ def interactive_plot(data):
                    for i, p in enumerate(plots) if p and p[0]]
             # print [['-'.join(map(str, [d[1]] + d[0])), len(d[6])]
             #        for plot in plots for d in plot]
-        command = choose_from('? :', ['!', 'g', 'G', 'f', 'a'])
+        if mode == 's':
+            default = 'a'
+        if mode == 'a':
+            default = 'g'
+        command = choose_from('? :',
+                              ['!', 'g', 'G', 'f', 'a'],
+                              default=default)
         history.append(command)
         if command == '!':
             interact(**{'dic': dic, 'data': data, 'plots': plots})
