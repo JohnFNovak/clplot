@@ -107,6 +107,10 @@ def interactive_plot(data):
     mode = choose_from('Pick a mode: from (s)ratch or (a)utomatic',
                        ['s', 'a'])
     plots = [[]]
+    if mode == 's':
+        default = 'a'
+    elif mode == 'a':
+        default = 'g'
     while command:
         print '(%s) =====================#' % (mode)
         if mode == 's':
@@ -115,23 +119,19 @@ def interactive_plot(data):
                    for i, p in enumerate(plots) if p and p[0]]
             # print [['-'.join(map(str, [d[1]] + d[0])), len(d[6])]
             #        for plot in plots for d in plot]
-        if mode == 's':
-            default = 'a'
-        if mode == 'a':
-            default = 'g'
         command = choose_from('?',
                               ['!', 'g', 'G', 'f', 'a'],
                               default=default)
         history.append(command)
         if command == '!':
             interact(**{'dic': dic, 'data': data, 'plots': plots})
-        if command == 'g':
+        elif command == 'g':
             if mode == 'a':
                 clplot(data)
             elif mode == 's':
                 for p in plots:
                     clplot(p)
-        if command == 'G':
+        elif command == 'G':
             dic['interactive'] = False
             if mode == 'a':
                 clplot(data)
@@ -139,13 +139,13 @@ def interactive_plot(data):
                 for p in plots:
                     clplot(p)
             exit(1)
-        if command == 'f':
+        elif command == 'f':
             new_file = raw_input('file to load: ').strip()
             if os.path.isfile(new_file):
                 files.append(new_file)
             data += structure(init(files=[new_file]))
             blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
-        if mode == 's' and command == 'a':
+        elif mode == 's' and command == 'a':
             print 'add data to plot'
             t = choose_from('(f)iles, (b)locks, (d)ata?',
                             ['f', 'b', 'd'], default='d')
