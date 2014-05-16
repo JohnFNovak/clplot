@@ -341,7 +341,7 @@ def choose_from(prompt, choices, default=' '):
     if default == ' ':
         prompt = prompt + ': '
     else:
-        prompt = prompt + '[%s]' % (default) + ': '
+        prompt = prompt + ' [%s]' % (default) + ': '
     while not choice:
         choice = raw_input(prompt) or default
         choice = choice[0].lower()

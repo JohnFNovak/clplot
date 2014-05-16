@@ -125,7 +125,7 @@ def interactive_plot(data):
             default = 'a'
         if mode == 'a':
             default = 'g'
-        command = choose_from('? :',
+        command = choose_from('?',
                               ['!', 'g', 'G', 'f', 'a'],
                               default=default)
         history.append(command)
