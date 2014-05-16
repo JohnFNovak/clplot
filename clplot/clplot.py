@@ -145,7 +145,8 @@ def interactive_plot(data):
             blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
         if mode == 's' and command == 'a':
             print 'add data to plot'
-            t = raw_input('(f)iles, (b)locks, (d)ata? [d]: ') or 'd'
+            t = choose_from('(f)iles, (b)locks, (d)ata? [d]: ',
+                            ['f', 'b', 'd'], default='d')
             cols = data
             if t == 'f':
                 for i, f in enumerate(files):
