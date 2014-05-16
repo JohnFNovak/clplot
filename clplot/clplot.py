@@ -124,7 +124,7 @@ def interactive_plot(data):
         command = choose_from('? :', ['!', 'g', 'G', 'f', 'a'])
         history.append(command)
         if command == '!':
-            interact(**{'dic': dic, 'data': data})
+            interact(**{'dic': dic, 'data': data, 'plots': plots})
         if mode == 'a' and command == 'g':
             clplot(data)
         if mode == 'a' and command == 'G':
