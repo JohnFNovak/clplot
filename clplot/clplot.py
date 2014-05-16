@@ -110,7 +110,7 @@ def interactive_plot(data):
     history = []
     files = dic['files']
     blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
-    mode = choose_from('Pick a mode: from (s)ratch or (a)utomatic :',
+    mode = choose_from('Pick a mode: from (s)ratch or (a)utomatic',
                        ['s', 'a'])
     plots = [[]]
     while command:
@@ -145,7 +145,7 @@ def interactive_plot(data):
             blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
         if mode == 's' and command == 'a':
             print 'add data to plot'
-            t = choose_from('(f)iles, (b)locks, (d)ata? [d]: ',
+            t = choose_from('(f)iles, (b)locks, (d)ata?',
                             ['f', 'b', 'd'], default='d')
             cols = data
             if t == 'f':
@@ -153,7 +153,7 @@ def interactive_plot(data):
                     n_b = len(set([' '.join(map(str, x[0][:2]))
                                    for x in data if x[1] == f]))
                     print '%d- file: %s [# blocks = %d]' % (i + 1, f, n_b)
-                choice = int(choose_from("selection: ",
+                choice = int(choose_from("selection",
                                          map(str,
                                              range(1, 1 + len(files))),
                                          default='1')) - 1
@@ -169,7 +169,7 @@ def interactive_plot(data):
                     # print [x for x in data if ' '.join([x[1], 'block:', str(x[0][1] + 1)]) == b]
                     n_r = len([x for x in data if ' '.join([x[1], 'block:', str(x[0][1] + 1)]) == b][0][6])
                     print '%d- file: %s [# cols = %d, # rows = %d]' % (i + 1, b, n_c, n_r)
-                choice = int(choose_from("selection: ",
+                choice = int(choose_from("selection",
                                          map(str,
                                              range(1, 1 + len(blocks))),
                                          default='1')) - 1
@@ -181,7 +181,7 @@ def interactive_plot(data):
             if t == 'd':
                 for i, d in enumerate(cols):
                     print '%d- file: %s block: %d col: %d [len %d]' % (i + 1, d[1], d[0][0] + 1, d[0][1] + 1, len(d[6]))
-            choice = int(choose_from("selection: ",
+            choice = int(choose_from("selection",
                                      map(str, range(1, 1 + len(cols))),
                                      default='1')) - 1
             print '-------------'
@@ -199,7 +199,7 @@ def interactive_plot(data):
                 opts = [p for p in plots if p[6] == size]
                 for i, o in enumerate(opts):
                     print i, ':', o
-                c = choose_from("select one ('n' for new): ",
+                c = choose_from("select one ('n' for new)",
                                 map(str, range(1, 1 + len(opts))) + ['n'])
                 if check_type(c) == 'num':
                     plots[plots.index(opts[int(c) - 1])].append(cols[choice])
@@ -208,7 +208,7 @@ def interactive_plot(data):
                 # print size, [len(p[0][6]) for p in plots]
                 print 'only one plot has been found with the appropriate',
                 print 'dimension.'
-                new = choose_from('start new plot? (y/n): ', ['y', 'n'])
+                new = choose_from('start new plot? (y/n)', ['y', 'n'])
                 if new == 'n':
                     plots[plots.index([p for p in plots if p
                                        and len(p[0]) > 6
