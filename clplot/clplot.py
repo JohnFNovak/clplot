@@ -104,8 +104,7 @@ def interactive_plot(data):
     history = []
     files = dic['files']
     blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
-    mode = choose_from('Pick a mode: from (s)ratch or (a)utomatic',
-                       ['s', 'a'])
+    mode = choose_from('Pick a mode: from (s)ratch or (a)utomatic', ['s', 'a'])
     plots = [[]]
     if mode == 's':
         default = 'a'
@@ -138,7 +137,7 @@ def interactive_plot(data):
             elif mode == 's':
                 for p in plots:
                     clplot(p)
-            exit(1)
+            sys.exit(1)
         elif command == 'f':
             new_file = raw_input('file to load: ').strip()
             if os.path.isfile(new_file):
