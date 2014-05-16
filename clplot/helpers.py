@@ -338,6 +338,7 @@ def choose_from(prompt, choices, default=' '):
     choice = False
     if not default:
         default = ' '
+    if default == ' ':
         prompt = prompt + ': '
     else:
         prompt = prompt + '[%s]' % (default) + ': '
