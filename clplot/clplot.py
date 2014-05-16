@@ -59,13 +59,13 @@ def clplot(data):
     data = structure(data)
 
     # data format:
-    # [[f_id, b_id], filename, output, x_label, y_label,
+    # [[f_id, b_id, c_id], filename, output, x_label, y_label,
     #  x, y, x_err, y_err, x_sys_err, y_sys_err]
 
     if not dic['MULTIP']:
         # multiplot flag not give, group plots by file, then block
         l = lambda x: '-'.join(map(str, x))
-        groups = [[d for d in data if l(d[0]) == f]
+        groups = [[d for d in data if l(d[0][:2]) == f]
                   for f in set([l(x[0]) for x in data])]
     else:
         groups = [data[(i * dic['MULTIP']):((i + 1) * dic['MULTIP'])]

@@ -101,7 +101,8 @@ def structure(data):
                 if check_type(Form[j + 1 + mults]) == 'num':
                     for k in range(1, int(Form[j + 1 + mults])):
                         if Form[j + 2 + mults] == "y":
-                            new.append([d[0], d[1], d[2], d[3]['x_label']])
+                            new.append([d[0] + [j + mults], d[1], d[2],
+                                        d[3]['x_label']])
                             if d[3]['labels']:
                                 new[-1].append(d[3]['labels'][j + mults])
                             else:
@@ -135,7 +136,8 @@ def structure(data):
                         count = count + 1
                     mults = mults + 1
                 elif Form[j + 1 + mults] == "y":
-                    new.append([d[0], d[1], d[2], d[3]['x_label']])
+                    new.append([d[0] + [j + 1 + mults], d[1], d[2],
+                                d[3]['x_label']])
                     if d[3]['labels']:
                         new[-1].append(d[3]['labels'][j + mults])
                     else:
