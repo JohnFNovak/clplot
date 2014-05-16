@@ -17,6 +17,7 @@ from helpers import read_flags, interact
 from plot import plot, plot_tiles
 from data_handler import make_blocks, read_data
 import sys
+import os
 
 
 def init(data=[], files=globe.dic['files']):
@@ -131,7 +132,8 @@ def interactive_plot(data):
             sys.exit(1)
         if command == 'f':
             new_file = raw_input('file to load: ').strip()
-            files.append(new_file)
+            if os.path.isfile(new_file):
+                files.append(new_file)
             data = init(data=data, files=[new_file])
             blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
         if command == 'x':
