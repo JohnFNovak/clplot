@@ -53,7 +53,7 @@ def clplot(data):
     dic = globe.dic
 
     if not data:
-        return
+        sys.exit(1)
 
     data = structure(data)
 
@@ -103,8 +103,12 @@ def interactive_plot(data):
     """Interactive Mode!"""
     dic = globe.dic
 
+    data = structure(data)
+
     command = True
     history = []
+    files = dic['files']
+    blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
     while command:
         print '#=====================#'
         command = raw_input('?: ')  # or '.'
@@ -113,6 +117,10 @@ def interactive_plot(data):
             interact(**{'dic': dic, 'data': data})
         if command == 'g':
             clplot(data)
+        if command == 'G':
+            dic['interactive'] = False
+            clplot(data)
+            exit(1)
         if command == 'q':
             sys.exit(1)
         if command == 'f':
@@ -125,6 +133,7 @@ if __name__ == '__main__':
     dic = globe.dic
     read_flags()
     data = init()
+
     if dic['interactive']:
         interactive_plot(data)
     else:
