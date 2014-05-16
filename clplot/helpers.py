@@ -334,5 +334,17 @@ def interact(**kwargs):
     return True
 
 
+def choose_from(prompt, choices, default=' '):
+    choice = False
+    if not default:
+        default = ' '
+    while not choice:
+        choice = raw_input(prompt) or default
+        choice = choice[0].lower()
+        if not choice in choices:
+            choice = False
+    return choice
+
+
 if __name__ == '__main__':
     print "This code is part of CLP"
