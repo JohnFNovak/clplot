@@ -46,17 +46,13 @@ def init(data=[], files=globe.dic['files']):
                     data.append([[j, i], filename, output, b, sys_err])
 
     data.sort(key=lambda x: x[0])
+    data = structure(data)
 
     return data
 
 
 def clplot(data):
     dic = globe.dic
-
-    if not data:
-        sys.exit(1)
-
-    data = structure(data)
 
     # data format:
     # [[f_id, b_id, c_id], filename, output, x_label, y_label,
@@ -103,8 +99,6 @@ def clplot(data):
 def interactive_plot(data):
     """Interactive Mode!"""
     dic = globe.dic
-
-    data = structure(data)
 
     command = True
     history = []
