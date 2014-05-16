@@ -109,6 +109,12 @@ def interactive_plot(data):
     history = []
     files = dic['files']
     blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
+    mode = False
+    while not mode:
+        mode = raw_input('Pick a mode: from (s)ratch or (a)utomatic :') or ' '
+        mode = mode[0].lower()
+        if not mode in ['s', 'a']:
+            mode = False
     while command:
         print '#=====================#'
         command = raw_input('?: ')  # or '.'
