@@ -13,7 +13,7 @@
 
 import globe
 from structure import structure
-from helpers import read_flags, interact
+from helpers import read_flags, interact, choose_from
 from plot import plot, plot_tiles
 from data_handler import make_blocks, read_data
 import sys
@@ -110,21 +110,20 @@ def interactive_plot(data):
     history = []
     files = dic['files']
     blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
-    mode = False
-    while not mode:
-        mode = raw_input('Pick a mode: from (s)ratch or (a)utomatic :') or ' '
-        mode = mode[0].lower()
-        if not mode in ['s', 'a']:
-            mode = False
+    mode = choose_from('Pick a mode: from (s)ratch or (a)utomatic :',
+                       ['s', 'a'])
+    plots = [[]]
     while command:
-        print '#=====================#'
+        print mode + ' =====================#'
+        if mode == 's':
+            print ['%d: %s cols by %d rows' % (i, len(p), len(p[0][6])) for i, p in enumerate(plots) if p and p[0]]
         command = raw_input('?: ')  # or '.'
         history.append(command)
         if command == '!':
             interact(**{'dic': dic, 'data': data})
-        if command == 'g':
+        if mode == 'a' and command == 'g':
             clplot(data)
-        if command == 'G':
+        if mode == 'a' and command == 'G':
             dic['interactive'] = False
             clplot(data)
             exit(1)
@@ -136,8 +135,9 @@ def interactive_plot(data):
                 files.append(new_file)
             data += structure(init(files=[new_file]))
             blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
-        if command == 'x':
-            t = raw_input('(f)iles, (b)locks, (d)ata? [d]: ').strip()[0] or 'd'
+        if mode == 's' and command == 'a':
+            print 'add data to plot'
+            t = raw_input('(f)iles, (b)locks, (d)ata? [d]: ') or 'd'
             cols = data
             if t == 'f':
                 for i, f in enumerate(files):
