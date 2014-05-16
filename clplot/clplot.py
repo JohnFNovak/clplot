@@ -124,7 +124,33 @@ def interactive_plot(data):
         if command == 'q':
             sys.exit(1)
         if command == 'f':
-            data = init(data=data, files=[raw_input('file to load: ').strip()])
+            new_file = raw_input('file to load: ').strip()
+            files.append(new_file)
+            data = init(data=data, files=[new_file])
+            blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
+        if command == 'x':
+            t = raw_input('(f)iles, (b)locks, (d)ata? [d]: ').strip()[0] or 'd'
+            cols = data
+            if t == 'f':
+                for i, f in enumerate(files):
+                    print '%d: %s' % (i, f)
+                choice = raw_input('selection: ')
+                t = 'b'
+                blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data
+                                   if x[1] == files[int(choice)]]))
+            if t == 'b':
+                for i, b in enumerate(blocks):
+                    print '%d: %s' % (i, b)
+                choice = raw_input('selection: ')
+                t = 'd'
+                cols = [d for d in data
+                        if (d[1] + '_' + str(d[0][1])) == blocks[int(choice)]]
+            if t == 'd':
+                for i, d in enumerate(cols):
+                    print '%d: %s' % (i, '-'.join(map(str, [d[1]] + d[0])))
+            choice = raw_input('selection: ')
+            print cols[int(choice)]
+            blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
 
 
 if __name__ == '__main__':
