@@ -125,11 +125,19 @@ def interactive_plot(data):
         history.append(command)
         if command == '!':
             interact(**{'dic': dic, 'data': data, 'plots': plots})
-        if mode == 'a' and command == 'g':
-            clplot(data)
-        if mode == 'a' and command == 'G':
+        if command == 'g':
+            if mode == 'a':
+                clplot(data)
+            elif mode == 's':
+                for p in plots:
+                    clplot(p)
+        if command == 'G':
             dic['interactive'] = False
-            clplot(data)
+            if mode == 'a':
+                clplot(data)
+            elif mode == 's':
+                for p in plots:
+                    clplot(p)
             exit(1)
         if command == 'f':
             new_file = raw_input('file to load: ').strip()
