@@ -258,7 +258,7 @@ def interactive_plot(data):
                     print 'starting new plot'
                     plots.append([cols[int(choice)]])
             blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
-        elif command == 'd' and mode == 's':
+        elif command == 'd':
             if len(plots) > 1:
                 print 'select plots:'
                 for i, p in enumerate(plots):
