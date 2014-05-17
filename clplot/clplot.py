@@ -131,7 +131,7 @@ def interactive_plot(data):
                 clplot(data)
             elif mode == 's':
                 for p in plots:
-                    c = choose_from('Plot %d: %s cols by %d rows ?' % (i + 1, len(p), len(p[0][6]))
+                    c = choose_from('Plot %d: %s cols by %d rows ?' % (i + 1, len(p), len(p[0][6])),
                                     ['y', 'n'],
                                     default='y')
                     if c == 'y':
@@ -142,7 +142,7 @@ def interactive_plot(data):
                 clplot(data)
             elif mode == 's':
                 for p in plots:
-                    c = choose_from('Plot %d: %s cols by %d rows ?' % (i + 1, len(p), len(p[0][6]))
+                    c = choose_from('Plot %d: %s cols by %d rows ?' % (i + 1, len(p), len(p[0][6])),
                                     ['y', 'n'],
                                     default='y')
                     if c == 'y':
