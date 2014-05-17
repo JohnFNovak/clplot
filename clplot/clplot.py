@@ -104,7 +104,9 @@ def interactive_plot(data):
     history = []
     files = dic['files']
     blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
-    mode = choose_from('Pick a mode: from (s)ratch or (a)utomatic', ['s', 'a'])
+    mode = choose_from('Pick a mode: from (s)ratch or (a)utomatic',
+                       ['s', 'a'],
+                       default='s')
     plots = [[]]
     if mode == 's':
         default = 'a'
@@ -201,7 +203,8 @@ def interactive_plot(data):
                 for i, o in enumerate(opts):
                     print i, ':', o
                 c = choose_from("select one ('n' for new)",
-                                map(str, range(1, 1 + len(opts))) + ['n'])
+                                map(str, range(1, 1 + len(opts))) + ['n'],
+                                default='1')
                 if check_type(c) == 'num':
                     plots[plots.index(opts[int(c) - 1])].append(cols[choice])
             elif len([p for p in plots if p and len(p[0]) > 6
@@ -209,7 +212,9 @@ def interactive_plot(data):
                 # print size, [len(p[0][6]) for p in plots]
                 print 'only one plot has been found with the appropriate',
                 print 'dimension.'
-                new = choose_from('start new plot? (y/n)', ['y', 'n'])
+                new = choose_from('start new plot? (y/n)',
+                                  ['y', 'n'],
+                                  default='n')
                 if new == 'n':
                     plots[plots.index([p for p in plots if p
                                        and len(p[0]) > 6
