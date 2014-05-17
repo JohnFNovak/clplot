@@ -42,7 +42,10 @@ dic = {'formats': [],
        'Verbose': 0,
        'GroupBy': 'files',
        'interactive': False,
-       'keep_live': False}
+       'keep_live': False,
+       'LoadFromSavePrompt': True,
+       'SavePrompt': True,
+       'DefaultSave': 'default_save.plots'}
 
 
 if __name__ == '__main__':

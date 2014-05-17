@@ -183,6 +183,7 @@ def read_flags():
             case = -1
             print "flag", flag, "not recognized"
         elif flag in ['!', 'I', 'interact']:
+            dic['Verbose'] = -1
             dic['interactive'] = True
         else:
             # if there is not a flag, and we are reading filenames or formats
@@ -334,7 +335,8 @@ def interact(**kwargs):
     return True
 
 
-def choose_from(prompt, choices, default=' '):
+def choose_from(prompt, options, default=' '):
+    options = map(str, options)
     choice = False
     if not default:
         default = ' '
@@ -344,14 +346,46 @@ def choose_from(prompt, choices, default=' '):
         prompt = prompt + ' [%s]' % (default) + ': '
     while not choice:
         choice = raw_input(prompt) or default
-        choice = choice[0].lower()
-        if choice == 'q':
+        if choice[0].lower() == 'q' and not choice in options:
             sys.exit(1)
-        if choice == '?' and not '?' in choices:
-            print 'Options: ' + ', '.join(choices)
-        if not choice in choices:
+        if choice == '?' and not '?' in options:
+            print 'Options: ' + ', '.join(options)
+        if not choice in options:
             choice = False
     return choice
+
+
+def choose_multiple(prompt, options, default=' '):
+    options = map(str, options)
+    choices = []
+    choice = False
+    if not default:
+        default = ' '
+    while True:
+        if not choices:
+            if default == ' ':
+                t_prompt = prompt + ': '
+            else:
+                t_prompt = prompt + ' [%s]' % (default) + ': '
+        else:
+            t_prompt = prompt + ' (%s)' % (', '.join(map(str, choices))) + ': '
+        choice = raw_input(t_prompt) or default
+        if choice[0].lower() == 'q' and not choice in options:
+            sys.exit(1)
+        if choice == '?' and not '?' in options:
+            print 'Options: ' + ', '.join(options)
+            print "'/' to exit"
+        if choice == '/':
+            return choices
+        if choice == 'a':
+            return options
+        elif choice in options and not choice in choices:
+            choices.append(choice)
+            default = '/'
+        elif choice in options and choice in choices and choice == default:
+            return choices
+        elif not choice in options:
+            choice = False
 
 
 if __name__ == '__main__':
