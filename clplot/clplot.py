@@ -192,13 +192,17 @@ def interactive_plot(data):
             if t == 'd':
                 for i, d in enumerate(cols):
                     print '%d- file: %s block: %d col: %d [len %d title: %s]' % (i + 1, d[1], d[0][0] + 1, d[0][1] + 1, len(d[6]), d[4])
-            choice = int(choose_from("selection",
-                                     map(str, range(1, 1 + len(cols))),
-                                     default='1')) - 1
+            choice = choose_from("selection",
+                                 map(str, range(1, 1 + len(cols)) + ['a']),
+                                 default='1')
             print '-------------'
-            size = len(cols[choice][6])
             good = False
-            if not plots[0]:
+            if check_type(choice) == 'num':
+                size = len(cols[int(choice) - 1][6])
+            if choice == 'a':
+                plots.append(cols)
+                good = True
+            elif not plots[0]:
                 print 'starting new plot'
                 plots[0].append(cols[choice])
                 good = True
