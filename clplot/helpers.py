@@ -376,6 +376,8 @@ def choose_multiple(prompt, options, default=' '):
             print "'/' to exit"
         if choice == '/':
             return choices
+        if choice == 'a':
+            return options
         elif choice in options:
             choices.append(choice)
         elif not choice in options:
