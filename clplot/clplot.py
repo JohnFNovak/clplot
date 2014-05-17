@@ -265,7 +265,7 @@ def interactive_plot(data):
             if c == 'y':
                 del(plots[choice][choice2])
         elif command == 's':
-            dic['Ustyle'] = raw_input('style: ')
+            dic['Ustyle'] = [raw_input('style: ')] + dic['Ustyle']
 
 
 if __name__ == '__main__':
