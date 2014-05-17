@@ -84,7 +84,7 @@ def plot(data, outputfile, numbered=0, Print=True, **kwargs):
         plt.xlim(dic['x_range'])
     if dic['y_range']:
         plt.ylim(dic['y_range'])
-    x_label = '/'.join(sorted(set([d[3] for d in data])))
+    x_label = '/'.join(sorted(set([d[3] for d in data if d[3]])))
     plt.xlabel(x_label, fontsize=dic['fontsize'])
     if dic['y_label']:
         plt.ylabel(dic['y_label'], fontsize=dic['fontsize'])
@@ -157,6 +157,14 @@ def plot(data, outputfile, numbered=0, Print=True, **kwargs):
 
     if dic['legend']:
         plt.legend()
+
+    if dic['interactive']:
+        if dic['keep_live']:
+            plt.ion()
+            plt.show(block=False)
+        else:
+            plt.show()
+        return
 
     outputname = outputfile
 

@@ -20,7 +20,7 @@ dic = {'formats': [],
        'Ustyle': [],
        'x_range': None,
        'y_range': None,
-       'x_label': 'x',
+       'x_label': None,
        'y_label': None,
        'x_log': False,
        'y_log': False,
@@ -40,7 +40,9 @@ dic = {'formats': [],
        'norm': False,
        'EmbedData': True,
        'Verbose': 0,
-       'GroupBy': 'files'}
+       'GroupBy': 'files',
+       'interactive': False,
+       'keep_live': False}
 
 
 if __name__ == '__main__':
