@@ -62,7 +62,7 @@ def clplot(data):
         # multiplot flag not give, group plots by file, then block
         l = lambda x: '-'.join(map(str, x))
         groups = [[d for d in data if l(d[0][:2]) == f]
-                  for f in set([l(x[0]) for x in data])]
+                  for f in set([l(x[0][:2]) for x in data])]
     else:
         groups = [data[(i * dic['MULTIP']):((i + 1) * dic['MULTIP'])]
                   for i in range((len(data) / dic['MULTIP']) + 1)]
