@@ -159,6 +159,8 @@ def interactive_plot(data):
             t = choose_from('(f)iles, (b)locks, (d)ata?',
                             ['f', 'b', 'd'], default='d')
             cols = data
+            blocks = list(set([' '.join([x[1], 'block:', str(x[0][1] + 1)]) for
+                               x in data]))
             if t == 'f':
                 for i, f in enumerate(files):
                     n_b = len(set([' '.join(map(str, x[0][:2]))
@@ -171,8 +173,8 @@ def interactive_plot(data):
                 t = 'b'
                 blocks = list(set([' '.join([x[1], 'block:', str(x[0][1] + 1)]) for
                                    x in data if x[1] == files[int(choice)]]))
-                blocks.sort(key=lambda x: x.split(' ')[-1])
                 print '-------------'
+            blocks.sort(key=lambda x: x.split(' ')[-1])
             if t == 'b':
                 for i, b in enumerate(blocks):
                     n_c = len(set([' '.join(map(str, x[0])) for x in data if
