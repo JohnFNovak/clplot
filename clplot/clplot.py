@@ -229,6 +229,7 @@ def interactive_plot(data):
                                     default='1')
                     if check_type(c) == 'num':
                         plots[plots.index(opts[int(c) - 1])].append(cols[choice])
+                    good = True
                 elif len([p for p in plots if p and len(p[0]) > 6
                           and len(p[0][6]) == size]) == 1:
                     # print size, [len(p[0][6]) for p in plots]
