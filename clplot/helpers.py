@@ -334,7 +334,7 @@ def interact(**kwargs):
     return True
 
 
-def choose_from(prompt, choices, default=' '):
+def choose_from(prompt, options, default=' '):
     choice = False
     if not default:
         default = ' '
@@ -347,9 +347,9 @@ def choose_from(prompt, choices, default=' '):
         choice = choice[0].lower()
         if choice == 'q':
             sys.exit(1)
-        if choice == '?' and not '?' in choices:
-            print 'Options: ' + ', '.join(choices)
-        if not choice in choices:
+        if choice == '?' and not '?' in options:
+            print 'Options: ' + ', '.join(options)
+        if not choice in options:
             choice = False
     return choice
 
