@@ -13,17 +13,16 @@
 
 import globe
 from structure import structure
-from helpers import read_flags
+from helpers import read_flags, interact, choose_from, check_type
 from plot import plot, plot_tiles
 from data_handler import make_blocks, read_data
+import sys
+import os
 
 
-def main():
+def init(data=[], files=globe.dic['files']):
     dic = globe.dic
-    read_flags()
-
-    data = []
-    for i, filename in enumerate(dic['files']):
+    for i, filename in enumerate(files):
         if dic['Verbose'] > 0:
             print "plotting", filename
         sys_err = dic['sys_err_default']
@@ -39,25 +38,31 @@ def main():
         # Now read data file
         blocks = make_blocks(read_data(filename))
 
-        for j, b in enumerate(blocks):
-            if dic['GroupBy'] == 'files':
-                data.append([[i, j], filename, output, b, sys_err])
-            elif dic['GroupBy'] == 'blocks':
-                data.append([[j, i], filename, output, b, sys_err])
+        if blocks:
+            for j, b in enumerate(blocks):
+                if dic['GroupBy'] == 'files':
+                    data.append([[i, j], filename, output, b, sys_err])
+                elif dic['GroupBy'] == 'blocks':
+                    data.append([[j, i], filename, output, b, sys_err])
 
     data.sort(key=lambda x: x[0])
-
     data = structure(data)
 
+    return data
+
+
+def clplot(data):
+    dic = globe.dic
+
     # data format:
-    # [[f_id, b_id], filename, output, x_label, y_label,
+    # [[f_id, b_id, c_id], filename, output, x_label, y_label,
     #  x, y, x_err, y_err, x_sys_err, y_sys_err]
 
     if not dic['MULTIP']:
         # multiplot flag not give, group plots by file, then block
         l = lambda x: '-'.join(map(str, x))
-        groups = [[d for d in data if l(d[0]) == f]
-                  for f in set([l(x[0]) for x in data])]
+        groups = [[d for d in data if l(d[0][:2]) == f]
+                  for f in set([l(x[0][:2]) for x in data])]
     else:
         groups = [data[(i * dic['MULTIP']):((i + 1) * dic['MULTIP'])]
                   for i in range((len(data) / dic['MULTIP']) + 1)]
@@ -91,8 +96,186 @@ def main():
         plot_tiles(tiles, numbered=tiled_count)
 
 
+def interactive_plot(data):
+    """Interactive Mode!"""
+    dic = globe.dic
+
+    command = True
+    history = []
+    files = dic['files']
+    blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
+    mode = choose_from('Pick a mode: from (s)ratch or (a)utomatic',
+                       ['s', 'a'],
+                       default='s')
+    plots = [[]]
+    if mode == 's':
+        default = 'a'
+    elif mode == 'a':
+        default = 'g'
+    while command:
+        print '(%s) =====================#' % (mode)
+        if mode == 's':
+            # print [p for p in plots]
+            print ['%d: %s cols by %d rows' % (i + 1, len(p), len(p[0][6]))
+                   for i, p in enumerate(plots) if p and p[0]]
+            # print [['-'.join(map(str, [d[1]] + d[0])), len(d[6])]
+            #        for plot in plots for d in plot]
+        command = choose_from('?',
+                              ['!', 'g', 'G', 'f', 'a', 'd', 's'],
+                              default=default)
+        history.append(command)
+        if command == '!':
+            interact(**{'dic': dic, 'data': data, 'plots': plots})
+        elif command == 'g':
+            if mode == 'a':
+                clplot(data)
+            elif mode == 's':
+                for p in plots:
+                    c = choose_from('Plot %d: %s cols by %d rows ?' % (i + 1, len(p), len(p[0][6])),
+                                    ['y', 'n'],
+                                    default='y')
+                    if c == 'y':
+                        clplot(p)
+        elif command == 'G':
+            dic['interactive'] = False
+            if mode == 'a':
+                clplot(data)
+            elif mode == 's':
+                for p in plots:
+                    c = choose_from('Plot %d: %s cols by %d rows ?' % (i + 1, len(p), len(p[0][6])),
+                                    ['y', 'n'],
+                                    default='y')
+                    if c == 'y':
+                        clplot(p)
+            sys.exit(1)
+        elif command == 'f':
+            new_file = raw_input('file to load: ').strip()
+            if os.path.isfile(new_file):
+                files.append(new_file)
+            data += structure(init(files=[new_file]))
+            blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
+        elif mode == 's' and command == 'a':
+            print 'add data to plot'
+            t = choose_from('(f)iles, (b)locks, (d)ata?',
+                            ['f', 'b', 'd'], default='d')
+            cols = data
+            blocks = list(set([' '.join([x[1], 'block:', str(x[0][1] + 1)]) for
+                               x in data]))
+            if t == 'f':
+                for i, f in enumerate(files):
+                    n_b = len(set([' '.join(map(str, x[0][:2]))
+                                   for x in data if x[1] == f]))
+                    print '%d- file: %s [# blocks = %d]' % (i + 1, f, n_b)
+                choice = int(choose_from("selection",
+                                         map(str,
+                                             range(1, 1 + len(files))),
+                                         default='1')) - 1
+                t = 'b'
+                blocks = list(set([' '.join([x[1], 'block:', str(x[0][1] + 1)]) for
+                                   x in data if x[1] == files[int(choice)]]))
+                print '-------------'
+            blocks.sort(key=lambda x: x.split(' ')[-1])
+            if t == 'b':
+                for i, b in enumerate(blocks):
+                    n_c = len(set([' '.join(map(str, x[0])) for x in data if
+                                   ' '.join([x[1], 'block:', str(x[0][1] + 1)]) == b]))
+                    # print [x for x in data if ' '.join([x[1], 'block:', str(x[0][1] + 1)]) == b]
+                    n_r = len([x for x in data if ' '.join([x[1], 'block:', str(x[0][1] + 1)]) == b][0][6])
+                    print '%d- file: %s [# cols = %d, # rows = %d]' % (i + 1, b, n_c, n_r)
+                choice = int(choose_from("selection",
+                                         map(str,
+                                             range(1, 1 + len(blocks))),
+                                         default='1')) - 1
+                t = 'd'
+                cols = [d for d in data
+                        if ' '.join([d[1], 'block:', str(d[0][1] + 1)]) ==
+                        blocks[choice]]
+                print '-------------'
+            if t == 'd':
+                for i, d in enumerate(cols):
+                    print '%d- file: %s block: %d col: %d [len %d title: %s]' % (i + 1, d[1], d[0][0] + 1, d[0][1] + 1, len(d[6]), d[4])
+            choice = choose_from("selection",
+                                 map(str, range(1, 1 + len(cols)) + ['a']),
+                                 default='1')
+            print '-------------'
+            good = False
+            if check_type(choice) == 'num':
+                size = len(cols[int(choice) - 1][6])
+            if choice == 'a':
+                if all([len(x[6]) == len(cols[0][6]) for x in cols]):
+                    plots.append(cols)
+                good = True
+            elif not plots[0]:
+                print 'starting new plot'
+                plots[0].append(cols[choice])
+                good = True
+            elif len([p for p in plots if p and len(p[0]) > 6
+                      and len(p[0][6]) == size]) > 1:
+                # print size, [len(p[0][6]) for p in plots]
+                print 'multiple plots of an appropriate dimension have been',
+                print 'found'
+                opts = [p for p in plots if p[6] == size]
+                for i, o in enumerate(opts):
+                    print i, ':', o
+                c = choose_from("select one ('n' for new)",
+                                map(str, range(1, 1 + len(opts))) + ['n'],
+                                default='1')
+                if check_type(c) == 'num':
+                    plots[plots.index(opts[int(c) - 1])].append(cols[choice])
+            elif len([p for p in plots if p and len(p[0]) > 6
+                      and len(p[0][6]) == size]) == 1:
+                # print size, [len(p[0][6]) for p in plots]
+                print 'only one plot has been found with the appropriate',
+                print 'dimension.'
+                new = choose_from('start new plot? (y/n)',
+                                  ['y', 'n'],
+                                  default='n')
+                if new == 'n':
+                    plots[plots.index([p for p in plots if p
+                                       and len(p[0]) > 6
+                                       and len(p[0][6]) == size][0]
+                                      )].append(cols[int(choice)])
+                    good = True
+            else:
+                print 'no plot of appropriate dimension has been found.'
+            if not good:
+                print 'starting new plot'
+                plots.append([cols[int(choice)]])
+            blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
+        elif command == 'd' and mode == 's':
+            if len(plots) > 1:
+                print 'plots:'
+                for i, p in enumerate(plots):
+                    print p
+                    # print '%d- %d: %s cols by %d rows ?' % (i + 1, len(p), len(p[0][6]))
+                choice = int(choose_from("selection",
+                                         map(str,
+                                             range(1, 1 + len(plots))),
+                                         default='1')) - 1
+            else:
+                choice = 0
+            print 'columns:'
+            for i, d in enumerate(plots[choice]):
+                print '%d- file: %s block: %d col: %d [len %d title: %s]' % (i + 1, d[1], d[0][0] + 1, d[0][1] + 1, len(d[6]), d[4])
+            choice2 = int(choose_from("selection",
+                                      map(str,
+                                          range(1, 1 + len(plots[choice]))),
+                                      default='1')) - 1
+            c = choose_from('delete?', ['y', 'n'], default='n')
+            if c == 'y':
+                del(plots[choice][choice2])
+        elif command == 's':
+            dic['Ustyle'] = [raw_input('style: ')] + dic['Ustyle']
+
+
 if __name__ == '__main__':
     """A Python program that takes a file or list of filesand creates plots of
     the data."""
     dic = globe.dic
-    main()
+    read_flags()
+    data = init()
+
+    if dic['interactive']:
+        interactive_plot(data)
+    else:
+        clplot(data)

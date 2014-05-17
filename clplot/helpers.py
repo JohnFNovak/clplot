@@ -14,6 +14,7 @@ import itertools
 import globe
 import sys
 import math as m
+import code
 
 
 def is_it_ordered(vals):
@@ -30,7 +31,7 @@ def is_it_ordered(vals):
     return ordered
 
 
-def check_type(x):
+def check_type(x, specific=False):
     """This function returns a string. It returns "str" if x is a string, and
     "num" if x is a number"""
     try:
@@ -38,7 +39,15 @@ def check_type(x):
     except ValueError:
         verdict = "str"
     else:
-        verdict = "num"
+        if not specific:
+            verdict = "num"
+        else:
+            try:
+                int(x)
+            except ValueError:
+                verdict = "float"
+            else:
+                verdict = "int"
 
     return verdict
 
@@ -173,6 +182,8 @@ def read_flags():
         elif "-" == flag[0] and not case in [7, 8, 9, 20]:
             case = -1
             print "flag", flag, "not recognized"
+        elif flag in ['!', 'I', 'interact']:
+            dic['interactive'] = True
         else:
             # if there is not a flag, and we are reading filenames or formats
             if case == 0:
@@ -314,6 +325,33 @@ def plot_arragnement():
         print "by", form[1]
 
     return form
+
+
+def interact(**kwargs):
+    global Opts
+    code.InteractiveConsole(locals=dict(globals().items() +
+                                        kwargs.items())).interact()
+    return True
+
+
+def choose_from(prompt, choices, default=' '):
+    choice = False
+    if not default:
+        default = ' '
+    if default == ' ':
+        prompt = prompt + ': '
+    else:
+        prompt = prompt + ' [%s]' % (default) + ': '
+    while not choice:
+        choice = raw_input(prompt) or default
+        choice = choice[0].lower()
+        if choice == 'q':
+            sys.exit(1)
+        if choice == '?' and not '?' in choices:
+            print 'Options: ' + ', '.join(choices)
+        if not choice in choices:
+            choice = False
+    return choice
 
 
 if __name__ == '__main__':

@@ -12,6 +12,7 @@
 import string
 import globe
 from helpers import check_type
+import os
 
 
 def make_blocks(dataarray):
@@ -49,9 +50,10 @@ def make_blocks(dataarray):
 
         return blank
 
+    blocks = []
     for i, d in enumerate(dataarray):
         if i == 0:  # first pass
-            blocks = [block(d, dataarray[i + 1])]
+            blocks.append(block(d, dataarray[i + 1]))
             previous = [check_type(x) for x in d]
         else:
             current = [check_type(x) for x in d]
@@ -82,6 +84,9 @@ def make_blocks(dataarray):
 
 
 def read_data(filename):
+    if not os.path.isfile(filename):
+        print filename, 'does not exist'
+        return []
     with open(filename, "r") as datafile:
         test = datafile.readline()
         test = datafile.readline()

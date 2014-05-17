@@ -18,19 +18,13 @@ dic = {'formats': [],
        'columnsfirst': False,
        'Ucolor': [],
        'Ustyle': [],
-       'Messy': False,
-       'remnants': [],
-       'remnanterrors': [],
        'x_range': None,
        'y_range': None,
-       'x_label': 'x',
+       'x_label': None,
        'y_label': None,
        'x_log': False,
        'y_log': False,
        'numbered': None,
-       'Numbering': None,
-       'mct': 0,  # multicounttile
-       'mcp': 0,  # multicountpile
        'files': [],
        'legend': False,
        'colorstyle': [],
@@ -46,9 +40,9 @@ dic = {'formats': [],
        'norm': False,
        'EmbedData': True,
        'Verbose': 0,
-       'delimiter': ',',
-       'AssumeForm': 'c',
-       'GroupBy': 'files'}
+       'GroupBy': 'files',
+       'interactive': False,
+       'keep_live': False}
 
 
 if __name__ == '__main__':
