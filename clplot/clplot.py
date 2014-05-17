@@ -121,7 +121,7 @@ def interactive_plot(data):
             # print [['-'.join(map(str, [d[1]] + d[0])), len(d[6])]
             #        for plot in plots for d in plot]
         command = choose_from('?',
-                              ['!', 'g', 'G', 'f', 'a'],
+                              ['!', 'g', 'G', 'f', 'a', 'd'],
                               default=default)
         history.append(command)
         if command == '!':
@@ -227,6 +227,28 @@ def interactive_plot(data):
                 print 'starting new plot'
                 plots.append([cols[int(choice)]])
             blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
+        elif command == 'd' and mode == 's':
+            if len(plots) > 1:
+                print 'plots:'
+                for i, p in enumerate(plots):
+                    print p
+                    # print '%d- %d: %s cols by %d rows ?' % (i + 1, len(p), len(p[0][6]))
+                choice = int(choose_from("selection",
+                                         map(str,
+                                             range(1, 1 + len(plots))),
+                                         default='1')) - 1
+            else:
+                choice = 0
+            print 'columns:'
+            for i, d in enumerate(plots[choice]):
+                print '%d- file: %s block: %d col: %d [len %d title: %s]' % (i + 1, d[1], d[0][0] + 1, d[0][1] + 1, len(d[6]), d[4])
+            choice2 = int(choose_from("selection",
+                                      map(str,
+                                          range(1, 1 + len(plots[choice]))),
+                                      default='1')) - 1
+            c = choose_from('delete?', ['y', 'n'], default='n')
+            if c == 'y':
+                del(plots[choice][choice2])
 
 
 if __name__ == '__main__':
