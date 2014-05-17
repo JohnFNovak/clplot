@@ -131,14 +131,22 @@ def interactive_plot(data):
                 clplot(data)
             elif mode == 's':
                 for p in plots:
-                    clplot(p)
+                    c = choose_from('Plot %d: %s cols by %d rows ?' % (i + 1, len(p), len(p[0][6]))
+                                    ['y', 'n'],
+                                    default='y')
+                    if c == 'y':
+                        clplot(p)
         elif command == 'G':
             dic['interactive'] = False
             if mode == 'a':
                 clplot(data)
             elif mode == 's':
                 for p in plots:
-                    clplot(p)
+                    c = choose_from('Plot %d: %s cols by %d rows ?' % (i + 1, len(p), len(p[0][6]))
+                                    ['y', 'n'],
+                                    default='y')
+                    if c == 'y':
+                        clplot(p)
             sys.exit(1)
         elif command == 'f':
             new_file = raw_input('file to load: ').strip()
