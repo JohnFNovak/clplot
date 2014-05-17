@@ -378,8 +378,10 @@ def choose_multiple(prompt, options, default=' '):
             return choices
         if choice == 'a':
             return options
-        elif choice in options:
+        elif choice in options and not choice in choices:
             choices.append(choice)
+        elif choice in options and choice in choices and choice == default:
+            return choices
         elif not choice in options:
             choice = False
 
