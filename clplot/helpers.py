@@ -60,7 +60,7 @@ def skip(iterator, n):
 def givehelp(a):
     """This command prints out some help"""
 
-    print """This is a function which trys to inteligently create plots from text files. This program is 'inteligent' in that it will try various assumptions about the format of the data in the files and the form the output should be given in. So, in many cases it can produce reasonable plots even if no information is provided by the user other than the filenames\n"""
+    print """This is a utility which trys to inteligently create plots from text files. In many cases it can produce reasonable plots even if no information is provided by the user other than the filenames\n"""
     if a == 0:
         print "for more help call this program with the '-help' flag"
     if a == 1:
@@ -89,6 +89,8 @@ def givehelp(a):
         -xscaled: Scale all of the x values by a constant number
         -alpha: Sets the 'opaque-ness' of shaded objects (like error bars). Number [0, 1], default 0.25
         -norm: Normalizes all plots
+
+        a '!' flag will start clplot in interactive mode.
 
         Example:
             I have a large number of files and I would like them to be plotted with 9 plots tiled per output. I would like them to be eps files, and I have a thing for green circles. In each file the data is in columns 6 wide, but I only want the first and fourth columns plotted. The first column is x, the other will be y. I would type:
