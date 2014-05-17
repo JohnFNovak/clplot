@@ -44,7 +44,8 @@ dic = {'formats': [],
        'interactive': False,
        'keep_live': False,
        'LoadFromSavePrompt': True,
-       'SavePrompt': True}
+       'SavePrompt': True,
+       'DefaultSave': 'default_save.plots'}
 
 
 if __name__ == '__main__':
