@@ -161,20 +161,21 @@ def interactive_plot(data):
                 n_b = len(set([' '.join(map(str, x[0][:2]))
                                for x in data if x[1] == f]))
                 print '%d- file: %s [# blocks = %d]' % (i + 1, f, n_b)
-            choice = int(choose_from("selection",
-                                     map(str,
-                                         range(1, 1 + len(files))),
-                                     default='1')) - 1
+            f_choice = int(choose_from("selection",
+                                       map(str,
+                                           range(1, 1 + len(files))),
+                                       default='1')) - 1
             blocks = list(set([' '.join([x[1], 'block:', str(x[0][1] + 1)]) for
-                               x in data if x[1] == files[int(choice)]]))
+                               x in data if x[1] == files[int(f_choice)]]))
             blocks.sort(key=lambda x: x.split(' ')[-1])
             print '-------------'
+            print 'file %s' % (files[int(f_choice)])
             print 'select block:'
             for i, b in enumerate(blocks):
                 n_c = len(set([' '.join(map(str, x[0])) for x in data if
                                ' '.join([x[1], 'block:', str(x[0][1] + 1)]) == b]))
                 n_r = len([x for x in data if ' '.join([x[1], 'block:', str(x[0][1] + 1)]) == b][0][6])
-                print '%d- file: %s [# cols = %d, # rows = %d]' % (i + 1, b, n_c, n_r)
+                print '%d- [# cols = %d, # rows = %d]' % (i + 1, n_c, n_r)
             choice = int(choose_from("selection",
                                      map(str,
                                          range(1, 1 + len(blocks))),
@@ -183,9 +184,11 @@ def interactive_plot(data):
                     if ' '.join([d[1], 'block:', str(d[0][1] + 1)]) ==
                     blocks[choice]]
             print '-------------'
+            print 'file %s' % (files[int(f_choice)])
+            print 'block %d- [# cols = %d, # rows = %d]' % (choice + 1, len(cols), len(cols[0][6]))
             print 'select columns:'
             for i, d in enumerate(cols):
-                print '%d- file: %s block: %d col: %d [len %d title: %s]' % (i + 1, d[1], d[0][0] + 1, d[0][1] + 1, len(d[6]), d[4])
+                print '%d- col: %d [len %d title: %s]' % (i + 1, d[0][1] + 1, len(d[6]), d[4])
             choices = choose_multiple("selections",
                                       range(1, 1 + len(cols)),
                                       default='1')
