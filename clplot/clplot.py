@@ -272,6 +272,7 @@ def interactive_plot(data):
             done = choose_from("delete plots:[%s] ('n' to select columns)?" % ', '.join(choices),
                                ['y', 'n'],
                                default='n')
+            choices = map(int, choices)
             if done == 'y':
                 for c in choices:
                     del(plots[c])
