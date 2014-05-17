@@ -203,6 +203,8 @@ def interactive_plot(data):
                 print 'adding all columns as plot'
                 if not plots[-1]:
                     plots[-1] = cols
+                else:
+                    plots.append(cols)
                 choices = []
             for choice in choices:
                 print choice
