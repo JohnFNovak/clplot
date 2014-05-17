@@ -41,7 +41,8 @@ dic = {'formats': [],
        'EmbedData': True,
        'Verbose': 0,
        'GroupBy': 'files',
-       'interactive': False}
+       'interactive': False,
+       'keep_live': False}
 
 
 if __name__ == '__main__':

@@ -159,7 +159,11 @@ def plot(data, outputfile, numbered=0, Print=True, **kwargs):
         plt.legend()
 
     if dic['interactive']:
-        plt.show()
+        if dic['keep_live']:
+            plt.ion()
+            plt.show(block=False)
+        else:
+            plt.show()
         return
 
     outputname = outputfile
