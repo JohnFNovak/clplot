@@ -354,5 +354,33 @@ def choose_from(prompt, options, default=' '):
     return choice
 
 
+def choose_multiple(prompt, options, default=' '):
+    options = map(str, options)
+    choices = []
+    choice = False
+    if not default:
+        default = ' '
+    while True:
+        if not choices:
+            if default == ' ':
+                t_prompt = prompt + ': '
+            else:
+                t_prompt = prompt + ' [%s]' % (default) + ': '
+        else:
+            t_prompt = prompt + '(%s)' % (', '.join(map(str, choices))) + ': '
+        choice = raw_input(t_prompt) or default
+        if choice[0].lower() == 'q':
+            sys.exit(1)
+        if choice == '?' and not '?' in options:
+            print 'Options: ' + ', '.join(options)
+            print "'/' to exit"
+        if choice == '/':
+            return choice
+        elif choice in options:
+            choices.append(choice)
+        elif not choice in options:
+            choice = False
+
+
 if __name__ == '__main__':
     print "This code is part of CLP"
