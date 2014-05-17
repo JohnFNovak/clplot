@@ -252,32 +252,34 @@ def interactive_plot(data):
             blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
         elif command == 'd' and mode == 's':
             if len(plots) > 1:
-                print 'plots:'
+                print 'select plots:'
                 for i, p in enumerate(plots):
-                    print p
-                    # print '%d- %d: %s cols by %d rows ?' % (i + 1, len(p), len(p[0][6]))
-                choice = int(choose_from("selection",
-                                         map(str,
-                                             range(1, 1 + len(plots))),
-                                         default='1')) - 1
+                    # print p
+                    print '%d- %s cols by %d rows' % (i + 1, len(p), len(p[0][6]))
+                choices = choose_multiple("selection",
+                                          range(1, 1 + len(plots)),
+                                          default='1')
             else:
-                choice = 0
-            done = choose_from('delete selected or select columns?',
+                choices = ['0']
+            done = choose_from("delete plots:[%s] ('n' to select columns)?" % ', '.join(choices),
                                ['y', 'n'],
                                default='n')
             if done == 'y':
-                del(plots[choice])
+                for c in choices:
+                    del(plots[c])
             else:
-                print 'columns:'
-                for i, d in enumerate(plots[choice]):
-                    print '%d- file: %s block: %d col: %d [len %d title: %s]' % (i + 1, d[1], d[0][0] + 1, d[0][1] + 1, len(d[6]), d[4])
-                choice2 = int(choose_from("selection",
-                                          map(str,
-                                              range(1, 1 + len(plots[choice]))),
-                                          default='1')) - 1
-                c = choose_from('delete?', ['y', 'n'], default='n')
-                if c == 'y':
-                    del(plots[choice][choice2])
+                for c in choices:
+                    print 'plot %s' % (c)
+                    print 'columns:'
+                    for i, d in enumerate(plots[choice]):
+                        print '%d- file: %s block: %d col: %d [len %d title: %s]' % (i + 1, d[1], d[0][0] + 1, d[0][1] + 1, len(d[6]), d[4])
+                    choice2 = int(choose_from("selection",
+                                              map(str,
+                                                  range(1, 1 + len(plots[choice]))),
+                                              default='1')) - 1
+                    s = choose_from('delete?', ['y', 'n'], default='n')
+                    if s == 'y':
+                        del(plots[choice][choice2])
         elif command == 's':
             dic['Ustyle'] = [raw_input('style: ')] + dic['Ustyle']
 
