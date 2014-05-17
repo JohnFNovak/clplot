@@ -346,7 +346,7 @@ def choose_from(prompt, options, default=' '):
         prompt = prompt + ' [%s]' % (default) + ': '
     while not choice:
         choice = raw_input(prompt) or default
-        if choice[0].lower() == 'q':
+        if choice[0].lower() == 'q' and not choice in options:
             sys.exit(1)
         if choice == '?' and not '?' in options:
             print 'Options: ' + ', '.join(options)
@@ -370,7 +370,7 @@ def choose_multiple(prompt, options, default=' '):
         else:
             t_prompt = prompt + ' (%s)' % (', '.join(map(str, choices))) + ': '
         choice = raw_input(t_prompt) or default
-        if choice[0].lower() == 'q':
+        if choice[0].lower() == 'q' and not choice in options:
             sys.exit(1)
         if choice == '?' and not '?' in options:
             print 'Options: ' + ', '.join(options)
