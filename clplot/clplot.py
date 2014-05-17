@@ -212,15 +212,15 @@ def interactive_plot(data):
                 if check_type(choice) == 'num':
                     size = len(cols[int(choice) - 1][6])
                     choice = int(choice) - 1
-                elif not plots[0]:
-                    print 'starting new plot'
+                if not plots[0]:
+                    print 'No plots, starting new plot'
                     plots[0].append(cols[choice])
                     good = True
                 elif len([p for p in plots if p and len(p[0]) > 6
                           and len(p[0][6]) == size]) > 1:
                     # print size, [len(p[0][6]) for p in plots]
-                    print 'multiple plots of an appropriate dimension have been',
-                    print 'found'
+                    print 'Multiple plots of an appropriate dimension have',
+                    print 'been found'
                     opts = [p for p in plots if p[6] == size]
                     for i, o in enumerate(opts):
                         print i, ':', o
@@ -232,7 +232,7 @@ def interactive_plot(data):
                 elif len([p for p in plots if p and len(p[0]) > 6
                           and len(p[0][6]) == size]) == 1:
                     # print size, [len(p[0][6]) for p in plots]
-                    print 'only one plot has been found with the appropriate',
+                    print 'One plot has been found with the appropriate',
                     print 'dimension.'
                     new = choose_from('start new plot? (y/n)',
                                       ['y', 'n'],
