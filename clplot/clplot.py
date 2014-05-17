@@ -202,7 +202,8 @@ def interactive_plot(data):
             if check_type(choice) == 'num':
                 size = len(cols[int(choice) - 1][6])
             if choice == 'a':
-                plots.append(cols)
+                if all([len(x[6]) == len(cols[0][6]) for x in cols]):
+                    plots.append(cols)
                 good = True
             elif not plots[0]:
                 print 'starting new plot'
