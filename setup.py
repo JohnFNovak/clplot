@@ -20,7 +20,7 @@ clplot - command line plotting utility
 """
 
 setup(
-    name='clplot',
+    name='commandlineplot',
     version=clplot.__version__,
     url='http://github.com/JohnFNovak/clplot/',
     license='Public Domain',
