@@ -181,7 +181,7 @@ def interactive_plot(data):
                 print '-------------'
             if t == 'd':
                 for i, d in enumerate(cols):
-                    print '%d- file: %s block: %d col: %d [len %d]' % (i + 1, d[1], d[0][0] + 1, d[0][1] + 1, len(d[6]))
+                    print '%d- file: %s block: %d col: %d [len %d title: %s]' % (i + 1, d[1], d[0][0] + 1, d[0][1] + 1, len(d[6]), d[4])
             choice = int(choose_from("selection",
                                      map(str, range(1, 1 + len(cols))),
                                      default='1')) - 1
