@@ -301,11 +301,12 @@ def interactive_plot(data=None, load=None):
         elif command == 's':
             dic['Ustyle'] = [raw_input('style: ')] + dic['Ustyle']
         elif command == 'q':
-            save = choose_from('save?', ['y', 'n'], default='y')
-            if save == 'y':
-                default = 'default_save.plots'
-                fname = raw_input('filename? [%s]: ' % (default)) or default
-                pickle.dump((data, plots, history, mode), open(fname, 'w'))
+            if dic['SavePrompt']:
+                save = choose_from('save?', ['y', 'n'], default='y')
+                if save == 'y':
+                    default = dic['DefaultSave']
+                    fname = raw_input('filename? [%s]: ' % (default)) or default
+                    pickle.dump((data, plots, history, mode), open(fname, 'w'))
             sys.exit(1)
 
 
@@ -319,7 +320,7 @@ if __name__ == '__main__':
         if dic['LoadFromSavePrompt']:
             load = choose_from('load saved state?', ['y', 'n'], default='n')
             if load == 'y':
-                default = 'default_save.plots'
+                default = dic['DefaultSave']
                 fname = raw_input('filename? [%s]: ' % (default)) or default
                 interactive_plot(load=pickle.load(open(fname, 'r')))
         interactive_plot(data=data)
