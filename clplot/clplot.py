@@ -97,33 +97,41 @@ def clplot(data):
         plot_tiles(tiles, numbered=tiled_count)
 
 
-def interactive_plot(data):
+def interactive_plot(data=None, load=None):
     """Interactive Mode!"""
     dic = globe.dic
 
     command = True
     history = []
-    files = dic['files']
-    blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
-    mode = choose_from('Pick a mode: from (s)ratch or (a)utomatic',
-                       ['s', 'a'],
-                       default='s')
-    if mode == 's':
-        plots = [[]]
-        default = 'a'
-    elif mode == 'a':
-        if not dic['MULTIP']:
-            # multiplot flag not give, group plots by file, then block
-            l = lambda x: '-'.join(map(str, x))
-            groups = [[d for d in data if l(d[0][:2]) == f]
-                      for f in set([l(x[0][:2]) for x in data])]
-        else:
-            groups = [data[(i * dic['MULTIP']):((i + 1) * dic['MULTIP'])]
-                      for i in range((len(data) / dic['MULTIP']) + 1)]
 
-        plots = groups
-        # interact(**{'dic': dic, 'data': data, 'plots': plots})
+    if not load:
+        files = dic['files']
+        mode = choose_from('Pick a mode: from (s)ratch or (a)utomatic',
+                           ['s', 'a'],
+                           default='s')
+        if mode == 's':
+            plots = [[]]
+        elif mode == 'a':
+            if not dic['MULTIP']:
+                # multiplot flag not give, group plots by file, then block
+                l = lambda x: '-'.join(map(str, x))
+                groups = [[d for d in data if l(d[0][:2]) == f]
+                          for f in set([l(x[0][:2]) for x in data])]
+            else:
+                groups = [data[(i * dic['MULTIP']):((i + 1) * dic['MULTIP'])]
+                          for i in range((len(data) / dic['MULTIP']) + 1)]
+
+            plots = groups
+            # interact(**{'dic': dic, 'data': data, 'plots': plots})
+    else:
+        data, plots, history, mode = load
+
+    if mode == 's':
+        default = 'a'
+    if mode == 'a':
         default = 'g'
+
+    blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
     while command:
         print '#=====================#'
         print ['%d: %s cols by %d rows' % (i + 1, len(p), len(p[0][6]))
@@ -295,9 +303,9 @@ def interactive_plot(data):
         elif command == 'q':
             save = choose_from('save?', ['y', 'n'], default='y')
             if save == 'y':
-                default = 'default_save.pkl'
+                default = 'default_save.plots'
                 fname = raw_input('filename? [%s]: ' % (default)) or default
-                pickle.dump(plots, open(fname, 'w'))
+                pickle.dump((data, plots, history, mode), open(fname, 'w'))
             sys.exit(1)
 
 
@@ -307,8 +315,13 @@ if __name__ == '__main__':
     dic = globe.dic
     read_flags()
     data = init()
-
     if dic['interactive']:
-        interactive_plot(data)
+        if dic['LoadFromSavePrompt']:
+            load = choose_from('load saved state?', ['y', 'n'], default='n')
+            if load == 'y':
+                default = 'default_save.plots'
+                fname = raw_input('filename? [%s]: ' % (default)) or default
+                interactive_plot(load=pickle.load(open(fname, 'r')))
+        interactive_plot(data=data)
     else:
         clplot(data)

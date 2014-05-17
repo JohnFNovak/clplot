@@ -42,7 +42,8 @@ dic = {'formats': [],
        'Verbose': 0,
        'GroupBy': 'files',
        'interactive': False,
-       'keep_live': False}
+       'keep_live': False,
+       'LoadFromSavePrompt': True}
 
 
 if __name__ == '__main__':
