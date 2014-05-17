@@ -347,6 +347,8 @@ def choose_from(prompt, choices, default=' '):
         choice = choice[0].lower()
         if choice == 'q':
             sys.exit(1)
+        if choice == '?' and not '?' in choices:
+            print 'Options: ' + ', '.join(choices)
         if not choice in choices:
             choice = False
     return choice
