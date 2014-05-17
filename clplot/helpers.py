@@ -183,6 +183,7 @@ def read_flags():
             case = -1
             print "flag", flag, "not recognized"
         elif flag in ['!', 'I', 'interact']:
+            dic['Verbose'] = -1
             dic['interactive'] = True
         else:
             # if there is not a flag, and we are reading filenames or formats
