@@ -195,7 +195,8 @@ def interactive_plot(data):
             print '-------------'
             if choices == map(str, range(1, 1 + len(cols))):
                 print 'adding all columns as plot'
-                plots.append(cols)
+                if not plots[-1]:
+                    plots[-1] = cols
                 choices = []
             for choice in choices:
                 print choice
