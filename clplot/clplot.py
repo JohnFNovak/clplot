@@ -107,19 +107,26 @@ def interactive_plot(data):
     mode = choose_from('Pick a mode: from (s)ratch or (a)utomatic',
                        ['s', 'a'],
                        default='s')
-    plots = [[]]
     if mode == 's':
+        plots = [[]]
         default = 'a'
     elif mode == 'a':
+        if not dic['MULTIP']:
+            # multiplot flag not give, group plots by file, then block
+            l = lambda x: '-'.join(map(str, x))
+            groups = [[d for d in data if l(d[0][:2]) == f]
+                      for f in set([l(x[0][:2]) for x in data])]
+        else:
+            groups = [data[(i * dic['MULTIP']):((i + 1) * dic['MULTIP'])]
+                      for i in range((len(data) / dic['MULTIP']) + 1)]
+
+        plots = groups
+        # interact(**{'dic': dic, 'data': data, 'plots': plots})
         default = 'g'
     while command:
-        print '(%s) =====================#' % (mode)
-        if mode == 's':
-            # print [p for p in plots]
-            print ['%d: %s cols by %d rows' % (i + 1, len(p), len(p[0][6]))
-                   for i, p in enumerate(plots) if p and p[0]]
-            # print [['-'.join(map(str, [d[1]] + d[0])), len(d[6])]
-            #        for plot in plots for d in plot]
+        print '#=====================#'
+        print ['%d: %s cols by %d rows' % (i + 1, len(p), len(p[0][6]))
+               for i, p in enumerate(plots) if p and p[0]]
         command = choose_from('?',
                               ['!', 'g', 'G', 'f', 'a', 'd', 's'],
                               default=default)
@@ -128,7 +135,8 @@ def interactive_plot(data):
             interact(**{'dic': dic, 'data': data, 'plots': plots})
         elif command == 'g':
             if mode == 'a':
-                clplot(data)
+                for p in plots:
+                    clplot(p)
             elif mode == 's':
                 if len([p for p in plots if p]) > 1:
                     for p in plots:
@@ -160,7 +168,7 @@ def interactive_plot(data):
                 files.append(new_file)
             data += structure(init(files=[new_file]))
             blocks = list(set([x[1] + '_' + str(x[0][1]) for x in data]))
-        elif mode == 's' and command == 'a':
+        elif command == 'a':
             print 'adding data to plot'
             print 'select file:'
             for i, f in enumerate(files):
