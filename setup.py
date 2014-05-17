@@ -50,6 +50,11 @@ setup(
     packages=['clplot'],
     include_package_data=True,
     platforms='any',
+    entry_points={
+        'console_scripts': [
+            'plot = clplot.clplot:main',
+        ]
+    },
     # test_suite='clplot.test.test_clplot',
     classifiers=[
         'Programming Language :: Python',
