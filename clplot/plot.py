@@ -17,6 +17,7 @@ import os
 import time
 import string
 import globe
+import pickle
 
 
 def plot_tiles(tiles, numbered=0, **kwargs):
@@ -261,6 +262,8 @@ def EmbedData(outputname, data):
         StringToEmbed += 'y ' + ' '.join(map(str, Y)) + '\n'
         StringToEmbed += 'y_err ' + ' '.join(map(str, Y_err)) + '\n'
         StringToEmbed += 'y_sys_err ' + ' '.join(map(str, Y_sys_err)) + '\n'
+        StringToEmbed += 'PickleDump:'
+        StringToEmbed += pickle.dumps(data)
     if dic['TYPE'] == 'jpg':
         with open(outputname, 'a') as f:
             f.write(StringToEmbed)
