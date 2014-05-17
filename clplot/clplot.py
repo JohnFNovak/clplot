@@ -130,12 +130,15 @@ def interactive_plot(data):
             if mode == 'a':
                 clplot(data)
             elif mode == 's':
-                for p in plots:
-                    c = choose_from('Plot %d: %s cols by %d rows ?' % (i + 1, len(p), len(p[0][6])),
-                                    ['y', 'n'],
-                                    default='y')
-                    if c == 'y':
-                        clplot(p)
+                if len([p for p in plots if p]) > 1:
+                    for p in plots:
+                        c = choose_from('Plot %d: %s cols by %d rows ?' % (i + 1, len(p), len(p[0][6])),
+                                        ['y', 'n'],
+                                        default='y')
+                        if c == 'y':
+                            clplot(p)
+                else:
+                    clplot(plots[0])
         elif command == 'G':
             dic['interactive'] = False
             if mode == 'a':
