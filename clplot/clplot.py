@@ -121,7 +121,7 @@ def interactive_plot(data):
             # print [['-'.join(map(str, [d[1]] + d[0])), len(d[6])]
             #        for plot in plots for d in plot]
         command = choose_from('?',
-                              ['!', 'g', 'G', 'f', 'a', 'd'],
+                              ['!', 'g', 'G', 'f', 'a', 'd', 's'],
                               default=default)
         history.append(command)
         if command == '!':
@@ -257,6 +257,8 @@ def interactive_plot(data):
             c = choose_from('delete?', ['y', 'n'], default='n')
             if c == 'y':
                 del(plots[choice][choice2])
+        elif command == 's':
+            dic['Ustyle'] = raw_input('style: ')
 
 
 if __name__ == '__main__':
