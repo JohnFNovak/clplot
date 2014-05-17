@@ -1,56 +1,43 @@
-from __future__ import print_function
 from setuptools import setup  # , find_packages
-# from setuptools.command.test import test as TestCommand
-import io
-# import codecs
 import os
-# import sys
 
 import clplot
 
 here = os.path.abspath(os.path.dirname(__file__))
 
+long_description = """
+clplot - command line plotting utility
 
-def read(*filenames, **kwargs):
-    encoding = kwargs.get('encoding', 'utf-8')
-    sep = kwargs.get('sep', '\n')
-    buf = []
-    for filename in filenames:
-        with io.open(filename, encoding=encoding) as f:
-            buf.append(f.read())
-    return sep.join(buf)
+    This utility is a command line front end to the matplotlib plotting
+        module. This utility handles reading the data from file and determining
+        the structure of the data. The utility attempts to make reasonable
+        plot output using a collection of assumptions and inferences from the
+        data. In many cases, reasonable output can be produced by the utility
+        with the user providing nothing more than file names.
 
-# long_description = read('README.txt', 'CHANGES.txt')
-
-
-# class PyTest(TestCommand):
-#     def finalize_options(self):
-#         TestCommand.finalize_options(self)
-#         self.test_args = []
-#         self.test_suite = True
-
-#     def run_tests(self):
-#         import pytest
-#         errcode = pytest.main(self.test_args)
-#         sys.exit(errcode)
+    when install with setuptools (or variant), an executable 'plot' is added
+        to the user's path.
+"""
 
 setup(
-    name='clplot',
+    name='commandlineplot',
     version=clplot.__version__,
     url='http://github.com/JohnFNovak/clplot/',
     license='Public Domain',
     author='John F Novak',
-    # tests_require=['pytest'],
     install_requires=['Matplotlib>1.0',
                       'numpy>1.0'],
-    # cmdclass={'test': PyTest},
     author_email='john.franc.novak@gmail.com',
     description='a command line plotting utility written in python',
-    # long_description=long_description,
+    long_description=long_description,
     packages=['clplot'],
     include_package_data=True,
     platforms='any',
-    # test_suite='clplot.test.test_clplot',
+    entry_points={
+        'console_scripts': [
+            'plot = clplot.clplot:main',
+        ]
+    },
     classifiers=[
         'Programming Language :: Python',
         'Development Status :: 4 - Beta',
@@ -59,9 +46,6 @@ setup(
         'Intended Audience :: Science/Research',
         'License :: Public Domain',
         'Operating System :: OS Independent',
-        'Topic :: Scientific/Engineering :: Visualization',
-        ],
-    # extras_require={
-    #     'testing': ['pytest'],
-    # }
+        'Topic :: Scientific/Engineering :: Visualization'
+        ]
 )

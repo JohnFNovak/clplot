@@ -310,7 +310,7 @@ def interactive_plot(data=None, load=None):
             sys.exit(1)
 
 
-if __name__ == '__main__':
+def main():
     """A Python program that takes a file or list of filesand creates plots of
     the data."""
     dic = globe.dic
@@ -326,3 +326,6 @@ if __name__ == '__main__':
         interactive_plot(data=data)
     else:
         clplot(data)
+
+if __name__ == '__main__':
+    main()

@@ -2,6 +2,9 @@
 
 ##A command line plotting utility written in python
 
+We live on pypi!
+> pip install commandlineplot
+
 ###John Novak
 
 john (period) franc (period) novak (at) gmail (dot) com <br />
