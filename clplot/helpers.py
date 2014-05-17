@@ -367,7 +367,7 @@ def choose_multiple(prompt, options, default=' '):
             else:
                 t_prompt = prompt + ' [%s]' % (default) + ': '
         else:
-            t_prompt = prompt + '(%s)' % (', '.join(map(str, choices))) + ': '
+            t_prompt = prompt + ' (%s)' % (', '.join(map(str, choices))) + ': '
         choice = raw_input(t_prompt) or default
         if choice[0].lower() == 'q':
             sys.exit(1)
