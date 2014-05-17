@@ -18,6 +18,7 @@ from plot import plot, plot_tiles
 from data_handler import make_blocks, read_data
 import sys
 import os
+import pickle
 
 
 def init(data=[], files=globe.dic['files']):
@@ -128,7 +129,7 @@ def interactive_plot(data):
         print ['%d: %s cols by %d rows' % (i + 1, len(p), len(p[0][6]))
                for i, p in enumerate(plots) if p and p[0]]
         command = choose_from('?',
-                              ['!', 'g', 'G', 'f', 'a', 'd', 's'],
+                              ['!', 'g', 'G', 'f', 'a', 'd', 's', 'q'],
                               default=default)
         history.append(command)
         if command == '!':
@@ -291,6 +292,13 @@ def interactive_plot(data):
                         del(plots[choice][choice2])
         elif command == 's':
             dic['Ustyle'] = [raw_input('style: ')] + dic['Ustyle']
+        elif command == 'q':
+            save = choose_from('save?', ['y', 'n'], default='y')
+            if save == 'y':
+                default = 'default_save.pkl'
+                fname = raw_input('filename? [%s]: ' % (default)) or default
+                pickle.dump(plots, open(fname, 'w'))
+            sys.exit(1)
 
 
 if __name__ == '__main__':
