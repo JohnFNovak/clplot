@@ -165,6 +165,9 @@ def read_flags():
         elif "-i" == flag:
             # input file flag
             case = 0
+        elif "-r" == flag:
+            # input file flag
+            case = 21
         elif "-o" == flag:
             # output file flag
             case = 1
@@ -284,6 +287,8 @@ def read_flags():
                 dic['alpha'] = float(flag)
             if case == 20:
                 dic['Verbose'] = int(flag)
+            if case == 21:
+                dic['replots'].append(flag)
             if case == -1:
                 print "ignoring", flag
 
