@@ -25,7 +25,7 @@ def init(data=[], files=globe.dic['files']):
     dic = globe.dic
     for i, filename in enumerate(files):
         if dic['Verbose'] > 0:
-            print "plotting", filename
+            print "loading", filename
         sys_err = dic['sys_err_default']
         if len(filename.split('#')) == 2:
             sys_err = float(filename.split('#')[1].strip())
