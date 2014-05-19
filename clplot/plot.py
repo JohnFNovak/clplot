@@ -285,5 +285,16 @@ def EmbedData(outputname, data):
             f.write('\n'.join(filetext[:2] + [StringToEmbed] + filetext[2:]))
 
 
+def reload_plot(filename):
+    if not os.path.isfile(filename):
+        print filename, 'does not exist'
+        return None
+    with open(filename, 'r') as f:
+        data = f.read()
+    data = data.split('PickleDump:')[-1]
+    data = pickle.loads(data)
+    return data[0]
+
+
 if __name__ == '__main__':
     print "This code is part of CLP"
