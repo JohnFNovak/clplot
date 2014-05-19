@@ -113,5 +113,6 @@ def read_data(filename):
 
     return data
 
+
 if __name__ == '__main__':
     print "This code is part of CLP"

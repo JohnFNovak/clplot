@@ -14,15 +14,16 @@
 import globe
 from structure import structure
 from helpers import read_flags, interact, choose_from, check_type, choose_multiple
-from plot import plot, plot_tiles
+from plot import plot, plot_tiles, reload_plot
 from data_handler import make_blocks, read_data
 import sys
 import os
 import pickle
 
 
-def init(data=[], files=globe.dic['files']):
+def init(data=[], files=globe.dic['files'], replot=globe.dic['replots']):
     dic = globe.dic
+
     for i, filename in enumerate(files):
         if dic['Verbose'] > 0:
             print "loading", filename
@@ -48,6 +49,13 @@ def init(data=[], files=globe.dic['files']):
 
     data.sort(key=lambda x: x[0])
     data = structure(data)
+
+    for i, filename in enumerate(replot):
+        if dic['Verbose'] > 0:
+            print "reloading data from", filename
+        if len(filename.split('#')) == 2:
+            filename = filename.split('#')[0].strip()
+        data.append(reload_plot(filename))
 
     return data
 
