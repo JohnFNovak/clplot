@@ -291,9 +291,11 @@ def reload_plot(filename):
         return None
     with open(filename, 'r') as f:
         data = f.read()
-    data = data.split('PickleDump:')[-1]
-    data = pickle.loads(data)
-    return data[0]
+    if len(data.split('PickleDump:')) > 1:
+        data = data.split('PickleDump:')[-1]
+        data = pickle.loads(data)
+        return data[0]
+    return None
 
 
 if __name__ == '__main__':
