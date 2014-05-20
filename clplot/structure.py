@@ -110,11 +110,11 @@ def structure(data):
                     size = h
                 for i in range(size):
                     if Form[0] == 'c':
-                        print 'column', i, 'starts with', block[0, i]
+                        print 'column', i + 1, 'starts with', block[0, i]
                         if d[3]['labels']:
                             print 'labeled:', d[3]['labels'][i]
                     if Form[0] == 'r':
-                        print block[i, 0]
+                        print 'row', i + 1, 'starts with', block[i, 0]
                     c = choose_from('include?',
                                     ['x', 'y', 'e', 'q', 's', 'S', 'n'])
                     if c == 'q':
