@@ -114,12 +114,14 @@ def interactive_plot(data=None, load=None):
 
     if not load:
         files = dic['files']
-        mode = choose_from('Pick a mode: from (s)ratch or (a)utomatic',
-                           ['s', 'a'],
-                           default='s')
-        if mode == 's':
+        mode = choose_from('load all data to plots?',
+                           ['n', 'y'],
+                           default='y')
+        if mode == 'n':
+            mode = 's'
             plots = [[]]
-        elif mode == 'a':
+        elif mode == 'y':
+            mode = 'a'
             if not dic['MULTIP']:
                 # multiplot flag not give, group plots by file, then block
                 l = lambda x: '-'.join(map(str, x))
@@ -329,7 +331,10 @@ def main():
             if load == 'y':
                 default = dic['DefaultSave']
                 fname = raw_input('filename? [%s]: ' % (default)) or default
+                print 'loading from saved state, not loading files from',
+                print 'command line arguments'
                 interactive_plot(load=pickle.load(open(fname, 'r')))
+                return
         data = init()
         interactive_plot(data=data)
     else:
