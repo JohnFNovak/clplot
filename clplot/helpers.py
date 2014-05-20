@@ -392,7 +392,7 @@ def interact(**kwargs):
     return True
 
 
-def choose_from(prompt, options, default=' '):
+def choose_from(prompt, options, default=' ', info=None):
     options = map(str, options)
     choice = False
     if not default:
@@ -406,13 +406,18 @@ def choose_from(prompt, options, default=' '):
         if choice[0].lower() == 'q' and not choice in options:
             sys.exit(1)
         if choice == '?' and not '?' in options:
-            print 'Options: ' + ', '.join(options)
+            if info and len(info) == len(options):
+                for i, o in enumerate(options):
+                    print o, ':', info[i]
+            else:
+                print 'Options: ' + ', '.join(options)
+                print "'/' to exit"
         if not choice in options:
             choice = False
     return choice
 
 
-def choose_multiple(prompt, options, default=' '):
+def choose_multiple(prompt, options, default=' ', info=None):
     options = map(str, options)
     choices = []
     choice = False
@@ -430,8 +435,12 @@ def choose_multiple(prompt, options, default=' '):
         if choice[0].lower() == 'q' and not choice in options:
             sys.exit(1)
         if choice == '?' and not '?' in options:
-            print 'Options: ' + ', '.join(options)
-            print "'/' to exit"
+            if info and len(info) == len(options):
+                for i, o in enumerate(options):
+                    print o, ':', info[i]
+            else:
+                print 'Options: ' + ', '.join(options)
+                print "'/' to exit"
         if choice == '/':
             return choices
         if choice == 'a':
