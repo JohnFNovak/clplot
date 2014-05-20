@@ -11,7 +11,7 @@
 
 import numpy as np
 import globe
-from helpers import check_type, is_it_ordered
+from helpers import check_type, is_it_ordered, choose_from
 
 
 def structure(data):
@@ -23,6 +23,8 @@ def structure(data):
     new = []
 
     for d in data:
+        if dic['interactive'] or dic['Verbose'] > 1:
+            print 'determining form of data from', d[1]
         Form = None
         w = d[3]['dims'][0]
         h = d[3]['dims'][1]
@@ -51,6 +53,7 @@ def structure(data):
                     if dic['Verbose'] > 0:
                         print "Using specified format:", f
                     Form = f
+
         if not Form:
             if w == 2 and h > 2:
                 # the good old fashioned two columns
@@ -76,6 +79,64 @@ def structure(data):
                 else:
                     print "I have no idea what's going on"
                     Form = 'cx' + ('y' * (w - 1))
+
+        if dic['interactive']:
+            print 'block is', w, 'columns by', h, 'rows'
+            if d[3]['labels']:
+                print 'column labels:', d[3]['labels']
+            print 'first column [:30]', block[:, 0][:30]
+            print 'first row', block[0, :]
+            if Form:
+                print 'The code has estimated that the correct format is', Form
+            c = choose_from('enter by hand?', ['y', 'n'], default='y',
+                            info=['enter form manually',
+                                  'use the form determined by the code'])
+            Form = None
+            if c == 'y':
+                if d[3]['Format']:
+                    print 'the block processor concluded the data was by',
+                    if d[3]['Format'] == 'c':
+                        print 'columns'
+                    if d[3]['Format'] == 'r':
+                        print 'rows'
+                    c = choose_from('is that okay?', ['y', 'n'], default='y',
+                                    info=['yes, use that determination',
+                                          'no, select rows/columns by hand'])
+                    if c == 'y':
+                        Form = d[3]['Format']
+                if not Form:
+                    Form = choose_from('columns or rows?',
+                                       ['c', 'r'],
+                                       default='c',
+                                       info=['the data is arranged by columns',
+                                             'the data is arranged by rows'])
+                if Form == 'c':
+                    size = w
+                elif Form == 'r':
+                    size = h
+                for i in range(size):
+                    if Form[0] == 'c':
+                        print 'column', i + 1, 'starts with', block[0, i]
+                        if d[3]['labels']:
+                            print 'labeled:', d[3]['labels'][i]
+                    if Form[0] == 'r':
+                        print 'row', i + 1, 'starts with', block[i, 0]
+                    c = choose_from('include?',
+                                    ['x', 'y', 'e', 'q', 's', 'S', 'n'],
+                                    info=['include as x row/column',
+                                          'include as y row/column',
+                                          'include as error on previous row/column',
+                                          'do not include and ignore all following rows/columns',
+                                          'include as percent systematic error on previous row/column',
+                                          'include as absolute systematic error on previous row/column',
+                                          'do not include'])
+                    if c == 'q':
+                        Form += '*'
+                        break
+                    elif c == 'n':
+                        Form += '_'
+                    else:
+                        Form += c
 
         if Form:
             if Form[0] == 'r':

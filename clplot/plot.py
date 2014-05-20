@@ -17,6 +17,7 @@ import os
 import time
 import string
 import globe
+import pickle
 
 
 def plot_tiles(tiles, numbered=0, **kwargs):
@@ -261,6 +262,8 @@ def EmbedData(outputname, data):
         StringToEmbed += 'y ' + ' '.join(map(str, Y)) + '\n'
         StringToEmbed += 'y_err ' + ' '.join(map(str, Y_err)) + '\n'
         StringToEmbed += 'y_sys_err ' + ' '.join(map(str, Y_sys_err)) + '\n'
+        StringToEmbed += 'PickleDump:'
+        StringToEmbed += pickle.dumps(data)
     if dic['TYPE'] == 'jpg':
         with open(outputname, 'a') as f:
             f.write(StringToEmbed)
@@ -280,6 +283,19 @@ def EmbedData(outputname, data):
                         obj_count + 1) + StringToEmbed + 'endstream\nendobj'
         with open(outputname, 'w') as f:
             f.write('\n'.join(filetext[:2] + [StringToEmbed] + filetext[2:]))
+
+
+def reload_plot(filename):
+    if not os.path.isfile(filename):
+        print filename, 'does not exist'
+        return None
+    with open(filename, 'r') as f:
+        data = f.read()
+    if len(data.split('PickleDump:')) > 1:
+        data = data.split('PickleDump:')[-1]
+        data = pickle.loads(data)
+        return data[0]
+    return None
 
 
 if __name__ == '__main__':
