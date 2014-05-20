@@ -33,7 +33,17 @@ def structure(data):
             print 'block is', w, 'by', h
             c = choose_from('do by hand?', ['y', 'n'], default='y')
             if c == 'y':
-                pass
+                if d[3]['Format']:
+                    print 'the block processor concluded the data was by',
+                    if d[3]['Format'] == 'c':
+                        print 'columns'
+                    if d[3]['Format'] == 'r':
+                        print 'rows'
+                    c = choose_from('is that okay?', ['y', 'n'], default='y')
+                    if c == 'y':
+                        Form = d[3]['Format']
+                if not Form:
+                    pass
         # Check if a prespecified format will work
         if dic['formats'] and not Form:
             if d[3]['Format']:
