@@ -31,6 +31,8 @@ def structure(data):
         Form = None
         if dic['interactive']:
             print 'block is', w, 'by', h
+            print 'first column', block[:, 0]
+            print 'first row', block[0, :]
             c = choose_from('do by hand?', ['y', 'n'], default='y')
             if c == 'y':
                 if d[3]['Format']:
@@ -43,7 +45,9 @@ def structure(data):
                     if c == 'y':
                         Form = d[3]['Format']
                 if not Form:
-                    pass
+                    Form = choose_from('columns or rows?',
+                                       ['c', 'r'],
+                                       default='c')
         # Check if a prespecified format will work
         if dic['formats'] and not Form:
             if d[3]['Format']:
