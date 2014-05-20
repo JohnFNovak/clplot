@@ -50,6 +50,27 @@ def structure(data):
                     Form = choose_from('columns or rows?',
                                        ['c', 'r'],
                                        default='c')
+                if Form == 'c':
+                    size = w
+                elif Form == 'r':
+                    size = h
+                for i in range(size):
+                    if Form[0] == 'c':
+                        print 'column', i, 'starts with', block[0, i]
+                        if d[3]['labels']:
+                            print 'labeled:', d[3]['labels'][i]
+                    if Form[0] == 'r':
+                        print block[i, 0]
+                    c = choose_from('include?',
+                                    ['x', 'y', 'e', 'q', 's', 'S', 'n'])
+                    if c == 'q':
+                        Form += '*'
+                        break
+                    elif c == 'n':
+                        Form += '_'
+                    else:
+                        Form += c
+
         # Check if a prespecified format will work
         if dic['formats'] and not Form:
             if d[3]['Format']:
