@@ -11,7 +11,7 @@
 
 import numpy as np
 import globe
-from helpers import check_type, is_it_ordered
+from helpers import check_type, is_it_ordered, choose_from
 
 
 def structure(data):
@@ -28,8 +28,14 @@ def structure(data):
         h = d[3]['dims'][1]
         block = np.array(d[3]['data'])
 
+        Form = None
+        if dic['interactive']:
+            print 'block is', w, 'by', h
+            c = choose_from('do by hand?', ['y', 'n'], default='y')
+            if c == 'y':
+                pass
         # Check if a prespecified format will work
-        if dic['formats']:
+        if dic['formats'] and not Form:
             if d[3]['Format']:
                 if dic['Verbose'] > 1:
                     print 'data handler decided appropriat format was',
