@@ -116,7 +116,9 @@ def interactive_plot(data=None, load=None):
         files = dic['files']
         mode = choose_from('load all data to plots?',
                            ['n', 'y'],
-                           default='y')
+                           default='y',
+                           info=['the initial plots list will be empty and the user will create plots individually from loaded data',
+                                 'all of the data loaded will be grouped into plots as they would be in the non-interactive mode'])
         if mode == 'n':
             mode = 's'
             plots = [[]]
@@ -148,7 +150,15 @@ def interactive_plot(data=None, load=None):
                for i, p in enumerate(plots) if p and p[0]]
         command = choose_from('?',
                               ['!', 'g', 'G', 'f', 'a', 'd', 's', 'q'],
-                              default=default)
+                              default=default,
+                              info=['drops user into an interactive python shell',
+                                    'generates plots without writing them to file',
+                                    'generates plots, writes them to file, then exits',
+                                    'load new data from file',
+                                    'add data to current plots, or add data to new plot',
+                                    'delete data from plots, or delete entire plots',
+                                    'enter plot point/line style',
+                                    'exit'])
         history.append(command)
         if command == '!':
             interact(**{'dic': dic, 'data': data, 'plots': plots})
@@ -327,7 +337,11 @@ def main():
     read_flags()
     if dic['interactive']:
         if dic['LoadFromSavePrompt']:
-            load = choose_from('load saved state?', ['y', 'n'], default='n')
+            load = choose_from('load saved state?',
+                               ['y', 'n'],
+                               default='n',
+                               info=['user can load options, data, and plots from previous session',
+                                     'data will be loaded from scratch'])
             if load == 'y':
                 default = dic['DefaultSave']
                 fname = raw_input('filename? [%s]: ' % (default)) or default

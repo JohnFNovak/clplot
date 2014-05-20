@@ -88,7 +88,9 @@ def structure(data):
             print 'first row', block[0, :]
             if Form:
                 print 'The code has estimated that the correct format is', Form
-            c = choose_from('enter by hand?', ['y', 'n'], default='y')
+            c = choose_from('enter by hand?', ['y', 'n'], default='y',
+                            info=['enter form manually',
+                                  'use the form determined by the code'])
             Form = None
             if c == 'y':
                 if d[3]['Format']:
@@ -97,13 +99,17 @@ def structure(data):
                         print 'columns'
                     if d[3]['Format'] == 'r':
                         print 'rows'
-                    c = choose_from('is that okay?', ['y', 'n'], default='y')
+                    c = choose_from('is that okay?', ['y', 'n'], default='y',
+                                    info=['yes, use that determination',
+                                          'no, select rows/columns by hand'])
                     if c == 'y':
                         Form = d[3]['Format']
                 if not Form:
                     Form = choose_from('columns or rows?',
                                        ['c', 'r'],
-                                       default='c')
+                                       default='c',
+                                       info=['the data is arranged by columns',
+                                             'the data is arranged by rows'])
                 if Form == 'c':
                     size = w
                 elif Form == 'r':
@@ -116,7 +122,14 @@ def structure(data):
                     if Form[0] == 'r':
                         print 'row', i + 1, 'starts with', block[i, 0]
                     c = choose_from('include?',
-                                    ['x', 'y', 'e', 'q', 's', 'S', 'n'])
+                                    ['x', 'y', 'e', 'q', 's', 'S', 'n'],
+                                    info=['include as x row/column',
+                                          'include as y row/column',
+                                          'include as error on previous row/column',
+                                          'do not include and ignore all following rows/columns',
+                                          'include as percent systematic error on previous row/column',
+                                          'include as absolute systematic error on previous row/column',
+                                          'do not include'])
                     if c == 'q':
                         Form += '*'
                         break
