@@ -30,8 +30,10 @@ def structure(data):
 
         Form = None
         if dic['interactive']:
-            print 'block is', w, 'by', h
-            print 'first column', block[:, 0]
+            print 'block is', w, 'columns by', h, 'rows'
+            if d[3]['labels']:
+                print 'column labels:', d[3]['labels']
+            print 'first column [:30]', block[:, 0][:30]
             print 'first row', block[0, :]
             c = choose_from('do by hand?', ['y', 'n'], default='y')
             if c == 'y':
