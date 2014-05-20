@@ -23,19 +23,73 @@ def structure(data):
     new = []
 
     for d in data:
+        if dic['interactive'] or dic['Verbose'] > 1:
+            print 'determining form of data from', d[1]
         Form = None
         w = d[3]['dims'][0]
         h = d[3]['dims'][1]
         block = np.array(d[3]['data'])
 
-        Form = None
+        # Check if a prespecified format will work
+        if dic['formats']:
+            if d[3]['Format']:
+                if dic['Verbose'] > 1:
+                    print 'data handler decided appropriat format was',
+                    print d[3]['Format']
+                formats = [x for x in dic['formats'] if x[0] == d[3]['Format']]
+            else:
+                formats = dic['formats']
+            for f in formats:
+                l = len(f) - 1
+                if dic['Verbose'] > 2:
+                    print 'checking', f, l, w, h
+                wild = '*' in f
+                if f[0] == "c" and (l == w or (l < w and wild)):
+                    if dic['Verbose'] > 0:
+                        print "Using specified format:", f
+                    Form = f
+                    break
+                elif f[0] == "r" and (l == h or (l < h and wild)):
+                    if dic['Verbose'] > 0:
+                        print "Using specified format:", f
+                    Form = f
+
+        if not Form:
+            if w == 2 and h > 2:
+                # the good old fashioned two columns
+                if dic['Verbose'] > 0:
+                    print "the good old fashioned two columns"
+                Form = 'cxy'
+            elif w > 2 and h == 2:
+                # the good old fashioned two rows
+                if dic['Verbose'] > 0:
+                    print "the good old fashioned two rows"
+                Form = 'rxy'
+            elif h > (w * 3):
+                Form = 'cx' + ('y' * (w - 1))
+            elif w > (h * 3):
+                Form = 'rx' + ('y' * (h - 1))
+            else:
+                rows = [is_it_ordered(block[:, x].tolist()) for x in range(w)]
+                cols = [is_it_ordered(block[x, :].tolist()) for x in range(h)]
+                if cols.count(1) > rows.count(1):
+                    Form = 'rx' + ('y' * (h - 1))
+                elif rows.count(1) > cols.count(1):
+                    Form = 'cx' + ('y' * (w - 1))
+                else:
+                    print "I have no idea what's going on"
+                    Form = 'cx' + ('y' * (w - 1))
+
         if dic['interactive']:
             print 'block is', w, 'columns by', h, 'rows'
             if d[3]['labels']:
                 print 'column labels:', d[3]['labels']
             print 'first column [:30]', block[:, 0][:30]
             print 'first row', block[0, :]
-            c = choose_from('do by hand?', ['y', 'n'], default='y')
+            if Form:
+                print 'The code has estimated that the correct format is', Form
+            c = choose_from('enter by hand?', ['y', 'n'], default='y')
+            Form = None
             if c == 'y':
                 if d[3]['Format']:
                     print 'the block processor concluded the data was by',
@@ -70,55 +124,6 @@ def structure(data):
                         Form += '_'
                     else:
                         Form += c
-
-        # Check if a prespecified format will work
-        if dic['formats'] and not Form:
-            if d[3]['Format']:
-                if dic['Verbose'] > 1:
-                    print 'data handler decided appropriat format was',
-                    print d[3]['Format']
-                formats = [x for x in dic['formats'] if x[0] == d[3]['Format']]
-            else:
-                formats = dic['formats']
-            for f in formats:
-                l = len(f) - 1
-                if dic['Verbose'] > 2:
-                    print 'checking', f, l, w, h
-                wild = '*' in f
-                if f[0] == "c" and (l == w or (l < w and wild)):
-                    if dic['Verbose'] > 0:
-                        print "Using specified format:", f
-                    Form = f
-                    break
-                elif f[0] == "r" and (l == h or (l < h and wild)):
-                    if dic['Verbose'] > 0:
-                        print "Using specified format:", f
-                    Form = f
-        if not Form:
-            if w == 2 and h > 2:
-                # the good old fashioned two columns
-                if dic['Verbose'] > 0:
-                    print "the good old fashioned two columns"
-                Form = 'cxy'
-            elif w > 2 and h == 2:
-                # the good old fashioned two rows
-                if dic['Verbose'] > 0:
-                    print "the good old fashioned two rows"
-                Form = 'rxy'
-            elif h > (w * 3):
-                Form = 'cx' + ('y' * (w - 1))
-            elif w > (h * 3):
-                Form = 'rx' + ('y' * (h - 1))
-            else:
-                rows = [is_it_ordered(block[:, x].tolist()) for x in range(w)]
-                cols = [is_it_ordered(block[x, :].tolist()) for x in range(h)]
-                if cols.count(1) > rows.count(1):
-                    Form = 'rx' + ('y' * (h - 1))
-                elif rows.count(1) > cols.count(1):
-                    Form = 'cx' + ('y' * (w - 1))
-                else:
-                    print "I have no idea what's going on"
-                    Form = 'cx' + ('y' * (w - 1))
 
         if Form:
             if Form[0] == 'r':
