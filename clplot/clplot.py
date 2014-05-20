@@ -323,7 +323,6 @@ def main():
     the data."""
     dic = globe.dic
     read_flags()
-    data = init()
     if dic['interactive']:
         if dic['LoadFromSavePrompt']:
             load = choose_from('load saved state?', ['y', 'n'], default='n')
@@ -331,8 +330,10 @@ def main():
                 default = dic['DefaultSave']
                 fname = raw_input('filename? [%s]: ' % (default)) or default
                 interactive_plot(load=pickle.load(open(fname, 'r')))
+        data = init()
         interactive_plot(data=data)
     else:
+        data = init()
         clplot(data)
 
 if __name__ == '__main__':
