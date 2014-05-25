@@ -17,6 +17,16 @@ import math as m
 import code
 
 
+def check_module(module):
+    import imp
+    try:
+        imp.find_module(module)
+        found = True
+    except ImportError:
+        found = False
+    return found
+
+
 def is_it_ordered(vals):
     """This function takes a list of numbers are returns whether or not they
     are in order"""
