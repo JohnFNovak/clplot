@@ -13,8 +13,8 @@
 
 import globe
 from structure import structure
-from helpers import read_flags, interact, choose_from, check_type, choose_multiple
-from plot import plot, plot_tiles, reload_plot
+from helpers import read_flags, interact, choose_from, check_type, choose_multiple, reload_plot
+from plot import plot, plot_tiles
 from data_handler import make_blocks, read_data
 import sys
 import os

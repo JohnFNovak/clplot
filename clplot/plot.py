@@ -10,14 +10,11 @@
 
 # written for Python 2.6. Requires Scipy, Numpy, and Matplotlib
 
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
-import os
-import time
 import string
 import globe
-import pickle
+from helpers import EmbedData
 
 
 def plot_tiles(tiles, numbered=0, **kwargs):
@@ -245,57 +242,6 @@ def parse_legend(data):
                         if k != len(hold)-1-i:
                             temp.append(labels[j].split(divider)[k])
                     labels[j] = string.join(temp, divider)
-
-
-def EmbedData(outputname, data):
-    dic = globe.dic
-    StringToEmbed = "Creation time: " + time.ctime() + '\n'
-    StringToEmbed += "Current directory: " + os.path.abspath('.') + '\n'
-    StringToEmbed += "Creation command: " + ' '.join(sys.argv) + '\n'
-    StringToEmbed += "Plotted values:" + '\n'
-    for i, d in enumerate(data):
-        X, Y, X_err, Y_err, X_sys_err, Y_sys_err = d[5:11]
-        StringToEmbed += 'Plot %d\n' % i
-        StringToEmbed += 'x ' + ' '.join(map(str, X)) + '\n'
-        StringToEmbed += 'x_err ' + ' '.join(map(str, X_err)) + '\n'
-        StringToEmbed += 'x_sys_err ' + ' '.join(map(str, X_err)) + '\n'
-        StringToEmbed += 'y ' + ' '.join(map(str, Y)) + '\n'
-        StringToEmbed += 'y_err ' + ' '.join(map(str, Y_err)) + '\n'
-        StringToEmbed += 'y_sys_err ' + ' '.join(map(str, Y_sys_err)) + '\n'
-        StringToEmbed += 'PickleDump:'
-        StringToEmbed += pickle.dumps(data)
-    if dic['TYPE'] == 'jpg':
-        with open(outputname, 'a') as f:
-            f.write(StringToEmbed)
-    elif dic['TYPE'] == 'pdf':
-        if dic['Verbose'] > 0:
-            print "Warning!!! Embedding data in pdfs is not reliable storage!"
-            print "Many PDF viewers will strip data which is not rendered!"
-        with open(outputname, 'r') as f:
-            filetext = f.read().split('\n')
-        obj_count = 0
-        for line in filetext:
-            if ' obj' in line:
-                obj_count = max(int(line.split()[0]), obj_count)
-            if 'xref' in line:
-                break
-        StringToEmbed = '%d 0 obj\n<</Novak\'s_EmbedData >>\nstream\n' % (
-                        obj_count + 1) + StringToEmbed + 'endstream\nendobj'
-        with open(outputname, 'w') as f:
-            f.write('\n'.join(filetext[:2] + [StringToEmbed] + filetext[2:]))
-
-
-def reload_plot(filename):
-    if not os.path.isfile(filename):
-        print filename, 'does not exist'
-        return None
-    with open(filename, 'r') as f:
-        data = f.read()
-    if len(data.split('PickleDump:')) > 1:
-        data = data.split('PickleDump:')[-1]
-        data = pickle.loads(data)
-        return data[0]
-    return None
 
 
 if __name__ == '__main__':
