@@ -31,19 +31,43 @@ class GnuPlotPipe:
 
 class GnuPlot:
     """Class which represents a plot"""
+    command = ''
+    labels = []
+
     def __init__(self):
         self.pipe = GnuPlotPipe()
 
     def __call__(self, command):
-        self.pipe(command)
+        self.pipe(self.command)
+
+    def plot(self, X, Y, style, xerr=None, yerr=None, fmt=None, label=None,
+             mec=None, mfc=None, ms=None):
+        self.command = ''
+        if label:
+            self.labels.append(label)
+        else:
+            self.labels.append('')
+        self.pipe(self.command)
+
+    def legend(self):
+        self.command = ''
+        self.pipe(self.command)
+
+    def savefig(self, filename):
+        self.command = ''
+        self.pipe(self.command)
+
+    def clear(self):
+        self.command = ''
+        self.labels = []
 
 
-global plot
-plot = GnuPlot()
+global Plot
+Plot = GnuPlot()
 
 
 def plot_tiles(tiles, numbered=0, **kwargs):
-    global plot
+    global Plot
     dic = globe.dic
     for i, t in enumerate(tiles):
         if not dic['columnsfirst']:
@@ -61,18 +85,16 @@ def plot_tiles(tiles, numbered=0, **kwargs):
     if numbered != 0:
         outputname = outputname + '_' + str(numbered)
     outputname = outputname + "." + dic['TYPE']
-    plt.tight_layout()  # Experimental, and may cause problems
-    plt.savefig(outputname)
+    Plot.savefig(outputname)
     if dic['Verbose'] > 0:
         print"printed to", outputname
     # if dic['EmbedData']:
     #     EmbedData(outputname, data)
     #check = subprocess.call(['open', outputname])
-    plt.clf()
 
 
 def plot(data, outputfile, numbered=0, Print=True, **kwargs):
-    global plot
+    global Plot
     """This function takes a list z of lists and trys to plot them. the first
     list is always x, and the folowing are always y's"""
 
@@ -143,50 +165,33 @@ def plot(data, outputfile, numbered=0, Print=True, **kwargs):
         X_err = [float(x) * dic['xscaled'] for x in X_err]
         Y_err = [float(x) * dic['yscaled'] for x in Y_err]
         if plottingerrors and not dic['errorbands']:
-            plt.errorbar(X, Y,
-                         xerr=X_err,
-                         yerr=Y_err,
-                         fmt=marker, label=d[4],
-                         mec=ecolor, mfc=fcolor, ms=msize)
+            Plot.plot(X, Y, xerr=X_err, yerr=Y_err, fmt=marker, label=d[4],
+                      mec=ecolor, mfc=fcolor, ms=msize)
         if plottingerrors and dic['errorbands']:
             if all([y == 0 for y in Y_err]):
-                plt.errorbar(X, Y,
-                             xerr=[0] * len(X),
-                             yerr=[0] * len(Y),
-                             fmt=marker, label=d[4],
-                             mec=ecolor, mfc=fcolor, ms=msize)
+                Plot.plot(X, Y, xerr=X_err, yerr=Y_err, fmt=marker, label=d[4],
+                          mec=ecolor, mfc=fcolor, ms=msize)
             else:
-                plt.errorbar(X, Y,
-                             xerr=[0] * len(X),
-                             yerr=[0] * len(Y),
-                             fmt=marker, label=d[4],
-                             mec=ecolor, mfc=fcolor, ms=msize)
-                plt.fill_between(np.array(X),
-                                 np.array(Y) + np.array(Y_err),
-                                 np.array(Y) - np.array(Y_err),
-                                 facecolor=ecolor, alpha=dic['alpha'],
-                                 interpolate=True, linewidth=0)
+                Plot.plot(X, Y, fmt=marker, label=d[4], mec=ecolor, mfc=fcolor,
+                          ms=msize)
+                Plot.band(np.array(X), np.array(Y_sys_err), facecolor=ecolor,
+                          alpha=dic['alpha'], interpolate=True, linewidth=0)
         if dic['plot_sys_err']:
-            plt.fill_between(np.array(X),
-                             np.array(Y) + np.array(Y_sys_err),
-                             np.array(Y) - np.array(Y_sys_err),
-                             facecolor=ecolor, alpha=dic['alpha'],
-                             interpolate=True, linewidth=0)
+            Plot.band(np.array(X), np.array(Y_sys_err), facecolor=ecolor,
+                      alpha=dic['alpha'], interpolate=True, linewidth=0)
         if not plottingerrors:
-            plt.plot(X, Y, points[k % len(points)])
-
-    plt.grid(dic['grid'])
+            Plot.plot(X, Y, points[k % len(points)])
 
     if dic['legend']:
-        plt.legend()
+        Plot.legend()
 
-    if dic['interactive']:
-        if dic['keep_live']:
-            plt.ion()
-            plt.show(block=False)
-        else:
-            plt.show()
-        return
+    # if dic['interactive']:
+    #     if dic['keep_live']:
+    #         plt.ion()
+    #         plt.show(block=False)
+    #     else:
+    #         plt.show()
+    #     return
 
     outputname = outputfile
 
@@ -198,14 +203,14 @@ def plot(data, outputfile, numbered=0, Print=True, **kwargs):
     outputname = outputname + "." + dic['TYPE']
 
     if Print:
-        plt.tight_layout()  # Experimental, and may cause problems
-        plt.savefig(outputname)
+        # plt.tight_layout()  # Experimental, and may cause problems
+        Plot.savefig(outputname)
         if dic['Verbose'] > 0:
             print"printed to", outputname
         if dic['EmbedData']:
             EmbedData(outputname, data)
         #check = subprocess.call(['open', outputname])
-        plt.clf()
+        Plot.clear()
 
 
 def parse_legend(data):
