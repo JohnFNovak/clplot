@@ -11,10 +11,33 @@
 # written for Python 2.6. Requires Scipy, Numpy, and Matplotlib
 
 import numpy as np
-import matplotlib.pyplot as plt
 import string
 import globe
 from helpers import EmbedData
+
+
+class GnuPlotPipe:
+    """Pipe to gnuplot to make plot calls"""
+    def __init__(self):
+        pass
+
+    def open():
+        pass
+
+    def close():
+        pass
+
+    def __call__(command):
+        pass
+
+
+class GnuPlot:
+    """Class which represents a plot"""
+    def __init__(self):
+        self.pipe = GnuPlotPipe()
+
+    def __call__(self, command):
+        self.pipe(command)
 
 
 def plot_tiles(tiles, numbered=0, **kwargs):
