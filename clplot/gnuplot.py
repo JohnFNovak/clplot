@@ -31,35 +31,42 @@ class GnuPlotPipe:
 
 class GnuPlot:
     """Class which represents a plot"""
-    command = ''
-    labels = []
 
     def __init__(self):
         self.pipe = GnuPlotPipe()
+        self.string = ''
+        self.labels = []
 
     def __call__(self, command):
-        self.pipe(self.command)
+        self.string += command
 
     def plot(self, X, Y, style, xerr=None, yerr=None, fmt=None, label=None,
              mec=None, mfc=None, ms=None):
-        self.command = ''
+        command = ''
         if label:
             self.labels.append(label)
         else:
             self.labels.append('')
-        self.pipe(self.command)
+        self.pipe(command)
 
     def legend(self):
-        self.command = ''
-        self.pipe(self.command)
+        command = ''
+        self.pipe(command)
 
     def savefig(self, filename):
-        self.command = ''
-        self.pipe(self.command)
+        command = ''
+        self.pipe(command)
 
     def clear(self):
-        self.command = ''
+        self.string = ''
         self.labels = []
+
+    def show(self):
+        self.pipe(self.string)
+
+    def band(self):
+        command = ''
+        self.pipe(command)
 
 
 global Plot
