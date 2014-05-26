@@ -14,21 +14,19 @@ import numpy as np
 import string
 import globe
 from helpers import EmbedData
+import subprocess
 
 
 class GnuPlotPipe:
     """Pipe to gnuplot to make plot calls"""
     def __init__(self):
-        pass
+        self.pipe = subprocess.Popen(['gnuplot', '-persist', 'w'])
 
-    def open():
-        pass
+    def close(self):
+        self.pipe.terminate()
 
-    def close():
-        pass
-
-    def __call__(command):
-        pass
+    def __call__(self, command):
+        self.pipe.communicate(command)
 
 
 class GnuPlot:
