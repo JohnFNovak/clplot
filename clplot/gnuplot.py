@@ -38,7 +38,12 @@ class GnuPlot:
         self.pipe(command)
 
 
+global plot
+plot = GnuPlot()
+
+
 def plot_tiles(tiles, numbered=0, **kwargs):
+    global plot
     dic = globe.dic
     for i, t in enumerate(tiles):
         if not dic['columnsfirst']:
@@ -67,6 +72,7 @@ def plot_tiles(tiles, numbered=0, **kwargs):
 
 
 def plot(data, outputfile, numbered=0, Print=True, **kwargs):
+    global plot
     """This function takes a list z of lists and trys to plot them. the first
     list is always x, and the folowing are always y's"""
 
@@ -100,20 +106,17 @@ def plot(data, outputfile, numbered=0, Print=True, **kwargs):
     plottingerrors = True
 
     if dic['x_range']:
-        plt.xlim(dic['x_range'])
+        plot('set xrange [' + ':'.join(map(str, dic['x_range'])) + ']')
     if dic['y_range']:
-        plt.ylim(dic['y_range'])
+        plot('set yrange [' + ':'.join(map(str, dic['y_range'])) + ']')
     x_label = '/'.join(sorted(set([d[3] for d in data if d[3]])))
-    plt.xlabel(x_label, fontsize=dic['fontsize'])
+    plot('set xlabel ' + x_label)
     if dic['y_label']:
-        plt.ylabel(dic['y_label'], fontsize=dic['fontsize'])
-    if dic['x_log']:
-        plt.xscale('log', nonposx='clip')
-    if dic['y_log']:
-        plt.yscale('log', nonposy='clip')
-
-    plt.tick_params(axis='both', which='major', labelsize=dic['fontsize']*0.75)
-    plt.tick_params(axis='both', which='minor', labelsize=dic['fontsize']*0.75)
+        plot('set xlabel ' + dic['y_label'])
+    # if dic['x_log']:
+    #     plt.xscale('log', nonposx='clip')
+    # if dic['y_log']:
+    #     plt.yscale('log', nonposy='clip')
 
     if dic['legend']:
         parse_legend(data)
