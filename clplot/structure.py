@@ -213,23 +213,23 @@ def structure(data):
                 elif Form[j + 1 + mults] == "x":
                     x = block[:, count].tolist()
                 elif Form[j + 1 + mults] == "e":
-                    if Form[j + 1 + mults] == "y":
+                    if Form[j + mults] == "y":
                         new[-1][-3] = block[:, count].tolist()
-                    if Form[j + 1 + mults] == "x":
+                    if Form[j + mults] == "x":
                         new[-1][-4] = block[:, count].tolist()
                 elif Form[j + 1 + mults] == "s":
                     # % systematic error
-                    if Form[j + 1 + mults] == "y":
+                    if Form[j + mults] == "y":
                         new[-1][-1] = (new[-1][-5] *
                                        block[:, count]).tolist()
-                    if Form[j + 1 + mults] == "x":
+                    if Form[j + mults] == "x":
                         new[-1][-2] = (new[-1][-6] *
                                        block[:, count]).tolist()
                 elif Form[j + 1 + mults] == "S":
                     # abs systematic error
-                    if Form[j + 1 + mults] == "y":
+                    if Form[j + mults] == "y":
                         new[-1][-1] = block[:, count].tolist()
-                    if Form[j + 1 + mults] == "x":
+                    if Form[j + mults] == "x":
                         new[-1][-2] = block[:, count].tolist()
                 count = count + 1
                 if j + mults + 2 == len(Form):
