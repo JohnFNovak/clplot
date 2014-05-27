@@ -174,7 +174,9 @@ def structure(data):
                             new[-1].append([0]*len(x))  # x err
                             new[-1].append([0]*len(x))  # y err
                             new[-1].append([0]*len(x))  # x sys err
-                            new[-1].append([d[-1]]*len(x))  # y sys err
+                            new[-1].append(d[-1] *
+                                           block[:, count].astype(float)
+                                           )  # y sys err
                         elif Form[j + 2 + mults] == "e":
                             if Form[j + 1 + mults] == "y":
                                 new[-1][-3] = block[:, count].tolist()
@@ -209,7 +211,8 @@ def structure(data):
                     new[-1].append([0]*len(x))  # x err
                     new[-1].append([0]*len(x))  # y err
                     new[-1].append([0]*len(x))  # x sys err
-                    new[-1].append([d[-1]]*len(x))  # y sys err
+                    new[-1].append(d[-1] *
+                                   block[:, count].astype(float))  # y sys err
                 elif Form[j + 1 + mults] == "x":
                     x = block[:, count].tolist()
                 elif Form[j + 1 + mults] == "e":
