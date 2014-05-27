@@ -77,17 +77,10 @@ def plot_tiles(tiles, numbered=0, **kwargs):
     global Plot
     dic = globe.dic
     for i, t in enumerate(tiles):
-        if not dic['columnsfirst']:
-            plt.subplot2grid((dic['layout'][0], dic['layout'][1]),
-                             (((i - 1) - (i - 1) %
-                               dic['layout'][1]) / dic['layout'][1],
-                              ((i - 1) % dic['layout'][1])))
-        if dic['columnsfirst']:
-            plt.subplot2grid((dic['layout'][0], dic['layout'][1]),
-                             ((i - 1) % dic['layout'][1]),
-                             (((i - 1) - (i - 1) %
-                              dic['layout'][1]) / dic['layout'][1]))
+        Plot('set multiplot layout %d, %d\n' % tuple(dic['layout']))
         plot(t[0], '', Print=False)
+        Plot('e\n#\n')
+    Plot('unset multiplot')
     outputname = tiles[-1][1] + "_tiled"
     if numbered != 0:
         outputname = outputname + '_' + str(numbered)
