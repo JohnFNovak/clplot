@@ -26,6 +26,8 @@ class Line():
     Column_ID = -1
     filename = ''
     output = ''
+    X_label = ''
+    Y_label = ''
     X = []
     Y = []
     X_err = []
