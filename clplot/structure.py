@@ -12,6 +12,7 @@
 import numpy as np
 import globe
 from helpers import check_type, is_it_ordered, choose_from
+from class_LinePlot import LinePlot, Line
 
 
 def structure(data):
@@ -20,7 +21,7 @@ def structure(data):
     it.'"""
     dic = globe.dic
 
-    new = []
+    new = LinePlot()
 
     for d in data:
         if dic['interactive'] or dic['Verbose'] > 1:
@@ -162,75 +163,77 @@ def structure(data):
                 if check_type(Form[j + 1 + mults]) == 'num':
                     for k in range(1, int(Form[j + 1 + mults])):
                         if Form[j + 2 + mults] == "y":
-                            new.append([d[0] + [j + mults], d[1], d[2],
-                                        d[3]['x_label']])
+                            temp = Line()
+                            temp.File_ID, temp.Block_ID = d[0]
+                            temp.Column_ID = j + mults
+                            temp.filename = d[1]
+                            temp.output = d[2]
+                            temp.X_label = d[3]['x_label']
                             if d[3]['labels']:
-                                new[-1].append(d[3]['labels'][j + mults])
+                                temp.Y_label = d[3]['labels'][j + mults]
                             else:
-                                new[-1].append('_'.join(map(str, [d[2],
+                                temp.Y_label = '_'.join(map(str, [d[2],
                                                'block', d[0][1], 'col',
-                                               j + mults])))
-                            new[-1] = new[-1] + [x, block[:, count].tolist()]
-                            new[-1].append([0]*len(x))  # x err
-                            new[-1].append([0]*len(x))  # y err
-                            new[-1].append([0]*len(x))  # x sys err
-                            new[-1].append([d[-1]]*len(x))  # y sys err
+                                               j + mults]))
+                            temp.X = x
+                            temp.Y = block[:, count].tolist()
                         elif Form[j + 2 + mults] == "e":
                             if Form[j + 1 + mults] == "y":
-                                new[-1][-3] = block[:, count].tolist()
+                                temp.Y_err = block[:, count].tolist()
                             if Form[j + 1 + mults] == "x":
-                                new[-1][-4] = block[:, count].tolist()
+                                temp.X_err = block[:, count].tolist()
                         elif Form[j + 2 + mults] == "s":
                             # % systematic error
                             if Form[j + 1 + mults] == "y":
-                                new[-1][-1] = (new[-1][-5] *
-                                               block[:, count]).tolist()
+                                temp.Y_sys_err = (new[-1][-5] *
+                                                  block[:, count]).tolist()
                             if Form[j + 1 + mults] == "x":
-                                new[-1][-2] = (new[-1][-6] *
-                                               block[:, count]).tolist()
+                                temp.X_sys_err = (new[-1][-6] *
+                                                  block[:, count]).tolist()
                         elif Form[j + 2 + mults] == "S":
                             # abs systematic error
                             if Form[j + 1 + mults] == "y":
-                                new[-1][-1] = block[:, count].tolist()
+                                temp.Y_sys_err = block[:, count].tolist()
                             if Form[j + 1 + mults] == "x":
-                                new[-1][-2] = block[:, count].tolist()
+                                temp.X_sys_err = block[:, count].tolist()
+                        new.add(temp)
                         count = count + 1
                     mults = mults + 1
                 elif Form[j + 1 + mults] == "y":
-                    new.append([d[0] + [j + 1 + mults], d[1], d[2],
-                                d[3]['x_label']])
+                    temp = Line()
+                    temp.File_ID, temp.Block_ID = d[0]
+                    temp.Column_ID = j + 1 + mults
+                    temp.filename = d[1]
+                    temp.output = d[2]
+                    temp.X_label = d[3]['x_label']
                     if d[3]['labels']:
-                        new[-1].append(d[3]['labels'][j + mults])
+                        temp.Y_label = d[3]['labels'][j + 1 + mults]
                     else:
-                        new[-1].append('_'.join(map(str, [d[2],
+                        temp.Y_label = '_'.join(map(str, [d[2],
                                        'block', d[0][1], 'col',
-                                       j + mults])))
-                    new[-1] = new[-1] + [x, block[:, count].tolist()]
-                    new[-1].append([0]*len(x))  # x err
-                    new[-1].append([0]*len(x))  # y err
-                    new[-1].append([0]*len(x))  # x sys err
-                    new[-1].append([d[-1]]*len(x))  # y sys err
-                elif Form[j + 1 + mults] == "x":
-                    x = block[:, count].tolist()
+                                       j + 1 + mults]))
+                    temp.X = x
+                    temp.Y = block[:, count].tolist()
                 elif Form[j + 1 + mults] == "e":
-                    if Form[j + 1 + mults] == "y":
-                        new[-1][-3] = block[:, count].tolist()
-                    if Form[j + 1 + mults] == "x":
-                        new[-1][-4] = block[:, count].tolist()
+                    if Form[j + mults] == "y":
+                        temp.Y_err = block[:, count].tolist()
+                    if Form[j + mults] == "x":
+                        temp.X_err = block[:, count].tolist()
                 elif Form[j + 1 + mults] == "s":
                     # % systematic error
-                    if Form[j + 1 + mults] == "y":
-                        new[-1][-1] = (new[-1][-5] *
-                                       block[:, count]).tolist()
-                    if Form[j + 1 + mults] == "x":
-                        new[-1][-2] = (new[-1][-6] *
-                                       block[:, count]).tolist()
+                    if Form[j + mults] == "y":
+                        temp.Y_sys_err = (new[-1][-5] *
+                                          block[:, count]).tolist()
+                    if Form[j + mults] == "x":
+                        temp.X_sys_err = (new[-1][-6] *
+                                          block[:, count]).tolist()
                 elif Form[j + 1 + mults] == "S":
                     # abs systematic error
-                    if Form[j + 1 + mults] == "y":
-                        new[-1][-1] = block[:, count].tolist()
-                    if Form[j + 1 + mults] == "x":
-                        new[-1][-2] = block[:, count].tolist()
+                    if Form[j + mults] == "y":
+                        temp.Y_sys_err = block[:, count].tolist()
+                    if Form[j + mults] == "x":
+                        temp.X_sys_err = block[:, count].tolist()
+                        new.add(temp)
                 count = count + 1
                 if j + mults + 2 == len(Form):
                     break
