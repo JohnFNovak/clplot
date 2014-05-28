@@ -250,9 +250,9 @@ def read_flags():
                 dic['formats'].append(flag)
             if case == 3:
                 if flag[0] == '.':
-                    dic['TYPE'].append(flag[1:])
+                    dic['TYPE'] = flag[1:]
                 else:
-                    dic['TYPE'].append(flag)
+                    dic['TYPE'] = flag
             if case == 4:
                 dic['MULTIP'] = int(flag)  # number of plots per plot
             if case == 5:
