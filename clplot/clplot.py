@@ -55,7 +55,7 @@ def init(data=[], files=globe.dic['files'], replot=globe.dic['replots']):
             print "reloading data from", filename
         if len(filename.split('#')) == 2:
             filename = filename.split('#')[0].strip()
-        data.append(reload_plot(filename))
+        data = data + reload_plot(filename)
 
     return data
 
