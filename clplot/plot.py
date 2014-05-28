@@ -128,24 +128,18 @@ def plot(data, outputfile, numbered=0, Print=True, **kwargs):
                          fmt=marker, label=d[4],
                          mec=ecolor, mfc=fcolor, ms=msize)
         if plottingerrors and dic['errorbands']:
-            if all([y == 0 for y in Y_err]):
-                plt.errorbar(X, Y,
-                             xerr=[0] * len(X),
-                             yerr=[0] * len(Y),
-                             fmt=marker, label=d[4],
-                             mec=ecolor, mfc=fcolor, ms=msize)
-            else:
-                plt.errorbar(X, Y,
-                             xerr=[0] * len(X),
-                             yerr=[0] * len(Y),
-                             fmt=marker, label=d[4],
-                             mec=ecolor, mfc=fcolor, ms=msize)
+            plt.errorbar(X, Y,
+                         xerr=[0] * len(X),
+                         yerr=[0] * len(Y),
+                         fmt=marker, label=d[4],
+                         mec=ecolor, mfc=fcolor, ms=msize)
+            if any([y != 0 for y in Y_err]):
                 plt.fill_between(np.array(X),
                                  np.array(Y) + np.array(Y_err),
                                  np.array(Y) - np.array(Y_err),
                                  facecolor=ecolor, alpha=dic['alpha'],
                                  interpolate=True, linewidth=0)
-        if dic['plot_sys_err']:
+        if dic['plot_sys_err'] and any([x != 0 for x in Y_sys_err]):
             plt.fill_between(np.array(X),
                              np.array(Y) + np.array(Y_sys_err),
                              np.array(Y) - np.array(Y_sys_err),
